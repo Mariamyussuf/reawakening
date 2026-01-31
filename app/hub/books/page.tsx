@@ -1,0 +1,232 @@
+"use client";
+
+import Link from "next/link";
+import { useState, useEffect } from "react";
+import { bookService } from "@/lib/books/book-service";
+import { Book, BookCategory } from "@/models/Book";
+import BookCard from "@/components/books/BookCard";
+
+export default function BooksLibraryPage() {
+    const [books, setBooks] = useState<Book[]>([]);
+    const [featuredBooks, setFeaturedBooks] = useState<Book[]>([]);
+    const [popularBooks, setPopularBooks] = useState<Book[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [searchQuery, setSearchQuery] = useState("");
+
+    useEffect(() => {
+        loadBooks();
+    }, []);
+
+    const loadBooks = async () => {
+        try {
+            const [allBooks, featured, popular] = await Promise.all([
+                bookService.getAllBooks(),
+                bookService.getFeaturedBooks(),
+                bookService.getPopularBooks(),
+            ]);
+
+            setBooks(allBooks);
+            setFeaturedBooks(featured);
+            setPopularBooks(popular);
+        } catch (error) {
+            console.error("Error loading books:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSearch = async () => {
+        if (searchQuery.trim()) {
+            const results = await bookService.searchBooks(searchQuery);
+            setBooks(results);
+        } else {
+            const allBooks = await bookService.getAllBooks();
+            setBooks(allBooks);
+        }
+    };
+
+    const categories = bookService.getAllCategories();
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-emerald-50 flex items-center justify-center">
+                <div className="text-center">
+                    <div className="text-6xl mb-4">📚</div>
+                    <p className="text-slate-700 font-semibold">Loading library...</p>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-emerald-50">
+            {/* Header */}
+            <header className="bg-white/90 backdrop-blur-md shadow-sm border-b border-slate-200">
+                <div className="container-custom py-4">
+                    <div className="flex items-center justify-between">
+                        <Link href="/hub" className="flex items-center space-x-2 text-slate-600 hover:text-slate-800">
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                            </svg>
+                            <span className="font-medium">Back to Hub</span>
+                        </Link>
+                        <h1 className="text-2xl font-bold text-slate-800">Books Library</h1>
+                        <div className="w-20"></div>
+                    </div>
+                </div>
+            </header>
+
+            <main className="container-custom py-8">
+                {/* Search Bar */}
+                <div className="card mb-8">
+                    <div className="flex gap-3">
+                        <div className="flex-1 relative">
+                            <input
+                                type="text"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+                                placeholder="Search books by title, author, or topic..."
+                                className="w-full px-4 py-3 pl-12 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                            />
+                            <svg className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                        <button
+                            onClick={handleSearch}
+                            className="px-6 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors"
+                        >
+                            Search
+                        </button>
+                    </div>
+                </div>
+
+                {/* Featured Book */}
+                {featuredBooks.length > 0 && (
+                    <div className="card bg-gradient-to-r from-green-600 to-emerald-600 text-white mb-8">
+                        <div className="flex items-center gap-2 mb-4">
+                            <span className="text-2xl">⭐</span>
+                            <h2 className="text-2xl font-bold">Featured Book</h2>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div className="md:col-span-1">
+                                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 h-64 flex items-center justify-center">
+                                    {featuredBooks[0].coverImage ? (
+                                        <img
+                                            src={featuredBooks[0].coverImage}
+                                            alt={featuredBooks[0].title}
+                                            className="max-h-full rounded"
+                                        />
+                                    ) : (
+                                        <div className="text-8xl">📖</div>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="md:col-span-2 flex flex-col justify-center">
+                                <h3 className="text-3xl font-bold mb-2">{featuredBooks[0].title}</h3>
+                                <p className="text-green-100 text-lg mb-4">by {featuredBooks[0].author}</p>
+                                <p className="text-white/90 mb-6 line-clamp-3">{featuredBooks[0].description}</p>
+                                <div className="flex gap-3">
+                                    <Link
+                                        href={`/hub/books/${featuredBooks[0].id}`}
+                                        className="px-6 py-3 bg-white text-green-600 rounded-lg font-semibold hover:bg-green-50 transition-colors"
+                                    >
+                                        View Details →
+                                    </Link>
+                                    <Link
+                                        href={`/hub/books/${featuredBooks[0].id}/read`}
+                                        className="px-6 py-3 bg-white/20 backdrop-blur-sm text-white rounded-lg font-semibold hover:bg-white/30 transition-colors"
+                                    >
+                                        Start Reading
+                                    </Link>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Categories */}
+                <div className="mb-8">
+                    <h2 className="text-2xl font-bold text-slate-800 mb-4">Browse by Category</h2>
+                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                        {categories.slice(0, 12).map((category) => (
+                            <Link
+                                key={category}
+                                href={`/hub/books/browse?category=${encodeURIComponent(category)}`}
+                                className="card text-center hover:shadow-lg transition-all duration-300 group"
+                            >
+                                <div className="text-4xl mb-2 group-hover:scale-110 transition-transform">
+                                    {getCategoryIcon(category)}
+                                </div>
+                                <p className="text-sm font-semibold text-slate-700 group-hover:text-green-600 transition-colors">
+                                    {category}
+                                </p>
+                            </Link>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Popular Books */}
+                {popularBooks.length > 0 && (
+                    <div className="mb-8">
+                        <div className="flex items-center justify-between mb-4">
+                            <h2 className="text-2xl font-bold text-slate-800">Popular Books</h2>
+                            <Link href="/hub/books/browse?sort=popular" className="text-green-600 hover:text-green-700 font-semibold text-sm">
+                                View All →
+                            </Link>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            {popularBooks.slice(0, 4).map((book) => (
+                                <BookCard key={book.id} book={book} />
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* All Books */}
+                <div>
+                    <h2 className="text-2xl font-bold text-slate-800 mb-4">
+                        {searchQuery ? `Search Results (${books.length})` : "All Books"}
+                    </h2>
+                    {books.length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            {books.map((book) => (
+                                <BookCard key={book.id} book={book} />
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="card text-center py-12">
+                            <div className="text-6xl mb-4">📚</div>
+                            <p className="text-slate-600 text-lg">No books found</p>
+                            <p className="text-slate-500 text-sm mt-2">Try a different search term</p>
+                        </div>
+                    )}
+                </div>
+            </main>
+        </div>
+    );
+}
+
+// Helper function to get category icon
+function getCategoryIcon(category: BookCategory): string {
+    const icons: Record<string, string> = {
+        [BookCategory.THEOLOGY]: "📖",
+        [BookCategory.DEVOTIONAL]: "🙏",
+        [BookCategory.BIOGRAPHY]: "👤",
+        [BookCategory.PRAYER]: "🕊️",
+        [BookCategory.LEADERSHIP]: "👨‍💼",
+        [BookCategory.FAMILY]: "👨‍👩‍👧‍👦",
+        [BookCategory.YOUTH]: "🎓",
+        [BookCategory.APOLOGETICS]: "🛡️",
+        [BookCategory.CHRISTIAN_LIVING]: "✨",
+        [BookCategory.BIBLE_STUDY]: "📕",
+        [BookCategory.CHURCH_HISTORY]: "⛪",
+        [BookCategory.MISSIONS]: "🌍",
+        [BookCategory.EVANGELISM]: "📢",
+        [BookCategory.DISCIPLESHIP]: "🌱",
+        [BookCategory.WOMEN]: "👩",
+        [BookCategory.MEN]: "👨",
+    };
+    return icons[category] || "📚";
+}
