@@ -51,7 +51,7 @@ export async function PUT(request: NextRequest) {
         user.password = hashedPassword;
         await user.save();
 
-        return ApiResponse.success(null, 'Password changed successfully');
+        return ApiResponse.success(null, 200, 'Password changed successfully');
     } catch (error: any) {
         log.error('Change password error', error, { endpoint: '/api/user/password' });
         return ApiResponse.internalError('An error occurred while changing password');

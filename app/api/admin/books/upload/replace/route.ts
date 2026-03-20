@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
             result.coverImage = `/images/books/covers/${coverFileName}`;
         }
 
-        return ApiResponse.success(result, "Files replaced successfully");
+        return ApiResponse.success(result, 200, "Files replaced successfully");
 
     } catch (error: any) {
         log.error("Replace files error", error, { endpoint: '/api/admin/books/upload/replace' });

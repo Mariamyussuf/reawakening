@@ -47,7 +47,7 @@ export async function DELETE(request: NextRequest) {
         // Delete user account
         await User.findByIdAndDelete(session.user.id);
 
-        return ApiResponse.success(null, 'Account deleted successfully');
+        return ApiResponse.success(null, 200, 'Account deleted successfully');
     } catch (error: any) {
         log.error('Delete account error', error, { endpoint: '/api/user/account' });
         return ApiResponse.internalError('An error occurred while deleting account');
