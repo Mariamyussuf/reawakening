@@ -5,6 +5,14 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
+// Cross icon for branding
+const CrossIcon = () => (
+    <svg width="32" height="32" viewBox="0 0 48 48" fill="none" className="text-gold">
+        <rect x="20" y="8" width="8" height="32" rx="1" fill="currentColor"/>
+        <rect x="8" y="20" width="32" height="8" rx="1" fill="currentColor"/>
+    </svg>
+);
+
 export default function SignInPage() {
     const router = useRouter();
     const [formData, setFormData] = useState({ email: "", password: "" });
@@ -36,44 +44,47 @@ export default function SignInPage() {
     };
 
     return (
-        <div className="min-h-screen flex overflow-hidden">
+        <div className="min-h-screen flex overflow-hidden font-body">
 
             {/* Left — decorative panel */}
-            <div className="hidden lg:flex lg:w-1/2 relative flex-col items-center justify-center px-12"
-                style={{ background: "linear-gradient(160deg, #0F1628 0%, #162147 50%, #1f3060 100%)" }}>
+            <div className="hidden lg:flex lg:w-1/2 relative flex-col items-center justify-center px-12 bg-deep">
 
-                {/* Pattern */}
-                <div className="absolute inset-0 bg-hero-pattern opacity-100" />
-                <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse at 60% 40%, rgba(212,175,55,0.12) 0%, transparent 65%)" }} />
+                {/* Radial gradient glow */}
+                <div className="absolute inset-0 bg-gradient-radial-gold opacity-20" />
+
+                {/* Noise overlay */}
+                <div className="noise-overlay" />
 
                 {/* Gold top rule */}
-                <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gold-500/60 to-transparent" />
+                <div className="absolute top-0 left-0 right-0 h-px bg-gold/40" />
 
                 <div className="relative z-10 text-center max-w-sm">
                     {/* Logo */}
                     <Link href="/" className="inline-flex flex-col items-center mb-12 group">
                         <div className="relative mb-4">
-                            <div className="absolute inset-0 bg-gold-500/25 rounded-2xl blur-lg" />
-                            <img src="/images/logo.png" alt="Reawakening" className="relative w-16 h-16 object-contain" />
+                            <div className="absolute inset-0 bg-gold/20 rounded-2xl blur-lg" />
+                            <div className="relative w-16 h-16 flex items-center justify-center">
+                                <CrossIcon />
+                            </div>
                         </div>
-                        <span className="font-display text-2xl font-semibold text-cream-50">Reawakening</span>
-                        <span className="font-sans text-[10px] tracking-[0.3em] uppercase text-gold-400/80 mt-1">Ministry</span>
+                        <span className="font-display text-2xl font-semibold text-cream tracking-wide">Reawakening</span>
+                        <span className="font-sans text-[10px] tracking-[0.3em] uppercase text-gold/80 mt-1">Ministry</span>
                     </Link>
 
-                    <div className="gold-line mx-auto mb-8" />
+                    <div className="w-16 h-px bg-gold/40 mx-auto mb-8" />
 
-                    <h2 className="font-display text-3xl font-light italic text-cream-50 leading-relaxed mb-4">
+                    <h2 className="font-display text-3xl font-light italic text-cream leading-relaxed mb-4">
                         &ldquo;Be on fire for God&rdquo;
                     </h2>
-                    <p className="font-sans text-sm text-navy-300 leading-relaxed">
+                    <p className="font-sans text-sm text-cream/60 leading-relaxed">
                         A digital home for students pursuing a deeper walk with God — through devotion, community, and Scripture.
                     </p>
 
                     <div className="mt-12 grid grid-cols-3 gap-4">
                         {[["500+", "Members"], ["12", "Conferences"], ["24/7", "Access"]].map(([val, label]) => (
                             <div key={label} className="text-center">
-                                <div className="font-display text-2xl font-semibold text-gold-gradient">{val}</div>
-                                <div className="font-sans text-[10px] tracking-widest uppercase text-navy-400 mt-1">{label}</div>
+                                <div className="font-display text-2xl font-semibold text-gold">{val}</div>
+                                <div className="font-sans text-[10px] tracking-widest uppercase text-cream/40 mt-1">{label}</div>
                             </div>
                         ))}
                     </div>
@@ -81,25 +92,25 @@ export default function SignInPage() {
             </div>
 
             {/* Right — form panel */}
-            <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 bg-cream-50">
+            <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 bg-cream">
                 <div className="w-full max-w-md">
 
                     {/* Mobile logo */}
                     <Link href="/" className="lg:hidden flex items-center justify-center gap-3 mb-10">
-                        <img src="/images/logo.png" alt="Reawakening" className="w-9 h-9 object-contain" />
-                        <span className="font-display text-xl font-semibold text-navy-900">Reawakening</span>
+                        <CrossIcon />
+                        <span className="font-display text-xl font-semibold text-deep">Reawakening</span>
                     </Link>
 
                     {/* Heading */}
                     <div className="mb-10">
-                        <p className="font-sans text-xs font-semibold tracking-[0.25em] uppercase text-gold-600 mb-2">Welcome back</p>
-                        <h1 className="font-display text-4xl font-semibold text-navy-900 mb-2">Sign In</h1>
-                        <p className="font-sans text-sm text-ink-500">Continue your spiritual journey</p>
+                        <p className="font-sans text-xs font-medium tracking-[0.2em] uppercase text-gold mb-2">Welcome back</p>
+                        <h1 className="font-display text-4xl font-medium text-deep mb-2">Sign In</h1>
+                        <p className="font-sans text-sm text-deep/60">Continue your spiritual journey</p>
                     </div>
 
                     {/* Error */}
                     {error && (
-                        <div className="flex items-start gap-3 p-4 rounded-xl bg-red-50 border border-red-200 mb-6">
+                        <div className="flex items-start gap-3 p-4 rounded-lg bg-red-50 border border-red-200 mb-6">
                             <svg className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
@@ -110,7 +121,7 @@ export default function SignInPage() {
                     {/* Form */}
                     <form onSubmit={handleSubmit} className="space-y-5">
                         <div>
-                            <label htmlFor="email" className="block font-sans text-xs font-semibold tracking-wide text-ink-600 mb-2 uppercase">
+                            <label htmlFor="email" className="block font-sans text-xs font-medium tracking-wide text-deep/70 mb-2 uppercase">
                                 Email Address
                             </label>
                             <input
@@ -120,17 +131,17 @@ export default function SignInPage() {
                                 required
                                 value={formData.email}
                                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                className="input-field"
+                                className="w-full px-4 py-3 rounded border border-mid/30 bg-warm-white text-deep text-sm outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all placeholder:text-mid/50"
                                 placeholder="you@example.com"
                             />
                         </div>
 
                         <div>
                             <div className="flex items-center justify-between mb-2">
-                                <label htmlFor="password" className="block font-sans text-xs font-semibold tracking-wide text-ink-600 uppercase">
+                                <label htmlFor="password" className="block font-sans text-xs font-medium tracking-wide text-deep/70 uppercase">
                                     Password
                                 </label>
-                                <Link href="/auth/forgot-password" className="font-sans text-xs text-gold-600 hover:text-gold-700 transition-colors">
+                                <Link href="/auth/forgot-password" className="font-sans text-xs text-gold hover:text-gold-dark transition-colors">
                                     Forgot password?
                                 </Link>
                             </div>
@@ -142,13 +153,13 @@ export default function SignInPage() {
                                     required
                                     value={formData.password}
                                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                    className="input-field pr-12"
+                                    className="w-full px-4 py-3 rounded border border-mid/30 bg-warm-white text-deep text-sm outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all placeholder:text-mid/50 pr-12"
                                     placeholder="••••••••"
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowPass(!showPass)}
-                                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-ink-400 hover:text-ink-600 transition-colors"
+                                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-mid/60 hover:text-deep transition-colors"
                                 >
                                     {showPass ? (
                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -168,15 +179,15 @@ export default function SignInPage() {
                             <input
                                 id="remember"
                                 type="checkbox"
-                                className="w-4 h-4 rounded border-ink-300 text-gold-500 focus:ring-gold-400 accent-navy-900"
+                                className="w-4 h-4 rounded border-mid/50 text-gold focus:ring-gold/30 accent-gold"
                             />
-                            <label htmlFor="remember" className="font-sans text-sm text-ink-600">Remember me for 30 days</label>
+                            <label htmlFor="remember" className="font-sans text-sm text-deep/70">Remember me for 30 days</label>
                         </div>
 
                         <button
                             type="submit"
                             disabled={loading}
-                            className="btn-primary w-full py-4 text-sm font-semibold disabled:opacity-60 disabled:cursor-not-allowed"
+                            className="w-full py-3.5 text-sm font-semibold tracking-wide uppercase bg-gold text-deep rounded hover:bg-gold-light transition-all disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                         >
                             {loading ? (
                                 <>
@@ -200,22 +211,22 @@ export default function SignInPage() {
                     {/* Divider */}
                     <div className="relative my-8">
                         <div className="absolute inset-0 flex items-center">
-                            <div className="w-full h-px bg-cream-300" />
+                            <div className="w-full h-px bg-mid/20" />
                         </div>
                         <div className="relative flex justify-center">
-                            <span className="px-4 bg-cream-50 font-sans text-xs text-ink-400">New to Reawakening?</span>
+                            <span className="px-4 bg-cream font-sans text-xs text-deep/50">New to Reawakening?</span>
                         </div>
                     </div>
 
                     <Link
                         href="/auth/signup"
-                        className="btn-outline w-full flex items-center justify-center py-4 text-sm font-semibold"
+                        className="w-full flex items-center justify-center py-3.5 text-sm font-semibold tracking-wide uppercase border border-gold text-gold rounded hover:bg-gold/10 transition-all"
                     >
                         Create an Account
                     </Link>
 
                     <div className="text-center mt-8">
-                        <Link href="/" className="font-sans text-xs text-ink-400 hover:text-ink-700 transition-colors inline-flex items-center gap-1.5">
+                        <Link href="/" className="font-sans text-xs text-deep/40 hover:text-deep/70 transition-colors inline-flex items-center gap-1.5">
                             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                             </svg>
