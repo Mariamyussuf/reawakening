@@ -386,7 +386,6 @@ export default function EditDevotionalPage() {
                             Cancel
                         </Link>
                     </div>
-                    </div>
                 </form>
             </main>
         </div>
