@@ -14,7 +14,7 @@ export default function DailyVersePage() {
             <Header />
             <main className="min-h-screen">
                 {/* Hero */}
-                <section className="bg-gradient-to-r from-green-600 to-emerald-600 text-white py-20">
+                <section className="bg-gradient-to-r from-orange-600 to-amber-600 text-white py-20">
                     <div className="container-custom text-center">
                         <h1 className="text-4xl md:text-5xl font-bold mb-4">Daily Bible Verse</h1>
                         <p className="text-xl opacity-90 max-w-2xl mx-auto">
@@ -37,7 +37,7 @@ export default function DailyVersePage() {
                             <h2 className="section-title text-center mb-12">How It Works</h2>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div className="card text-center">
-                                    <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-4 text-white font-bold text-xl">
+                                    <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-4 text-white font-bold text-xl">
                                         1
                                     </div>
                                     <h3 className="font-bold text-slate-800 mb-2">Read Daily</h3>
@@ -47,7 +47,7 @@ export default function DailyVersePage() {
                                 </div>
 
                                 <div className="card text-center">
-                                    <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 text-white font-bold text-xl">
+                                    <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-amber-600 rounded-full flex items-center justify-center mx-auto mb-4 text-white font-bold text-xl">
                                         2
                                     </div>
                                     <h3 className="font-bold text-slate-800 mb-2">Mark as Read</h3>
@@ -57,7 +57,7 @@ export default function DailyVersePage() {
                                 </div>
 
                                 <div className="card text-center">
-                                    <div className="w-12 h-12 bg-gradient-to-br from-teal-500 to-teal-600 rounded-full flex items-center justify-center mx-auto mb-4 text-white font-bold text-xl">
+                                    <div className="w-12 h-12 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-full flex items-center justify-center mx-auto mb-4 text-white font-bold text-xl">
                                         3
                                     </div>
                                     <h3 className="font-bold text-slate-800 mb-2">Build Consistency</h3>

@@ -62,14 +62,16 @@ export default function SignUpPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-emerald-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50 to-amber-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-md w-full">
                 {/* Logo and Header */}
                 <div className="text-center mb-8">
                     <Link href="/" className="inline-flex items-center space-x-2 mb-6">
-                        <div className="w-12 h-12 bg-gradient-to-br from-green-600 to-emerald-600 rounded-lg flex items-center justify-center shadow-md">
-                            <span className="text-white font-bold text-2xl">R</span>
-                        </div>
+                        <img
+                            src="/images/logo.png"
+                            alt="Reawakening Logo"
+                            className="w-12 h-12 object-contain"
+                        />
                         <span className="text-2xl font-bold text-slate-800">Reawakening</span>
                     </Link>
                     <h2 className="text-3xl font-bold text-slate-800 mb-2">Join Our Community</h2>
@@ -97,7 +99,7 @@ export default function SignUpPage() {
                                 required
                                 value={formData.name}
                                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
                                 placeholder="John Doe"
                             />
                         </div>
@@ -114,7 +116,7 @@ export default function SignUpPage() {
                                 required
                                 value={formData.email}
                                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
                                 placeholder="you@example.com"
                             />
                         </div>
@@ -131,7 +133,7 @@ export default function SignUpPage() {
                                 required
                                 value={formData.password}
                                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
                                 placeholder="••••••••"
                             />
                             <p className="mt-1 text-xs text-slate-500">Must be at least 6 characters</p>
@@ -149,7 +151,7 @@ export default function SignUpPage() {
                                 required
                                 value={formData.confirmPassword}
                                 onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
                                 placeholder="••••••••"
                             />
                         </div>
@@ -161,17 +163,17 @@ export default function SignUpPage() {
                                     name="terms"
                                     type="checkbox"
                                     required
-                                    className="h-4 w-4 text-green-600 focus:ring-green-500 border-slate-300 rounded"
+                                    className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-slate-300 rounded"
                                 />
                             </div>
                             <div className="ml-3 text-sm">
                                 <label htmlFor="terms" className="text-slate-700">
                                     I agree to the{" "}
-                                    <Link href="/terms" className="font-medium text-green-600 hover:text-green-700">
+                                    <Link href="/terms" className="font-medium text-orange-600 hover:text-orange-700">
                                         Terms of Service
                                     </Link>{" "}
                                     and{" "}
-                                    <Link href="/privacy" className="font-medium text-green-600 hover:text-green-700">
+                                    <Link href="/privacy" className="font-medium text-orange-600 hover:text-orange-700">
                                         Privacy Policy
                                     </Link>
                                 </label>

@@ -1,48 +1,49 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import dbConnect from '@/lib/mongodb';
-import JournalEntry from '@/models/JournalEntry';
+import { requireAuth } from '@/lib/middleware/auth';
+import { rateLimiters } from '@/lib/middleware/ratelimit';
+import { validateBody } from '@/lib/validation';
+import { JournalEntrySchema } from '@/lib/validation/schemas';
+import { ApiResponse } from '@/lib/api/response';
+import { log } from '@/lib/logger';
+import prisma from '@/lib/prisma';
 
 // GET /api/journal/entries - Get user's journal entries
 export async function GET(request: NextRequest) {
+    // Apply rate limiting
+    const rateLimitResponse = await rateLimiters.api(request);
+    if (rateLimitResponse) {
+        return rateLimitResponse;
+    }
+
     try {
-        const session = await getServerSession(authOptions);
-
-        if (!session || !session.user) {
-            return NextResponse.json(
-                { error: 'Unauthorized' },
-                { status: 401 }
-            );
-        }
-
-        await dbConnect();
+        const session = await requireAuth();
 
         const { searchParams } = new URL(request.url);
         const category = searchParams.get('category');
         const limit = parseInt(searchParams.get('limit') || '50');
         const skip = parseInt(searchParams.get('skip') || '0');
 
-        const query: any = { userId: (session.user as any).id };
+        const where: any = { userId: session.user.id };
 
         if (category && category !== 'all') {
-            query.category = category;
+            where.category = category;
         }
 
-        const entries = await JournalEntry.find(query)
-            .sort({ createdAt: -1 })
-            .limit(limit)
-            .skip(skip)
-            .lean();
+        const entries = await prisma.journalEntry.findMany({
+            where,
+            orderBy: { createdAt: 'desc' },
+            take: limit,
+            skip: skip,
+        });
 
         // Format response
-        const formattedEntries = entries.map((entry: any) => ({
-            id: entry._id.toString(),
+        const formattedEntries = entries.map((entry) => ({
+            id: entry.id,
             title: entry.title,
             content: entry.content,
             category: entry.category,
             mood: entry.mood,
-            tags: entry.tags || [],
+            tags: entry.tags ? JSON.parse(entry.tags) : [],
             date: formatDate(entry.createdAt),
             time: formatTime(entry.createdAt),
             createdAt: entry.createdAt,
@@ -50,96 +51,67 @@ export async function GET(request: NextRequest) {
         }));
 
         // Get total count for pagination
-        const total = await JournalEntry.countDocuments(query);
+        const total = await prisma.journalEntry.count({ where });
 
-        return NextResponse.json(
-            {
-                entries: formattedEntries,
-                total,
-                limit,
-                skip,
-            },
-            { status: 200 }
-        );
+        return ApiResponse.success({
+            entries: formattedEntries,
+            total,
+            limit,
+            skip,
+        });
     } catch (error: any) {
-        console.error('Get journal entries error:', error);
-        return NextResponse.json(
-            { error: 'An error occurred while fetching journal entries' },
-            { status: 500 }
-        );
+        log.error('Get journal entries error', error, { endpoint: '/api/journal/entries' });
+        return ApiResponse.internalError('An error occurred while fetching journal entries');
     }
 }
 
 // POST /api/journal/entries - Create journal entry
 export async function POST(request: NextRequest) {
+    // Apply rate limiting
+    const rateLimitResponse = await rateLimiters.api(request);
+    if (rateLimitResponse) {
+        return rateLimitResponse;
+    }
+
     try {
-        const session = await getServerSession(authOptions);
+        const session = await requireAuth();
 
-        if (!session || !session.user) {
-            return NextResponse.json(
-                { error: 'Unauthorized' },
-                { status: 401 }
-            );
+        // Validate request body
+        const validation = await validateBody(request, JournalEntrySchema);
+        if (!validation.success) {
+            return validation.response;
         }
 
-        const { title, content, category, mood, tags } = await request.json();
+        const { title, content, category, mood, tags } = validation.data;
 
-        // Validation
-        if (!content || !content.trim()) {
-            return NextResponse.json(
-                { error: 'Please provide journal content' },
-                { status: 400 }
-            );
-        }
-
-        if (content.length > 5000) {
-            return NextResponse.json(
-                { error: 'Content cannot be more than 5000 characters' },
-                { status: 400 }
-            );
-        }
-
-        if (title && title.length > 200) {
-            return NextResponse.json(
-                { error: 'Title cannot be more than 200 characters' },
-                { status: 400 }
-            );
-        }
-
-        await dbConnect();
-
-        const entry = await JournalEntry.create({
-            userId: (session.user as any).id,
-            title: title?.trim() || undefined,
-            content: content.trim(),
-            category: category || 'general',
-            mood: mood || undefined,
-            tags: tags || [],
+        const entry = await prisma.journalEntry.create({
+            data: {
+                userId: session.user.id,
+                title: title?.trim() || null,
+                content: content.trim(),
+                category: category || 'GENERAL',
+                mood: mood || null,
+                tags: JSON.stringify(tags || []),
+            }
         });
 
         const formattedEntry = {
-            id: entry._id.toString(),
+            id: entry.id,
             title: entry.title,
             content: entry.content,
             category: entry.category,
             mood: entry.mood,
-            tags: entry.tags || [],
+            tags: entry.tags ? JSON.parse(entry.tags) : [],
             date: formatDate(entry.createdAt),
             time: formatTime(entry.createdAt),
             createdAt: entry.createdAt,
             updatedAt: entry.updatedAt,
         };
 
-        return NextResponse.json(
-            { message: 'Journal entry created successfully', entry: formattedEntry },
-            { status: 201 }
-        );
+        return ApiResponse.created(formattedEntry, 'Journal entry created successfully');
     } catch (error: any) {
-        console.error('Create journal entry error:', error);
-        return NextResponse.json(
-            { error: 'An error occurred while creating journal entry' },
-            { status: 500 }
-        );
+        log.error('Create journal entry error', error, { endpoint: '/api/journal/entries' });
+        return ApiResponse.internalError('An error occurred while creating journal entry');
     }
 }
 

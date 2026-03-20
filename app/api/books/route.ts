@@ -1,14 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import dbConnect from '@/lib/mongodb';
-import BookModel from '@/models/BookModel';
+import { rateLimiters } from '@/lib/middleware/ratelimit';
+import { ApiResponse } from '@/lib/api/response';
+import { log } from '@/lib/logger';
+import prisma from '@/lib/prisma';
 
 // GET /api/books - Get all books with optional filters
 export async function GET(request: NextRequest) {
-    try {
-        await dbConnect();
+    // Apply rate limiting
+    const rateLimitResponse = await rateLimiters.api(request);
+    if (rateLimitResponse) {
+        return rateLimitResponse;
+    }
 
+    try {
         const { searchParams } = new URL(request.url);
         const category = searchParams.get('category');
         const featured = searchParams.get('featured') === 'true';
@@ -20,50 +24,57 @@ export async function GET(request: NextRequest) {
         const sortBy = searchParams.get('sortBy') || 'createdAt';
         const sortOrder = searchParams.get('sortOrder') || 'desc';
 
-        const query: any = {};
+        const where: any = {};
 
         if (category) {
-            query.categories = category;
+            where.categories = { contains: category };
         }
 
         if (featured) {
-            query.featured = true;
+            where.featured = true;
         }
 
         if (popular) {
-            query.popular = true;
+            where.popular = true;
         }
 
         if (newRelease) {
-            query.newRelease = true;
+            where.newRelease = true;
         }
 
         if (search) {
-            query.$text = { $search: search };
+            where.OR = [
+                { title: { contains: search } },
+                { author: { contains: search } },
+                { description: { contains: search } },
+                { tags: { contains: search } },
+                { categories: { contains: search } },
+            ];
         }
 
-        const sort: any = {};
+        const orderBy: any = {};
         if (sortBy === 'views') {
-            sort.totalViews = sortOrder === 'asc' ? 1 : -1;
+            orderBy.totalViews = sortOrder === 'asc' ? 'asc' : 'desc';
         } else if (sortBy === 'downloads') {
-            sort.totalDownloads = sortOrder === 'asc' ? 1 : -1;
+            orderBy.totalDownloads = sortOrder === 'asc' ? 'asc' : 'desc';
         } else if (sortBy === 'rating') {
-            sort.averageRating = sortOrder === 'asc' ? 1 : -1;
+            orderBy.averageRating = sortOrder === 'asc' ? 'asc' : 'desc';
         } else {
-            sort.createdAt = sortOrder === 'asc' ? 1 : -1;
+            orderBy[sortBy] = sortOrder === 'asc' ? 'asc' : 'desc';
         }
 
-        const books = await BookModel.find(query)
-            .sort(sort)
-            .limit(limit)
-            .skip(skip)
-            .lean();
+        const books = await prisma.book.findMany({
+            where,
+            orderBy,
+            take: limit,
+            skip: skip,
+        });
 
-        const total = await BookModel.countDocuments(query);
+        const total = await prisma.book.count({ where });
 
         // Format response
-        const formattedBooks = books.map((book: any) => ({
-            id: book._id.toString(),
+        const formattedBooks = books.map((book) => ({
+            id: book.id,
             title: book.title,
             author: book.author,
             description: book.description,
@@ -71,8 +82,8 @@ export async function GET(request: NextRequest) {
             pdfUrl: book.pdfUrl,
             fileSize: book.fileSize,
             pageCount: book.pageCount,
-            categories: book.categories,
-            tags: book.tags,
+            categories: book.categories ? JSON.parse(book.categories) : [],
+            tags: book.tags ? JSON.parse(book.tags) : [],
             publishYear: book.publishYear,
             publisher: book.publisher,
             isbn: book.isbn,
@@ -88,20 +99,14 @@ export async function GET(request: NextRequest) {
             updatedAt: book.updatedAt,
         }));
 
-        return NextResponse.json(
-            {
-                books: formattedBooks,
-                total,
-                limit,
-                skip,
-            },
-            { status: 200 }
-        );
+        return ApiResponse.success({
+            books: formattedBooks,
+            total,
+            limit,
+            skip,
+        });
     } catch (error: any) {
-        console.error('Get books error:', error);
-        return NextResponse.json(
-            { error: 'An error occurred while fetching books' },
-            { status: 500 }
-        );
+        log.error('Get books error', error, { endpoint: '/api/books' });
+        return ApiResponse.internalError('An error occurred while fetching books');
     }
 }

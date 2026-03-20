@@ -1,67 +1,62 @@
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
-import dbConnect from '@/lib/mongodb';
-import User from '@/models/User';
+import prisma from '@/lib/prisma';
+import { rateLimiters } from '@/lib/middleware/ratelimit';
+import { validateBody } from '@/lib/validation';
+import { RegisterSchema } from '@/lib/validation/schemas';
+import { ApiResponse } from '@/lib/api/response';
 
 export async function POST(request: NextRequest) {
+    // Apply rate limiting for authentication
+    const rateLimitResponse = await rateLimiters.auth(request);
+    if (rateLimitResponse) {
+        return rateLimitResponse;
+    }
+
     try {
-        const { name, email, password } = await request.json();
-
-        // Validation
-        if (!name || !email || !password) {
-            return NextResponse.json(
-                { error: 'Please provide all required fields' },
-                { status: 400 }
-            );
+        // Validate request body
+        const validation = await validateBody(request, RegisterSchema);
+        if (!validation.success) {
+            return validation.response;
         }
 
-        if (password.length < 6) {
-            return NextResponse.json(
-                { error: 'Password must be at least 6 characters' },
-                { status: 400 }
-            );
-        }
-
-        await dbConnect();
+        const { name, email, password } = validation.data;
 
         // Check if user already exists
-        const existingUser = await User.findOne({ email: email.toLowerCase() });
+        const existingUser = await prisma.user.findUnique({
+            where: { email }
+        });
 
         if (existingUser) {
-            return NextResponse.json(
-                { error: 'User with this email already exists' },
-                { status: 400 }
-            );
+            return ApiResponse.error('User with this email already exists', 400);
         }
 
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 12);
 
         // Create user
-        const user = await User.create({
-            name,
-            email: email.toLowerCase(),
-            password: hashedPassword,
+        const user = await prisma.user.create({
+            data: {
+                name,
+                email,
+                password: hashedPassword,
+            }
         });
 
         // Return user without password
         const userResponse = {
-            id: user._id,
+            id: user.id,
             name: user.name,
             email: user.email,
             role: user.role,
             joinDate: user.joinDate,
         };
 
-        return NextResponse.json(
-            { message: 'User created successfully', user: userResponse },
-            { status: 201 }
-        );
+        return ApiResponse.created(userResponse, 'User created successfully');
     } catch (error: any) {
-        console.error('Registration error:', error);
-        return NextResponse.json(
-            { error: 'An error occurred during registration' },
-            { status: 500 }
-        );
+        const { log } = await import('@/lib/logger');
+        log.error('Registration error', error, { endpoint: '/api/auth/register' });
+        return ApiResponse.internalError('An error occurred during registration');
     }
 }
+

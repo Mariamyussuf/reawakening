@@ -1,68 +1,68 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import dbConnect from '@/lib/mongodb';
-import Prayer from '@/models/Prayer';
+import { requireAuth } from '@/lib/middleware/auth';
+import { rateLimiters } from '@/lib/middleware/ratelimit';
+import { ApiResponse } from '@/lib/api/response';
+import { log } from '@/lib/logger';
+import prisma from '@/lib/prisma';
 
 // POST /api/prayers/:id/pray - Increment prayer count (user prays for this request)
 export async function POST(
     request: NextRequest,
     { params }: { params: { id: string } }
 ) {
+    // Apply rate limiting
+    const rateLimitResponse = await rateLimiters.api(request);
+    if (rateLimitResponse) {
+        return rateLimitResponse;
+    }
+
     try {
-        const session = await getServerSession(authOptions);
+        const session = await requireAuth();
 
-        if (!session || !session.user) {
-            return NextResponse.json(
-                { error: 'Unauthorized' },
-                { status: 401 }
-            );
-        }
-
-        await dbConnect();
-
-        const userId = (session.user as any).id;
-        const prayer = await Prayer.findById(params.id);
+        const userId = session.user.id;
+        const prayer = await prisma.prayer.findUnique({
+            where: { id: params.id }
+        });
 
         if (!prayer) {
-            return NextResponse.json(
-                { error: 'Prayer not found' },
-                { status: 404 }
-            );
+            return ApiResponse.error('Prayer not found', 404);
         }
 
         // Check if user already prayed for this
-        const hasPrayed = prayer.prayedBy.some(
-            (id: any) => id.toString() === userId
-        );
+        let prayedBy: string[] = [];
+        try {
+            prayedBy = prayer.prayedBy ? JSON.parse(prayer.prayedBy) : [];
+        } catch (e) {
+            prayedBy = [];
+        }
+
+        const hasPrayed = prayedBy.includes(userId);
+        let updatedPrayerCount = prayer.prayerCount;
 
         if (hasPrayed) {
             // Remove prayer (unpray)
-            prayer.prayedBy = prayer.prayedBy.filter(
-                (id: any) => id.toString() !== userId
-            );
-            prayer.prayerCount = Math.max(0, prayer.prayerCount - 1);
+            prayedBy = prayedBy.filter((id) => id !== userId);
+            updatedPrayerCount = Math.max(0, updatedPrayerCount - 1);
         } else {
             // Add prayer
-            prayer.prayedBy.push(userId);
-            prayer.prayerCount += 1;
+            prayedBy.push(userId);
+            updatedPrayerCount += 1;
         }
 
-        await prayer.save();
+        const updatedPrayer = await prisma.prayer.update({
+            where: { id: params.id },
+            data: {
+                prayedBy: JSON.stringify(prayedBy),
+                prayerCount: updatedPrayerCount
+            }
+        });
 
-        return NextResponse.json(
-            {
-                message: hasPrayed ? 'Prayer removed' : 'Thank you for praying!',
-                prayerCount: prayer.prayerCount,
-                hasPrayed: !hasPrayed,
-            },
-            { status: 200 }
-        );
+        return ApiResponse.success({
+            prayerCount: updatedPrayer.prayerCount,
+            hasPrayed: !hasPrayed,
+        }, 200, hasPrayed ? 'Prayer removed' : 'Thank you for praying!');
     } catch (error: any) {
-        console.error('Pray for request error:', error);
-        return NextResponse.json(
-            { error: 'An error occurred while updating prayer count' },
-            { status: 500 }
-        );
+        log.error('Pray for request error', error, { endpoint: '/api/prayers/[id]/pray', prayerId: params.id });
+        return ApiResponse.internalError('An error occurred while updating prayer count');
     }
 }

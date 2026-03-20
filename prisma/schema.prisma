@@ -1,0 +1,174 @@
+// This is your Prisma schema file for Turso (SQLite)
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider  = "sqlite"
+  url       = "file:./dev.db"
+}
+
+model User {
+  id                String   @id @default(cuid())
+  name              String
+  email             String   @unique
+  password          String
+  phone             String?
+  campus            String?
+  bio               String?
+  avatar            String?
+  role              String   @default("MEMBER")
+  joinDate          DateTime @default(now())
+  streak            Int      @default(0)
+  totalVerses       Int      @default(0)
+  completedCourses  Int      @default(0)
+  lastActive        DateTime @default(now())
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Notification settings
+  dailyVerse        Boolean  @default(true)
+  eventReminders    Boolean  @default(true)
+  prayerRequests    Boolean  @default(false)
+  weeklyDigest      Boolean  @default(true)
+
+  // Privacy settings
+  showProfile       Boolean  @default(true)
+  showActivity      Boolean  @default(true)
+  allowMessages     Boolean  @default(true)
+
+  // Relations
+  prayers           Prayer[]
+  journalEntries    JournalEntry[]
+  bibleBookmarks    BibleBookmark[]
+
+  @@index([email])
+  @@index([role])
+  @@map("users")
+}
+
+model Prayer {
+  id              String   @id @default(cuid())
+  userId          String
+  title           String
+  description     String
+  category        String   @default("GENERAL")
+  isAnonymous     Boolean  @default(false)
+  isAnswered      Boolean  @default(false)
+  answeredDate    DateTime?
+  prayerCount     Int      @default(0)
+  prayedBy        String   // JSON string array of user IDs
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isAnswered])
+  @@map("prayers")
+}
+
+model JournalEntry {
+  id              String   @id @default(cuid())
+  userId          String
+  title           String?
+  content         String
+  category        String   @default("GENERAL")
+  mood            String?
+  tags            String   // JSON string array
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([category])
+  @@map("journal_entries")
+}
+
+model Devotional {
+  id              String   @id @default(cuid())
+  title           String
+  content         String   // Rich text HTML
+  excerpt         String
+  author          String
+  coverImage      String?
+  publishDate     DateTime @default(now())
+  scheduledDate   DateTime?
+  status          String   @default("DRAFT")
+  tags            String   // JSON string array
+  scripture       String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([status])
+  @@map("devotionals")
+}
+
+model Book {
+  id              String   @id @default(cuid())
+  title           String
+  author          String
+  description     String
+  coverImage      String?
+  pdfUrl          String
+  fileSize        Float    // In MB
+  pageCount       Int?
+  categories      String   // JSON string array
+  tags            String   // JSON string array
+  publishYear     Int?
+  publisher       String?
+  isbn            String?
+  language        String   @default("en")
+  difficulty      String   @default("INTERMEDIATE")
+  featured        Boolean  @default(false)
+  popular         Boolean  @default(false)
+  newRelease      Boolean  @default(false)
+  totalDownloads  Int      @default(0)
+  totalViews      Int      @default(0)
+  averageRating   Float?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([featured])
+  @@index([popular])
+  @@index([newRelease])
+  @@map("books")
+}
+
+model BibleBookmark {
+  id              String   @id @default(cuid())
+  userId          String
+  version         String   @default("KJV")
+  bookId          String
+  bookName        String
+  chapter         Int
+  verse           Int?
+  verseText       String?
+  reference       String
+  note            String?
+  color           String   @default("YELLOW")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([bookId])
+  @@map("bible_bookmarks")
+}
+
+// Note: SQLite doesn't support enums, so we use strings with validation in the application layer
+// Valid values for role: "MEMBER", "ADMIN", "LEADER"
+// Valid values for category: "GENERAL", "HEALTH", "FAMILY", etc.
+// Valid values for mood: "GRATEFUL", "JOYFUL", "HOPEFUL", etc.
+// Valid values for status: "DRAFT", "SCHEDULED", "PUBLISHED"
+// Valid values for difficulty: "BEGINNER", "INTERMEDIATE", "ADVANCED"
+// Valid values for color: "YELLOW", "GREEN", "BLUE", "PINK", "PURPLE"
+

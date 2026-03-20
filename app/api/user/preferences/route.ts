@@ -1,62 +1,52 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { requireAuth } from '@/lib/middleware/auth';
+import { rateLimiters } from '@/lib/middleware/ratelimit';
+import { validateBody } from '@/lib/validation';
+import { UpdatePreferencesSchema } from '@/lib/validation/schemas';
+import { ApiResponse } from '@/lib/api/response';
+import { log } from '@/lib/logger';
 import dbConnect from '@/lib/mongodb';
 import User from '@/models/User';
 
 // PUT /api/user/preferences - Update notification and privacy preferences
 export async function PUT(request: NextRequest) {
+    // Apply rate limiting
+    const rateLimitResponse = await rateLimiters.api(request);
+    if (rateLimitResponse) {
+        return rateLimitResponse;
+    }
+
     try {
-        const session = await getServerSession(authOptions);
+        const session = await requireAuth();
 
-        if (!session || !session.user) {
-            return NextResponse.json(
-                { error: 'Unauthorized' },
-                { status: 401 }
-            );
+        // Validate request body
+        const validation = await validateBody(request, UpdatePreferencesSchema);
+        if (!validation.success) {
+            return validation.response;
         }
 
-        const updates = await request.json();
-        const allowedFields = ['notifications', 'privacy'];
-
-        // Filter to only allow specific fields
-        const filteredUpdates: any = {};
-        for (const field of allowedFields) {
-            if (updates[field] !== undefined) {
-                filteredUpdates[field] = updates[field];
-            }
-        }
+        const updates = validation.data;
 
         await dbConnect();
 
         const user = await User.findByIdAndUpdate(
-            (session.user as any).id,
+            session.user.id,
             { $set: filteredUpdates },
             { new: true, runValidators: true }
         ).select('-password');
 
         if (!user) {
-            return NextResponse.json(
-                { error: 'User not found' },
-                { status: 404 }
-            );
+            return ApiResponse.error('User not found', 404);
         }
 
-        return NextResponse.json(
-            {
-                message: 'Preferences updated successfully',
-                preferences: {
-                    notifications: user.notifications,
-                    privacy: user.privacy,
-                },
+        return ApiResponse.success({
+            preferences: {
+                notifications: user.notifications,
+                privacy: user.privacy,
             },
-            { status: 200 }
-        );
+        }, 'Preferences updated successfully');
     } catch (error: any) {
-        console.error('Update preferences error:', error);
-        return NextResponse.json(
-            { error: 'An error occurred while updating preferences' },
-            { status: 500 }
-        );
+        log.error('Update preferences error', error, { endpoint: '/api/user/preferences' });
+        return ApiResponse.internalError('An error occurred while updating preferences');
     }
 }

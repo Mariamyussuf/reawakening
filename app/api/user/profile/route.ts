@@ -1,82 +1,63 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import dbConnect from '@/lib/mongodb';
-import User from '@/models/User';
+import { requireAuth } from '@/lib/middleware/auth';
+import { rateLimiters } from '@/lib/middleware/ratelimit';
+import { validateBody } from '@/lib/validation';
+import { UpdateProfileSchema } from '@/lib/validation/schemas';
+import { ApiResponse } from '@/lib/api/response';
+import { log } from '@/lib/logger';
+import prisma from '@/lib/prisma';
 
 // PUT /api/user/profile - Update user profile
 export async function PUT(request: NextRequest) {
+    // Apply rate limiting
+    const rateLimitResponse = await rateLimiters.api(request);
+    if (rateLimitResponse) {
+        return rateLimitResponse;
+    }
+
     try {
-        const session = await getServerSession(authOptions);
+        const session = await requireAuth();
 
-        if (!session || !session.user) {
-            return NextResponse.json(
-                { error: 'Unauthorized' },
-                { status: 401 }
-            );
+        // Validate request body
+        const validation = await validateBody(request, UpdateProfileSchema);
+        if (!validation.success) {
+            return validation.response;
         }
 
-        const updates = await request.json();
-        const allowedFields = ['name', 'phone', 'campus', 'bio', 'avatar'];
+        const updates = validation.data;
 
-        // Filter to only allow specific fields
-        const filteredUpdates: any = {};
-        for (const field of allowedFields) {
-            if (updates[field] !== undefined) {
-                filteredUpdates[field] = updates[field];
-            }
-        }
+        // Filter out sensitive fields just in case (though schema should catch this)
+        const allowedUpdates = {
+            name: updates.name,
+            phone: updates.phone,
+            campus: updates.campus,
+            bio: updates.bio,
+            avatar: updates.avatar
+        };
 
-        // Validation
-        if (filteredUpdates.name && filteredUpdates.name.length > 60) {
-            return NextResponse.json(
-                { error: 'Name cannot be more than 60 characters' },
-                { status: 400 }
-            );
-        }
-
-        if (filteredUpdates.bio && filteredUpdates.bio.length > 500) {
-            return NextResponse.json(
-                { error: 'Bio cannot be more than 500 characters' },
-                { status: 400 }
-            );
-        }
-
-        await dbConnect();
-
-        const user = await User.findByIdAndUpdate(
-            (session.user as any).id,
-            { $set: filteredUpdates },
-            { new: true, runValidators: true }
-        ).select('-password');
+        const user = await prisma.user.update({
+            where: { id: session.user.id },
+            data: allowedUpdates,
+        });
 
         if (!user) {
-            return NextResponse.json(
-                { error: 'User not found' },
-                { status: 404 }
-            );
+            return ApiResponse.error('User not found', 404);
         }
 
-        return NextResponse.json(
-            {
-                message: 'Profile updated successfully',
-                user: {
-                    id: user._id.toString(),
-                    name: user.name,
-                    email: user.email,
-                    phone: user.phone,
-                    campus: user.campus,
-                    bio: user.bio,
-                    avatar: user.avatar,
-                },
+        return ApiResponse.success({
+            user: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                phone: user.phone,
+                campus: user.campus,
+                bio: user.bio,
+                avatar: user.avatar,
             },
-            { status: 200 }
-        );
+        }, 200, 'Profile updated successfully');
     } catch (error: any) {
-        console.error('Update profile error:', error);
-        return NextResponse.json(
-            { error: 'An error occurred while updating profile' },
-            { status: 500 }
-        );
+        log.error('Update profile error', error, { endpoint: '/api/user/profile' });
+        return ApiResponse.internalError('An error occurred while updating profile');
     }
 }
+

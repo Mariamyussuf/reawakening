@@ -179,4 +179,4 @@ For questions or support:
 
 ---
 
-**Built with ❤️ for the glory of God and the spiritual growth of students.**
+**Built too cook❤️ for the glory of God and the spiritual growth of students.**

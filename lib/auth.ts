@@ -1,8 +1,8 @@
 import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
-import dbConnect from '@/lib/mongodb';
-import User from '@/models/User';
+import prisma from '@/lib/prisma';
+import { env } from '@/lib/env';
 
 export const authOptions: NextAuthOptions = {
     providers: [
@@ -17,10 +17,10 @@ export const authOptions: NextAuthOptions = {
                     throw new Error('Please enter your email and password');
                 }
 
-                await dbConnect();
-
-                // Find user with password field
-                const user = await User.findOne({ email: credentials.email }).select('+password');
+                // Find user
+                const user = await prisma.user.findUnique({
+                    where: { email: credentials.email }
+                });
 
                 if (!user) {
                     throw new Error('No user found with this email');
@@ -34,11 +34,13 @@ export const authOptions: NextAuthOptions = {
                 }
 
                 // Update last active
-                user.lastActive = new Date();
-                await user.save();
+                await prisma.user.update({
+                    where: { id: user.id },
+                    data: { lastActive: new Date() }
+                });
 
                 return {
-                    id: user._id.toString(),
+                    id: user.id,
                     email: user.email,
                     name: user.name,
                     role: user.role,
@@ -50,14 +52,14 @@ export const authOptions: NextAuthOptions = {
         async jwt({ token, user }) {
             if (user) {
                 token.id = user.id;
-                token.role = (user as any).role;
+                token.role = user.role;
             }
             return token;
         },
         async session({ session, token }) {
             if (session.user) {
-                (session.user as any).id = token.id;
-                (session.user as any).role = token.role;
+                session.user.id = token.id;
+                session.user.role = token.role;
             }
             return session;
         },
@@ -71,5 +73,5 @@ export const authOptions: NextAuthOptions = {
         strategy: 'jwt',
         maxAge: 30 * 24 * 60 * 60, // 30 days
     },
-    secret: process.env.NEXTAUTH_SECRET,
+    secret: env.NEXTAUTH_SECRET,
 };

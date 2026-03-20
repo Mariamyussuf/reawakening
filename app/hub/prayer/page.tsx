@@ -67,7 +67,7 @@ export default function PrayerPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         if (!newTitle.trim() || !newRequest.trim()) {
             setError("Please provide both title and description");
             return;
@@ -113,7 +113,7 @@ export default function PrayerPage() {
             });
 
             if (!response.ok) throw new Error("Failed to update prayer");
-            
+
             await fetchPrayers();
             setSuccess("Prayer status updated!");
         } catch (err: any) {
@@ -130,7 +130,7 @@ export default function PrayerPage() {
             });
 
             if (!response.ok) throw new Error("Failed to delete prayer");
-            
+
             await fetchPrayers();
             setSuccess("Prayer deleted successfully!");
         } catch (err: any) {
@@ -145,9 +145,9 @@ export default function PrayerPage() {
             });
 
             if (!response.ok) throw new Error("Failed to update prayer count");
-            
+
             const data = await response.json();
-            
+
             // Update local state
             if (activeTab === "praying-for") {
                 setPrayingFor((prev) =>
@@ -193,7 +193,7 @@ export default function PrayerPage() {
     ];
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-emerald-50">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50 to-amber-50">
             {/* Header */}
             <header className="bg-white/90 backdrop-blur-md shadow-sm border-b border-slate-200">
                 <div className="container-custom py-4">
@@ -262,7 +262,7 @@ export default function PrayerPage() {
                                         value={newTitle}
                                         onChange={(e) => setNewTitle(e.target.value)}
                                         placeholder="Brief title for your prayer request..."
-                                        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent mb-4"
+                                        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent mb-4"
                                         maxLength={100}
                                     />
                                 </div>
@@ -275,7 +275,7 @@ export default function PrayerPage() {
                                         value={newRequest}
                                         onChange={(e) => setNewRequest(e.target.value)}
                                         placeholder="Share your prayer request with the community..."
-                                        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                                         maxLength={1000}
                                     />
                                     <p className="text-xs text-slate-500 mt-1">{newRequest.length}/1000 characters</p>
@@ -284,7 +284,7 @@ export default function PrayerPage() {
                                     <button
                                         type="submit"
                                         disabled={submitting}
-                                        className="px-6 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="px-6 py-2 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         {submitting ? "Submitting..." : "Submit Prayer Request"}
                                     </button>
@@ -308,7 +308,7 @@ export default function PrayerPage() {
                                     <button
                                         onClick={() => setActiveTab("my-prayers")}
                                         className={`px-4 py-3 font-medium transition-all duration-200 border-b-2 ${activeTab === "my-prayers"
-                                            ? "border-green-600 text-green-600"
+                                            ? "border-orange-600 text-orange-600"
                                             : "border-transparent text-slate-600 hover:text-slate-800"
                                             }`}
                                     >
@@ -317,7 +317,7 @@ export default function PrayerPage() {
                                     <button
                                         onClick={() => setActiveTab("praying-for")}
                                         className={`px-4 py-3 font-medium transition-all duration-200 border-b-2 ${activeTab === "praying-for"
-                                            ? "border-green-600 text-green-600"
+                                            ? "border-orange-600 text-orange-600"
                                             : "border-transparent text-slate-600 hover:text-slate-800"
                                             }`}
                                     >
@@ -340,7 +340,7 @@ export default function PrayerPage() {
                                             <div
                                                 key={prayer.id}
                                                 className={`p-4 rounded-lg border-2 transition-all duration-300 ${prayer.isAnswered
-                                                    ? "bg-gradient-to-r from-green-50 to-emerald-50 border-green-200"
+                                                    ? "bg-gradient-to-r from-amber-50 to-orange-50 border-amber-200"
                                                     : "bg-white border-slate-200 hover:shadow-md"
                                                     }`}
                                             >
@@ -349,7 +349,7 @@ export default function PrayerPage() {
                                                         <div className="flex items-center gap-2 mb-2">
                                                             <h3 className="font-bold text-slate-800">{prayer.title}</h3>
                                                             {prayer.isAnswered && (
-                                                                <span className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
+                                                                <span className="px-2 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-medium">
                                                                     ✓ Answered
                                                                 </span>
                                                             )}
@@ -378,7 +378,7 @@ export default function PrayerPage() {
                                                     <div className="flex gap-2">
                                                         <button
                                                             onClick={() => handleMarkAnswered(prayer.id)}
-                                                            className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
+                                                            className="px-4 py-2 bg-orange-600 text-white rounded-lg text-sm font-medium hover:bg-orange-700 transition-colors"
                                                         >
                                                             Mark as Answered
                                                         </button>
@@ -416,11 +416,10 @@ export default function PrayerPage() {
                                                         <div className="flex items-center gap-4">
                                                             <button
                                                                 onClick={() => handlePray(prayer.id)}
-                                                                className={`flex items-center gap-2 text-sm font-medium transition-colors ${
-                                                                    prayer.hasPrayed
-                                                                        ? "text-green-600 hover:text-green-700"
-                                                                        : "text-slate-600 hover:text-green-600"
-                                                                }`}
+                                                                className={`flex items-center gap-2 text-sm font-medium transition-colors ${prayer.hasPrayed
+                                                                    ? "text-orange-600 hover:text-orange-700"
+                                                                    : "text-slate-600 hover:text-orange-600"
+                                                                    }`}
                                                             >
                                                                 <svg
                                                                     className={`w-4 h-4 ${prayer.hasPrayed ? "fill-current" : ""}`}
@@ -451,7 +450,7 @@ export default function PrayerPage() {
                             <div className="space-y-3">
                                 {prayerPrompts.map((prompt, index) => (
                                     <div key={index} className="p-4 bg-slate-50 rounded-lg border border-slate-200">
-                                        <p className="text-xs font-semibold text-emerald-600 mb-2">{prompt.category}</p>
+                                        <p className="text-xs font-semibold text-orange-600 mb-2">{prompt.category}</p>
                                         <p className="text-sm text-slate-700 italic leading-relaxed">&quot;{prompt.prompt}&quot;</p>
                                     </div>
                                 ))}

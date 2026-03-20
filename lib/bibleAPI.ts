@@ -1,8 +1,10 @@
 // Bible API Service
 // Handles all Bible API interactions
 
+import { env } from '@/lib/env';
+
 const BIBLE_API_BASE = 'https://api.scripture.api.bible/v1';
-const API_KEY = process.env.BIBLE_API_KEY || '';
+const API_KEY = env.BIBLE_API_KEY || '';
 
 // Bible translation IDs from API.Bible
 export const BIBLE_VERSIONS = {

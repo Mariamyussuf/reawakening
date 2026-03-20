@@ -109,9 +109,9 @@ export default function BookmarksPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-emerald-50">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50 to-amber-50">
             {/* Header */}
-            <div className="bg-white/80 backdrop-blur-sm border-b border-green-100 sticky top-0 z-10">
+            <div className="bg-white/80 backdrop-blur-sm border-b border-orange-100 sticky top-0 z-10">
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                     <div className="flex items-center justify-between">
                         <div>
@@ -122,7 +122,7 @@ export default function BookmarksPage() {
                         </div>
                         <Link
                             href="/hub/bible"
-                            className="px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:scale-105 transition-transform"
+                            className="px-4 py-2 bg-gradient-to-r from-orange-600 to-amber-600 text-white rounded-lg hover:scale-105 transition-transform"
                         >
                             ← Back
                         </Link>
@@ -197,7 +197,7 @@ export default function BookmarksPage() {
                                                 }`}
                                         >
                                             <div className="flex items-start justify-between mb-3">
-                                                <h3 className="font-bold text-green-600 text-lg">{bookmark.reference}</h3>
+                                                <h3 className="font-bold text-orange-600 text-lg">{bookmark.reference}</h3>
                                                 <span className="text-sm text-gray-500">
                                                     {new Date(bookmark.createdAt).toLocaleDateString()}
                                                 </span>
@@ -229,7 +229,7 @@ export default function BookmarksPage() {
                                                     <div className="flex gap-2">
                                                         <button
                                                             onClick={handleSaveEdit}
-                                                            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
+                                                            className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors text-sm"
                                                         >
                                                             Save
                                                         </button>
@@ -296,7 +296,7 @@ export default function BookmarksPage() {
                                                 }`}
                                         >
                                             <div className="flex items-start justify-between mb-3">
-                                                <h3 className="font-bold text-green-600 text-lg">{highlight.reference}</h3>
+                                                <h3 className="font-bold text-orange-600 text-lg">{highlight.reference}</h3>
                                                 <span className="text-sm text-gray-500">
                                                     {new Date(highlight.createdAt).toLocaleDateString()}
                                                 </span>
@@ -328,7 +328,7 @@ export default function BookmarksPage() {
                                                     <div className="flex gap-2">
                                                         <button
                                                             onClick={handleSaveEdit}
-                                                            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
+                                                            className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors text-sm"
                                                         >
                                                             Save
                                                         </button>
@@ -387,7 +387,7 @@ export default function BookmarksPage() {
                                 </p>
                                 <Link
                                     href="/hub/bible"
-                                    className="inline-block px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:scale-105 transition-transform"
+                                    className="inline-block px-6 py-3 bg-gradient-to-r from-orange-600 to-amber-600 text-white rounded-lg hover:scale-105 transition-transform"
                                 >
                                     Start Reading
                                 </Link>

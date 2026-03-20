@@ -1,37 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
-import dbConnect from '@/lib/mongodb';
-import BookModel from '@/models/BookModel';
+import { rateLimiters } from '@/lib/middleware/ratelimit';
+import { ApiResponse } from '@/lib/api/response';
+import { log } from '@/lib/logger';
+import prisma from '@/lib/prisma';
 
 // POST /api/books/:id/view - Increment view count
 export async function POST(
     request: NextRequest,
     { params }: { params: { id: string } }
 ) {
+    // Apply rate limiting
+    const rateLimitResponse = await rateLimiters.api(request);
+    if (rateLimitResponse) {
+        return rateLimitResponse;
+    }
+
     try {
-        await dbConnect();
+        const book = await prisma.book.update({
+            where: { id: params.id },
+            data: { totalViews: { increment: 1 } }
+        });
 
-        const book = await BookModel.findByIdAndUpdate(
-            params.id,
-            { $inc: { totalViews: 1 } },
-            { new: true }
-        );
-
-        if (!book) {
-            return NextResponse.json(
-                { error: 'Book not found' },
-                { status: 404 }
-            );
-        }
-
-        return NextResponse.json(
-            { message: 'View count updated', totalViews: book.totalViews },
-            { status: 200 }
-        );
+        return ApiResponse.success({ totalViews: book.totalViews }, 200, 'View count updated');
     } catch (error: any) {
-        console.error('Increment view error:', error);
-        return NextResponse.json(
-            { error: 'An error occurred while updating view count' },
-            { status: 500 }
-        );
+        if (error.code === 'P2025') {
+            return ApiResponse.error('Book not found', 404);
+        }
+        log.error('Increment view error', error, { endpoint: '/api/books/[id]/view', bookId: params.id });
+        return ApiResponse.internalError('An error occurred while updating view count');
     }
 }

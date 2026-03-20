@@ -23,9 +23,11 @@ export default function Header() {
                 <div className="flex items-center justify-between">
                     {/* Logo */}
                     <Link href="/" className="flex items-center space-x-2 group">
-                        <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center shadow-md group-hover:shadow-lg transition-all duration-300">
-                            <span className="text-white font-bold text-xl">R</span>
-                        </div>
+                        <img
+                            src="/images/logo.png"
+                            alt="Reawakening Logo"
+                            className="w-10 h-10 object-contain group-hover:scale-105 transition-transform duration-300"
+                        />
                         <span className="text-xl font-bold text-slate-800">Reawakening</span>
                     </Link>
 
@@ -35,7 +37,7 @@ export default function Header() {
                             <Link
                                 key={item.name}
                                 href={item.href}
-                                className="px-4 py-2 text-slate-700 hover:text-blue-600 font-medium rounded-lg hover:bg-blue-50 transition-all duration-200"
+                                className="px-4 py-2 text-slate-700 hover:text-orange-600 font-medium rounded-lg hover:bg-orange-50 transition-all duration-200"
                             >
                                 {item.name}
                             </Link>
@@ -73,7 +75,7 @@ export default function Header() {
                             <Link
                                 key={item.name}
                                 href={item.href}
-                                className="block px-4 py-2 text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg font-medium transition-all duration-200"
+                                className="block px-4 py-2 text-slate-700 hover:text-orange-600 hover:bg-orange-50 rounded-lg font-medium transition-all duration-200"
                                 onClick={() => setMobileMenuOpen(false)}
                             >
                                 {item.name}

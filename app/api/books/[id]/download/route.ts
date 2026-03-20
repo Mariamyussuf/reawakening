@@ -1,52 +1,38 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import dbConnect from '@/lib/mongodb';
-import BookModel from '@/models/BookModel';
+import { requireAuth } from '@/lib/middleware/auth';
+import { rateLimiters } from '@/lib/middleware/ratelimit';
+import { ApiResponse } from '@/lib/api/response';
+import { log } from '@/lib/logger';
+import prisma from '@/lib/prisma';
 
 // POST /api/books/:id/download - Increment download count and return download URL
 export async function POST(
     request: NextRequest,
     { params }: { params: { id: string } }
 ) {
+    // Apply rate limiting
+    const rateLimitResponse = await rateLimiters.api(request);
+    if (rateLimitResponse) {
+        return rateLimitResponse;
+    }
+
     try {
-        const session = await getServerSession(authOptions);
+        await requireAuth();
 
-        if (!session || !session.user) {
-            return NextResponse.json(
-                { error: 'Unauthorized' },
-                { status: 401 }
-            );
-        }
+        const book = await prisma.book.update({
+            where: { id: params.id },
+            data: { totalDownloads: { increment: 1 } }
+        });
 
-        await dbConnect();
-
-        const book = await BookModel.findByIdAndUpdate(
-            params.id,
-            { $inc: { totalDownloads: 1 } },
-            { new: true }
-        );
-
-        if (!book) {
-            return NextResponse.json(
-                { error: 'Book not found' },
-                { status: 404 }
-            );
-        }
-
-        return NextResponse.json(
-            {
-                message: 'Download count updated',
-                totalDownloads: book.totalDownloads,
-                pdfUrl: book.pdfUrl,
-            },
-            { status: 200 }
-        );
+        return ApiResponse.success({
+            totalDownloads: book.totalDownloads,
+            pdfUrl: book.pdfUrl,
+        }, 200, 'Download count updated');
     } catch (error: any) {
-        console.error('Increment download error:', error);
-        return NextResponse.json(
-            { error: 'An error occurred while updating download count' },
-            { status: 500 }
-        );
+        if (error.code === 'P2025') {
+            return ApiResponse.error('Book not found', 404);
+        }
+        log.error('Increment download error', error, { endpoint: '/api/books/[id]/download', bookId: params.id });
+        return ApiResponse.internalError('An error occurred while updating download count');
     }
 }

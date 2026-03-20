@@ -47,7 +47,7 @@ export default function PrayerJournalPage() {
         { id: "general", name: "General Prayer", color: "slate" },
         { id: "morning", name: "Morning Prayer", color: "amber" },
         { id: "evening", name: "Evening Prayer", color: "indigo" },
-        { id: "gratitude", name: "Gratitude", color: "emerald" },
+        { id: "gratitude", name: "Gratitude", color: "orange" },
         { id: "answered", name: "Answered Prayer", color: "blue" },
         { id: "study", name: "Study Prayer", color: "violet" },
         { id: "prayer", name: "Prayer", color: "purple" },
@@ -231,7 +231,7 @@ export default function PrayerJournalPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-pink-50">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50 to-amber-50">
             {/* Header */}
             <header className="bg-white/90 backdrop-blur-md shadow-sm border-b border-slate-200">
                 <div className="container-custom py-4">
@@ -302,7 +302,7 @@ export default function PrayerJournalPage() {
                                         value={newTitle}
                                         onChange={(e) => setNewTitle(e.target.value)}
                                         placeholder="Give your entry a title..."
-                                        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent mb-4"
+                                        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent mb-4"
                                         maxLength={200}
                                     />
                                 </div>
@@ -317,11 +317,10 @@ export default function PrayerJournalPage() {
                                                 key={cat.id}
                                                 type="button"
                                                 onClick={() => setSelectedCategory(cat.id)}
-                                                className={`px-4 py-2.5 rounded-lg border transition-all duration-200 text-sm font-medium ${
-                                                    selectedCategory === cat.id
-                                                        ? "border-purple-500 bg-purple-50 text-purple-700"
+                                                className={`px-4 py-2.5 rounded-lg border transition-all duration-200 text-sm font-medium ${selectedCategory === cat.id
+                                                        ? "border-orange-500 bg-orange-50 text-orange-700"
                                                         : "border-slate-200 hover:border-slate-300 text-slate-700"
-                                                }`}
+                                                    }`}
                                             >
                                                 {cat.name}
                                             </button>
@@ -338,7 +337,7 @@ export default function PrayerJournalPage() {
                                         value={newEntry}
                                         onChange={(e) => setNewEntry(e.target.value)}
                                         placeholder="Write your prayer, thoughts, or reflections here..."
-                                        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                                         maxLength={5000}
                                         required
                                     />
@@ -353,7 +352,7 @@ export default function PrayerJournalPage() {
                                         <select
                                             value={selectedMood}
                                             onChange={(e) => setSelectedMood(e.target.value)}
-                                            className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                            className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                                         >
                                             <option value="">Select mood...</option>
                                             {moods.map((mood) => (
@@ -372,7 +371,7 @@ export default function PrayerJournalPage() {
                                             value={tags}
                                             onChange={(e) => setTags(e.target.value)}
                                             placeholder="gratitude, prayer, study..."
-                                            className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                            className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                                         />
                                     </div>
                                 </div>
@@ -381,13 +380,13 @@ export default function PrayerJournalPage() {
                                     <button
                                         type="submit"
                                         disabled={submitting}
-                                        className="px-6 py-2 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="px-6 py-2 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         {submitting
                                             ? "Saving..."
                                             : editingId
-                                            ? "Update Entry"
-                                            : "Save Entry"}
+                                                ? "Update Entry"
+                                                : "Save Entry"}
                                     </button>
                                     <button
                                         type="button"
@@ -407,7 +406,7 @@ export default function PrayerJournalPage() {
                                 <select
                                     value={filterCategory}
                                     onChange={(e) => setFilterCategory(e.target.value)}
-                                    className="px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                    className="px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                                 >
                                     <option value="all">All Categories</option>
                                     {categories.map((cat) => (
@@ -428,11 +427,11 @@ export default function PrayerJournalPage() {
                                     journalEntries.map((entry) => (
                                         <div
                                             key={entry.id}
-                                            className="p-4 bg-gradient-to-r from-slate-50 to-purple-50 rounded-lg border border-slate-200 hover:shadow-md transition-all duration-300"
+                                            className="p-4 bg-gradient-to-r from-slate-50 to-orange-50 rounded-lg border border-slate-200 hover:shadow-md transition-all duration-300"
                                         >
                                             <div className="flex items-start justify-between mb-3">
                                                 <div className="flex items-center gap-3 flex-1">
-                                                    <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-purple-600 rounded-lg flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+                                                    <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-600 rounded-lg flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
                                                         {entry.category.charAt(0).toUpperCase()}
                                                     </div>
                                                     <div className="flex-1">
@@ -519,13 +518,13 @@ export default function PrayerJournalPage() {
                         </div>
 
                         {/* Scripture Inspiration */}
-                        <div className="card bg-gradient-to-br from-purple-50 to-pink-50">
+                        <div className="card bg-gradient-to-br from-orange-50 to-amber-50">
                             <h3 className="text-lg font-bold text-slate-800 mb-3">Today's Inspiration</h3>
-                            <div className="p-3 bg-white rounded-lg border border-purple-200">
+                            <div className="p-3 bg-white rounded-lg border border-orange-200">
                                 <p className="text-sm text-slate-700 italic mb-2">
                                     "This is the confidence we have in approaching God: that if we ask anything according to his will, he hears us."
                                 </p>
-                                <p className="text-xs font-semibold text-purple-600">1 John 5:14</p>
+                                <p className="text-xs font-semibold text-orange-600">1 John 5:14</p>
                             </div>
                         </div>
 

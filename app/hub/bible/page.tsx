@@ -42,15 +42,15 @@ export default function BiblePage() {
     );
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-emerald-50/30 to-sky-50/40">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50/30 to-amber-50/40">
             {/* Floating Background Elements */}
             <div className="fixed inset-0 pointer-events-none overflow-hidden">
-                <div className="absolute top-20 right-20 w-96 h-96 bg-emerald-300/10 rounded-full blur-3xl"></div>
-                <div className="absolute bottom-20 left-20 w-80 h-80 bg-sky-300/10 rounded-full blur-3xl"></div>
+                <div className="absolute top-20 right-20 w-96 h-96 bg-orange-300/10 rounded-full blur-3xl"></div>
+                <div className="absolute bottom-20 left-20 w-80 h-80 bg-amber-300/10 rounded-full blur-3xl"></div>
             </div>
 
             {/* Header */}
-            <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-emerald-100/50 shadow-sm">
+            <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-orange-100/50 shadow-sm">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                     <div className="flex items-center justify-between mb-6">
                         <div>
@@ -83,8 +83,8 @@ export default function BiblePage() {
                                 key={version}
                                 onClick={() => setSelectedVersion(version)}
                                 className={`px-5 py-2.5 rounded-xl font-semibold transition-all ${selectedVersion === version
-                                        ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg scale-105'
-                                        : 'bg-white/90 text-slate-700 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300'
+                                    ? 'bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow-lg scale-105'
+                                    : 'bg-white/90 text-slate-700 hover:bg-orange-50 border border-slate-200 hover:border-orange-300'
                                     }`}
                             >
                                 {version}
@@ -113,8 +113,8 @@ export default function BiblePage() {
                     <button
                         onClick={() => setActiveTestament('all')}
                         className={`px-6 py-3 rounded-xl font-semibold transition-all ${activeTestament === 'all'
-                                ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg'
-                                : 'bg-white/90 text-slate-700 hover:bg-emerald-50 border border-slate-200'
+                            ? 'bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow-lg'
+                            : 'bg-white/90 text-slate-700 hover:bg-orange-50 border border-slate-200'
                             }`}
                     >
                         All Books ({books.length})
@@ -122,8 +122,8 @@ export default function BiblePage() {
                     <button
                         onClick={() => setActiveTestament('old')}
                         className={`px-6 py-3 rounded-xl font-semibold transition-all ${activeTestament === 'old'
-                                ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg'
-                                : 'bg-white/90 text-slate-700 hover:bg-emerald-50 border border-slate-200'
+                            ? 'bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow-lg'
+                            : 'bg-white/90 text-slate-700 hover:bg-orange-50 border border-slate-200'
                             }`}
                     >
                         Old Testament ({oldTestamentBooks.length})
@@ -131,8 +131,8 @@ export default function BiblePage() {
                     <button
                         onClick={() => setActiveTestament('new')}
                         className={`px-6 py-3 rounded-xl font-semibold transition-all ${activeTestament === 'new'
-                                ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg'
-                                : 'bg-white/90 text-slate-700 hover:bg-emerald-50 border border-slate-200'
+                            ? 'bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow-lg'
+                            : 'bg-white/90 text-slate-700 hover:bg-orange-50 border border-slate-200'
                             }`}
                     >
                         New Testament ({newTestamentBooks.length})
@@ -142,7 +142,7 @@ export default function BiblePage() {
                 {/* Books Grid */}
                 {loading ? (
                     <div className="text-center py-20">
-                        <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-emerald-600 border-t-transparent mb-4"></div>
+                        <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-orange-600 border-t-transparent mb-4"></div>
                         <p className="text-slate-600 text-lg font-medium">Loading books...</p>
                     </div>
                 ) : (
@@ -155,7 +155,7 @@ export default function BiblePage() {
                             >
                                 <div className="text-center">
                                     <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">📕</div>
-                                    <h3 className="font-bold text-slate-900 mb-1 group-hover:text-emerald-600 transition-colors">
+                                    <h3 className="font-bold text-slate-900 mb-1 group-hover:text-orange-600 transition-colors">
                                         {book.name}
                                     </h3>
                                     <p className="text-sm text-slate-500">{book.chapters} chapters</p>
@@ -204,7 +204,7 @@ export default function BiblePage() {
                                 href="/daily-verse"
                                 className="card-glass hover:scale-105 cursor-pointer group"
                             >
-                                <div className="icon-container bg-gradient-to-br from-emerald-500 to-teal-600 mb-4 group-hover:scale-110 group-hover:rotate-3">
+                                <div className="icon-container bg-gradient-to-br from-orange-500 to-amber-600 mb-4 group-hover:scale-110 group-hover:rotate-3">
                                     <span className="text-3xl">✨</span>
                                 </div>
                                 <h3 className="font-bold text-slate-900 mb-2 text-xl">Verse of the Day</h3>
@@ -230,7 +230,7 @@ export default function BiblePage() {
                                     href={`/hub/bible/${book.id}/1?version=${selectedVersion}`}
                                     className="relative overflow-hidden card-premium hover:scale-105 cursor-pointer group"
                                 >
-                                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-600 to-teal-600 opacity-95"></div>
+                                    <div className="absolute inset-0 bg-gradient-to-br from-orange-600 to-amber-600 opacity-95"></div>
                                     <div className="relative z-10 text-white text-center py-4">
                                         <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">⭐</div>
                                         <h3 className="font-bold mb-1 text-xl">{book.name}</h3>

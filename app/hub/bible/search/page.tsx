@@ -29,9 +29,9 @@ export default function BibleSearchPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-emerald-50">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50 to-amber-50">
             {/* Header */}
-            <div className="bg-white/80 backdrop-blur-sm border-b border-green-100 sticky top-0 z-10">
+            <div className="bg-white/80 backdrop-blur-sm border-b border-orange-100 sticky top-0 z-10">
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                     <div className="flex items-center justify-between mb-4">
                         <h1 className="text-3xl font-bold text-gray-900" style={{ fontFamily: 'Merriweather, serif' }}>
@@ -39,7 +39,7 @@ export default function BibleSearchPage() {
                         </h1>
                         <Link
                             href="/hub/bible"
-                            className="px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:scale-105 transition-transform"
+                            className="px-4 py-2 bg-gradient-to-r from-orange-600 to-amber-600 text-white rounded-lg hover:scale-105 transition-transform"
                         >
                             ← Back
                         </Link>
@@ -53,12 +53,12 @@ export default function BibleSearchPage() {
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 placeholder="Search for verses, topics, or keywords..."
-                                className="flex-1 px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                                className="flex-1 px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500"
                             />
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:scale-105 transition-transform disabled:opacity-50"
+                                className="px-6 py-3 bg-gradient-to-r from-orange-600 to-amber-600 text-white rounded-lg hover:scale-105 transition-transform disabled:opacity-50"
                             >
                                 {loading ? 'Searching...' : 'Search'}
                             </button>
@@ -75,8 +75,8 @@ export default function BibleSearchPage() {
                                     type="button"
                                     onClick={() => setSelectedVersion(version)}
                                     className={`px-4 py-2 rounded-lg font-medium transition-all ${selectedVersion === version
-                                            ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg'
-                                            : 'bg-white text-gray-700 hover:bg-green-50 border border-gray-200'
+                                        ? 'bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow-lg'
+                                        : 'bg-white text-gray-700 hover:bg-orange-50 border border-gray-200'
                                         }`}
                                 >
                                     {version}
@@ -91,7 +91,7 @@ export default function BibleSearchPage() {
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {loading && (
                     <div className="text-center py-12">
-                        <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-green-600 border-t-transparent"></div>
+                        <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-orange-600 border-t-transparent"></div>
                         <p className="mt-4 text-gray-600">Searching the Bible...</p>
                     </div>
                 )}
@@ -114,16 +114,16 @@ export default function BibleSearchPage() {
                                 key={index}
                                 className="bg-white rounded-xl p-6 shadow-sm hover:shadow-lg transition-all border border-gray-100"
                             >
-                                <h3 className="font-bold text-green-600 mb-2">{result.reference}</h3>
+                                <h3 className="font-bold text-orange-600 mb-2">{result.reference}</h3>
                                 <p className="text-gray-800 leading-relaxed">{result.text}</p>
                                 <div className="mt-4 flex gap-2">
-                                    <button className="px-4 py-2 bg-green-50 text-green-600 rounded-lg hover:bg-green-100 transition-colors text-sm">
+                                    <button className="px-4 py-2 bg-orange-50 text-orange-600 rounded-lg hover:bg-orange-100 transition-colors text-sm">
                                         🔖 Bookmark
                                     </button>
-                                    <button className="px-4 py-2 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 transition-colors text-sm">
+                                    <button className="px-4 py-2 bg-amber-50 text-amber-600 rounded-lg hover:bg-amber-100 transition-colors text-sm">
                                         ✨ Highlight
                                     </button>
-                                    <button className="px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors text-sm">
+                                    <button className="px-4 py-2 bg-yellow-50 text-yellow-600 rounded-lg hover:bg-yellow-100 transition-colors text-sm">
                                         📤 Share
                                     </button>
                                 </div>
@@ -152,7 +152,7 @@ export default function BibleSearchPage() {
                                                 setSearchQuery(term);
                                                 handleSearch(new Event('submit') as any);
                                             }}
-                                            className="px-4 py-2 bg-white border border-gray-200 rounded-lg hover:bg-green-50 hover:border-green-300 transition-colors text-sm"
+                                            className="px-4 py-2 bg-white border border-gray-200 rounded-lg hover:bg-orange-50 hover:border-orange-300 transition-colors text-sm"
                                         >
                                             {term}
                                         </button>

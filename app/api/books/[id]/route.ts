@@ -1,29 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import dbConnect from '@/lib/mongodb';
-import BookModel from '@/models/BookModel';
+import { rateLimiters } from '@/lib/middleware/ratelimit';
+import { ApiResponse } from '@/lib/api/response';
+import { log } from '@/lib/logger';
+import prisma from '@/lib/prisma';
 
 // GET /api/books/:id - Get single book
 export async function GET(
     request: NextRequest,
     { params }: { params: { id: string } }
 ) {
-    try {
-        await dbConnect();
+    // Apply rate limiting
+    const rateLimitResponse = await rateLimiters.api(request);
+    if (rateLimitResponse) {
+        return rateLimitResponse;
+    }
 
-        const book = await BookModel.findById(params.id).lean();
+    try {
+        const book = await prisma.book.findUnique({
+            where: { id: params.id }
+        });
 
         if (!book) {
-            return NextResponse.json(
-                { error: 'Book not found' },
-                { status: 404 }
-            );
+            return ApiResponse.error('Book not found', 404);
         }
 
         // Format response
         const formattedBook = {
-            id: book._id.toString(),
+            id: book.id,
             title: book.title,
             author: book.author,
             description: book.description,
@@ -31,8 +34,8 @@ export async function GET(
             pdfUrl: book.pdfUrl,
             fileSize: book.fileSize,
             pageCount: book.pageCount,
-            categories: book.categories,
-            tags: book.tags,
+            categories: book.categories ? JSON.parse(book.categories) : [],
+            tags: book.tags ? JSON.parse(book.tags) : [],
             publishYear: book.publishYear,
             publisher: book.publisher,
             isbn: book.isbn,
@@ -48,12 +51,9 @@ export async function GET(
             updatedAt: book.updatedAt,
         };
 
-        return NextResponse.json({ book: formattedBook }, { status: 200 });
+        return ApiResponse.success({ book: formattedBook });
     } catch (error: any) {
-        console.error('Get book error:', error);
-        return NextResponse.json(
-            { error: 'An error occurred while fetching book' },
-            { status: 500 }
-        );
+        log.error('Get book error', error, { endpoint: '/api/books/[id]', bookId: params.id });
+        return ApiResponse.internalError('An error occurred while fetching book');
     }
 }

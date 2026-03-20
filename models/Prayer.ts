@@ -69,6 +69,8 @@ const PrayerSchema = new Schema<IPrayer>(
 PrayerSchema.index({ userId: 1, createdAt: -1 });
 PrayerSchema.index({ isAnswered: 1, createdAt: -1 });
 PrayerSchema.index({ prayerCount: -1 });
+// Full-text search index
+PrayerSchema.index({ title: 'text', description: 'text', category: 'text' });
 
 const Prayer: Model<IPrayer> = mongoose.models.Prayer || mongoose.model<IPrayer>('Prayer', PrayerSchema);
 

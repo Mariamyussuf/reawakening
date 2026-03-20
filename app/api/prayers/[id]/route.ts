@@ -1,54 +1,58 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import dbConnect from '@/lib/mongodb';
-import Prayer from '@/models/Prayer';
+import { requireAuth } from '@/lib/middleware/auth';
+import { rateLimiters } from '@/lib/middleware/ratelimit';
+import { validateBody } from '@/lib/validation';
+import { UpdatePrayerSchema } from '@/lib/validation/schemas';
+import { ApiResponse } from '@/lib/api/response';
+import { log } from '@/lib/logger';
+import prisma from '@/lib/prisma';
 
 // PUT /api/prayers/:id - Update prayer
 export async function PUT(
     request: NextRequest,
     { params }: { params: { id: string } }
 ) {
-    try {
-        const session = await getServerSession(authOptions);
+    // Apply rate limiting
+    const rateLimitResponse = await rateLimiters.api(request);
+    if (rateLimitResponse) {
+        return rateLimitResponse;
+    }
 
-        if (!session || !session.user) {
-            return NextResponse.json(
-                { error: 'Unauthorized' },
-                { status: 401 }
-            );
+    try {
+        const session = await requireAuth();
+
+        // Validate request body
+        const validation = await validateBody(request, UpdatePrayerSchema);
+        if (!validation.success) {
+            return validation.response;
         }
 
-        const { title, description, category } = await request.json();
+        const { title, description, category } = validation.data;
 
-        await dbConnect();
+        const existingPrayer = await prisma.prayer.findUnique({
+            where: { id: params.id }
+        });
 
-        const prayer = await Prayer.findById(params.id);
-
-        if (!prayer) {
-            return NextResponse.json(
-                { error: 'Prayer not found' },
-                { status: 404 }
-            );
+        if (!existingPrayer) {
+            return ApiResponse.error('Prayer not found', 404);
         }
 
         // Check if user owns this prayer
-        if (prayer.userId.toString() !== (session.user as any).id) {
-            return NextResponse.json(
-                { error: 'Unauthorized to update this prayer' },
-                { status: 403 }
-            );
+        if (existingPrayer.userId !== session.user.id) {
+            return ApiResponse.forbidden('Unauthorized to update this prayer');
         }
 
-        // Update fields
-        if (title) prayer.title = title.trim();
-        if (description) prayer.description = description.trim();
-        if (category) prayer.category = category;
-
-        await prayer.save();
+        const prayer = await prisma.prayer.update({
+            where: { id: params.id },
+            data: {
+                title: title ? title.trim() : undefined,
+                description: description ? description.trim() : undefined,
+                category: category || undefined,
+            }
+        });
 
         const formattedPrayer = {
-            id: prayer._id.toString(),
+            id: prayer.id,
             title: prayer.title,
             description: prayer.description,
             category: prayer.category,
@@ -59,16 +63,10 @@ export async function PUT(
             createdAt: prayer.createdAt,
         };
 
-        return NextResponse.json(
-            { message: 'Prayer updated successfully', prayer: formattedPrayer },
-            { status: 200 }
-        );
+        return ApiResponse.success(formattedPrayer, 200, 'Prayer updated successfully');
     } catch (error: any) {
-        console.error('Update prayer error:', error);
-        return NextResponse.json(
-            { error: 'An error occurred while updating prayer' },
-            { status: 500 }
-        );
+        log.error('Update prayer error', error, { endpoint: '/api/prayers/[id]', prayerId: params.id });
+        return ApiResponse.internalError('An error occurred while updating prayer');
     }
 }
 
@@ -77,47 +75,36 @@ export async function DELETE(
     request: NextRequest,
     { params }: { params: { id: string } }
 ) {
+    // Apply rate limiting
+    const rateLimitResponse = await rateLimiters.api(request);
+    if (rateLimitResponse) {
+        return rateLimitResponse;
+    }
+
     try {
-        const session = await getServerSession(authOptions);
+        const session = await requireAuth();
 
-        if (!session || !session.user) {
-            return NextResponse.json(
-                { error: 'Unauthorized' },
-                { status: 401 }
-            );
-        }
-
-        await dbConnect();
-
-        const prayer = await Prayer.findById(params.id);
+        const prayer = await prisma.prayer.findUnique({
+            where: { id: params.id }
+        });
 
         if (!prayer) {
-            return NextResponse.json(
-                { error: 'Prayer not found' },
-                { status: 404 }
-            );
+            return ApiResponse.error('Prayer not found', 404);
         }
 
         // Check if user owns this prayer
-        if (prayer.userId.toString() !== (session.user as any).id) {
-            return NextResponse.json(
-                { error: 'Unauthorized to delete this prayer' },
-                { status: 403 }
-            );
+        if (prayer.userId !== session.user.id) {
+            return ApiResponse.forbidden('Unauthorized to delete this prayer');
         }
 
-        await Prayer.findByIdAndDelete(params.id);
+        await prisma.prayer.delete({
+            where: { id: params.id }
+        });
 
-        return NextResponse.json(
-            { message: 'Prayer deleted successfully' },
-            { status: 200 }
-        );
+        return ApiResponse.success(null, 200, 'Prayer deleted successfully');
     } catch (error: any) {
-        console.error('Delete prayer error:', error);
-        return NextResponse.json(
-            { error: 'An error occurred while deleting prayer' },
-            { status: 500 }
-        );
+        log.error('Delete prayer error', error, { endpoint: '/api/prayers/[id]', prayerId: params.id });
+        return ApiResponse.internalError('An error occurred while deleting prayer');
     }
 }
 

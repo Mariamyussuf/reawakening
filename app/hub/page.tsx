@@ -20,8 +20,9 @@ import {
     MapPinIcon
 } from "@/components/icons";
 
-// TEMPORARY: Set to true to use mock data for testing
-const TEST_MODE = true;
+// Use environment variable for development mode (only in development)
+// Note: NEXT_PUBLIC_ vars are available on client side, so we can't use validated env here
+const TEST_MODE = process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_TEST_MODE === 'true';
 
 const MOCK_USER_DATA = {
     name: "Test User",
@@ -67,12 +68,11 @@ export default function MemberHub() {
             <ProtectedRoute>
                 <div className="min-h-screen bg-neutral-50 flex items-center justify-center">
                     <div className="text-center">
-                        <div className="relative w-16 h-16 mx-auto mb-4">
-                            <div className="absolute inset-0 bg-gradient-to-br from-teal-600 to-emerald-600 rounded-lg animate-pulse"></div>
-                            <div className="absolute inset-0 flex items-center justify-center">
-                                <span className="text-white font-bold text-2xl">R</span>
-                            </div>
-                        </div>
+                        <img
+                            src="/images/logo.png"
+                            alt="Reawakening Logo"
+                            className="w-16 h-16 mx-auto mb-4 object-contain animate-pulse"
+                        />
                         <p className="text-neutral-900 font-semibold text-base">Loading your dashboard...</p>
                         <p className="text-neutral-500 text-sm mt-1">Preparing your spiritual journey</p>
                     </div>
@@ -144,6 +144,13 @@ export default function MemberHub() {
             color: "rose",
         },
         {
+            title: "Devotionals",
+            description: "Daily inspiration",
+            href: "/hub/devotionals",
+            iconPath: "M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z",
+            color: "amber",
+        },
+        {
             title: "Community",
             description: "Connect with members",
             href: "/hub/community",
@@ -155,60 +162,39 @@ export default function MemberHub() {
     return (
         <ProtectedRoute>
             <div className="min-h-screen bg-neutral-50">
-                {/* Header */}
-                <header className="sticky top-0 z-50 bg-white border-b border-neutral-200 shadow-sm">
-                    <div className="container-custom py-3">
-                        <div className="flex items-center justify-between">
-                            <Link href="/" className="flex items-center space-x-3 group">
-                                <div className="w-10 h-10 bg-gradient-to-br from-teal-600 to-emerald-600 rounded-lg flex items-center justify-center shadow-sm group-hover:shadow-md transition-all duration-200">
-                                    <span className="text-white font-bold text-lg">R</span>
-                                </div>
-                                <div>
-                                    <span className="text-lg font-semibold text-neutral-900 block">Reawakening Hub</span>
-                                    <span className="text-xs text-neutral-500">Member Dashboard</span>
-                                </div>
-                            </Link>
+                <main className="container-custom py-8">
+                    {/* Top Bar for Desktop - Notification & Profile - Now aligned right */}
+                    <div className="flex justify-end items-center mb-8 gap-4 px-4 sm:px-0">
+                        <button className="relative p-2 rounded-lg hover:bg-neutral-100 transition-colors group">
+                            <BellIcon className="text-neutral-600 group-hover:text-neutral-900 transition-colors" size={20} />
+                            <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
+                        </button>
 
-                            <div className="flex items-center gap-3">
-                                <button className="relative p-2 rounded-lg hover:bg-neutral-100 transition-colors group">
-                                    <BellIcon className="text-neutral-600 group-hover:text-neutral-900 transition-colors" size={20} />
-                                    <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
-                                </button>
-
-                                <div className="flex items-center gap-2">
-                                    <div className="text-right hidden sm:block">
-                                        <p className="text-sm font-semibold text-neutral-900">{userData.name}</p>
-                                        <p className="text-xs text-neutral-500">{userData.email}</p>
-                                    </div>
-                                    <button
-                                        onClick={() => signOut({ callbackUrl: "/" })}
-                                        className="w-9 h-9 bg-gradient-to-br from-teal-600 to-emerald-600 rounded-lg flex items-center justify-center text-white font-semibold shadow-sm hover:shadow-md transition-all"
-                                        title="Sign Out"
-                                    >
-                                        {userData.name.charAt(0).toUpperCase()}
-                                    </button>
-                                </div>
+                        <div className="flex items-center gap-2">
+                            <div className="text-right hidden sm:block">
+                                <p className="text-sm font-semibold text-neutral-900">{userData.name}</p>
+                                <p className="text-xs text-neutral-500">{userData.email}</p>
+                            </div>
+                            <div className="w-9 h-9 bg-gradient-to-br from-orange-600 to-amber-600 rounded-lg flex items-center justify-center text-white font-semibold shadow-sm">
+                                {userData.name.charAt(0).toUpperCase()}
                             </div>
                         </div>
                     </div>
-                </header>
-
-                <main className="container-custom py-8">
                     {/* Welcome Banner */}
-                    <div className="relative overflow-hidden bg-gradient-to-r from-teal-600 to-emerald-600 rounded-xl shadow-md mb-8 p-8">
+                    <div className="relative overflow-hidden bg-gradient-to-r from-orange-600 to-amber-600 rounded-xl shadow-md mb-8 p-8">
                         <div className="relative z-10">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <h1 className="text-3xl md:text-4xl font-semibold text-white mb-1">
                                         Welcome back, {userData.name.split(" ")[0]}
                                     </h1>
-                                    <p className="text-teal-50 text-base md:text-lg">Continue your spiritual journey today</p>
+                                    <p className="text-orange-50 text-base md:text-lg">Continue your spiritual journey today</p>
                                 </div>
                                 <div className="hidden lg:flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-lg px-6 py-4">
                                     <FlameIcon className="text-white" size={24} />
                                     <div className="text-right">
                                         <div className="text-3xl font-bold text-white">{userData.streak}</div>
-                                        <div className="text-xs text-teal-50">Day Streak</div>
+                                        <div className="text-xs text-orange-50">Day Streak</div>
                                     </div>
                                 </div>
                             </div>
@@ -231,8 +217,8 @@ export default function MemberHub() {
                         <div className="stat-card group">
                             <div className="flex items-center justify-between mb-3">
                                 <span className="text-slate-600 text-sm font-semibold">Verses Read</span>
-                                <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
-                                    <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                                <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center">
+                                    <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                                     </svg>
                                 </div>
@@ -272,24 +258,36 @@ export default function MemberHub() {
                     <div className="mb-8">
                         <div className="flex items-center justify-between mb-6">
                             <h2 className="text-3xl font-bold text-slate-900">Quick Actions</h2>
-                            <div className="h-1 flex-1 ml-6 bg-gradient-to-r from-emerald-200 to-transparent rounded-full"></div>
+                            <div className="h-1 flex-1 ml-6 bg-gradient-to-r from-orange-200 to-transparent rounded-full"></div>
                         </div>
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                            {quickActions.map((action, index) => (
-                                <Link
-                                    key={index}
-                                    href={action.href}
-                                    className="group relative bg-white rounded-xl p-5 border border-slate-200 hover:border-slate-300 hover:shadow-lg transition-all duration-300"
-                                >
-                                    <div className={`w-12 h-12 rounded-lg bg-${action.color}-50 flex items-center justify-center mb-4 group-hover:bg-${action.color}-100 transition-colors`}>
-                                        <svg className={`w-6 h-6 text-${action.color}-600`} fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d={action.iconPath} />
-                                        </svg>
-                                    </div>
-                                    <h3 className="font-semibold text-slate-900 mb-1 text-sm">{action.title}</h3>
-                                    <p className="text-xs text-slate-500">{action.description}</p>
-                                </Link>
-                            ))}
+                            {quickActions.map((action, index) => {
+                                const colorClasses: Record<string, { bg: string; hover: string; text: string }> = {
+                                    emerald: { bg: 'bg-orange-50', hover: 'group-hover:bg-orange-100', text: 'text-orange-600' },
+                                    slate: { bg: 'bg-slate-50', hover: 'group-hover:bg-slate-100', text: 'text-slate-600' },
+                                    amber: { bg: 'bg-amber-50', hover: 'group-hover:bg-amber-100', text: 'text-amber-600' },
+                                    blue: { bg: 'bg-blue-50', hover: 'group-hover:bg-blue-100', text: 'text-blue-600' },
+                                    rose: { bg: 'bg-rose-50', hover: 'group-hover:bg-rose-100', text: 'text-rose-600' },
+                                    indigo: { bg: 'bg-indigo-50', hover: 'group-hover:bg-indigo-100', text: 'text-indigo-600' },
+                                };
+                                const colors = colorClasses[action.color] || colorClasses.slate;
+
+                                return (
+                                    <Link
+                                        key={index}
+                                        href={action.href}
+                                        className="group relative bg-white rounded-xl p-5 border border-slate-200 hover:border-slate-300 hover:shadow-lg transition-all duration-300"
+                                    >
+                                        <div className={`w-12 h-12 rounded-lg ${colors.bg} flex items-center justify-center mb-4 ${colors.hover} transition-colors`}>
+                                            <svg className={`w-6 h-6 ${colors.text}`} fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d={action.iconPath} />
+                                            </svg>
+                                        </div>
+                                        <h3 className="font-semibold text-slate-900 mb-1 text-sm">{action.title}</h3>
+                                        <p className="text-xs text-slate-500">{action.description}</p>
+                                    </Link>
+                                );
+                            })}
                         </div>
                     </div>
 
@@ -300,7 +298,7 @@ export default function MemberHub() {
                             <div className="card-glass">
                                 <div className="flex items-center justify-between mb-6">
                                     <h2 className="text-2xl font-bold text-slate-900">Upcoming Events</h2>
-                                    <Link href="/conference" className="text-emerald-600 hover:text-emerald-700 font-semibold text-sm inline-flex items-center gap-1 group">
+                                    <Link href="/conference" className="text-orange-600 hover:text-orange-700 font-semibold text-sm inline-flex items-center gap-1 group">
                                         View All
                                         <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -311,20 +309,20 @@ export default function MemberHub() {
                                     {upcomingEvents.map((event) => (
                                         <div
                                             key={event.id}
-                                            className="relative overflow-hidden p-5 bg-gradient-to-br from-slate-50 to-emerald-50/50 rounded-xl border border-emerald-100/50 hover:shadow-lg transition-all duration-300 group"
+                                            className="relative overflow-hidden p-5 bg-gradient-to-br from-slate-50 to-orange-50/50 rounded-xl border border-orange-100/50 hover:shadow-lg transition-all duration-300 group"
                                         >
                                             <div className="flex items-start justify-between">
                                                 <div className="flex-1">
-                                                    <h3 className="font-bold text-slate-900 mb-2 text-lg group-hover:text-emerald-600 transition-colors">{event.title}</h3>
+                                                    <h3 className="font-bold text-slate-900 mb-2 text-lg group-hover:text-orange-600 transition-colors">{event.title}</h3>
                                                     <div className="space-y-1.5 text-sm text-slate-600">
                                                         <p className="flex items-center gap-2">
-                                                            <svg className="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                                             </svg>
                                                             {event.date} at {event.time}
                                                         </p>
                                                         <p className="flex items-center gap-2">
-                                                            <svg className="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                                             </svg>
@@ -337,7 +335,7 @@ export default function MemberHub() {
                                                         Registered ✓
                                                     </span>
                                                 ) : (
-                                                    <button className="px-5 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-lg text-sm font-semibold hover:shadow-lg transition-all hover:scale-105">
+                                                    <button className="px-5 py-2 bg-gradient-to-r from-orange-600 to-amber-600 text-white rounded-lg text-sm font-semibold hover:shadow-lg transition-all hover:scale-105">
                                                         Register
                                                     </button>
                                                 )}
@@ -356,7 +354,7 @@ export default function MemberHub() {
                                 <div className="space-y-4">
                                     {recentActivity.map((activity) => (
                                         <div key={activity.id} className="flex items-start gap-3 pb-4 border-b border-slate-100 last:border-0 last:pb-0">
-                                            <div className="w-2 h-2 bg-emerald-500 rounded-full mt-2 flex-shrink-0"></div>
+                                            <div className="w-2 h-2 bg-orange-500 rounded-full mt-2 flex-shrink-0"></div>
                                             <div className="flex-1 min-w-0">
                                                 <p className="text-sm font-semibold text-slate-900">{activity.action}</p>
                                                 <p className="text-xs text-slate-500 mt-1">{activity.time}</p>
@@ -367,17 +365,17 @@ export default function MemberHub() {
                             </div>
 
                             {/* Member Since */}
-                            <div className="card-premium bg-gradient-to-br from-emerald-50 to-teal-50">
+                            <div className="card-premium bg-gradient-to-br from-orange-50 to-amber-50">
                                 <div className="text-center relative z-10">
-                                    <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl shadow-lg mb-4">
+                                    <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-br from-orange-500 to-amber-600 rounded-2xl shadow-lg mb-4">
                                         <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
                                         </svg>
                                     </div>
                                     <p className="text-sm text-slate-600 mb-1 font-medium">Member Since</p>
                                     <p className="text-2xl font-bold text-slate-900 mb-4">{userData.joinDate}</p>
-                                    <div className="pt-4 border-t border-emerald-200">
-                                        <Link href="/hub/settings" className="inline-flex items-center gap-2 text-emerald-600 hover:text-emerald-700 font-semibold text-sm group">
+                                    <div className="pt-4 border-t border-orange-200">
+                                        <Link href="/hub/settings" className="inline-flex items-center gap-2 text-orange-600 hover:text-orange-700 font-semibold text-sm group">
                                             Manage Account
                                             <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -399,7 +397,7 @@ export default function MemberHub() {
                                             key={tab}
                                             onClick={() => setActiveTab(tab.toLowerCase().replace(" ", "-"))}
                                             className={`px-5 py-3 font-semibold transition-all duration-200 border-b-2 whitespace-nowrap ${activeTab === tab.toLowerCase().replace(" ", "-")
-                                                ? "border-emerald-600 text-emerald-600"
+                                                ? "border-orange-600 text-orange-600"
                                                 : "border-transparent text-slate-600 hover:text-slate-900"
                                                 }`}
                                         >
@@ -413,8 +411,8 @@ export default function MemberHub() {
                             <div className="min-h-[200px]">
                                 {activeTab === "overview" && (
                                     <div className="text-center py-12">
-                                        <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-2xl mb-4">
-                                            <svg className="w-8 h-8 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-orange-100 to-amber-100 rounded-2xl mb-4">
+                                            <svg className="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                                             </svg>
                                         </div>
@@ -428,10 +426,10 @@ export default function MemberHub() {
                                             <div>
                                                 <div className="flex justify-between mb-3">
                                                     <span className="text-sm font-semibold text-slate-700">Bible Reading Plan</span>
-                                                    <span className="text-sm font-bold text-emerald-600">65%</span>
+                                                    <span className="text-sm font-bold text-orange-600">65%</span>
                                                 </div>
                                                 <div className="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
-                                                    <div className="bg-gradient-to-r from-emerald-500 to-teal-500 h-3 rounded-full transition-all duration-500" style={{ width: "65%" }}></div>
+                                                    <div className="bg-gradient-to-r from-orange-500 to-amber-500 h-3 rounded-full transition-all duration-500" style={{ width: "65%" }}></div>
                                                 </div>
                                             </div>
                                             <div>

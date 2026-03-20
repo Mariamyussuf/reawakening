@@ -13,11 +13,11 @@ export default function AboutPage() {
             <Header />
             <main className="min-h-screen">
                 {/* Hero */}
-                <section className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-20">
+                <section className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white py-20">
                     <div className="container-custom text-center">
                         <h1 className="text-4xl md:text-5xl font-bold mb-4">About Reawakening</h1>
                         <p className="text-xl opacity-90 max-w-2xl mx-auto">
-                            A ministry born from a desire to help students stay spiritually grounded
+                            A meeting set out to thoroughly equip students to be on fire for God
                         </p>
                     </div>
                 </section>
@@ -26,16 +26,19 @@ export default function AboutPage() {
                 <section className="container-custom py-16">
                     <div className="max-w-4xl mx-auto">
                         <div className="card mb-8">
-                            <h2 className="text-3xl font-bold text-slate-800 mb-4">Our Vision</h2>
-                            <p className="text-lg text-slate-600 leading-relaxed">
-                                To see students maintain spiritual discipline, clarity, and growth during holiday periods—remaining rooted in Christ even when the structure of school life fades away.
+                            <h2 className="text-3xl font-bold text-slate-800 mb-4">Our Purpose</h2>
+                            <p className="text-lg text-slate-600 leading-relaxed mb-4">
+                                Reawakening is a meeting set out to{" "}
+                                <span className="font-semibold text-emerald-600">thoroughly equip students</span> to be on fire for God and{" "}
+                                <span className="font-semibold text-emerald-600">effectively nurture them</span> in preserving their fire and zeal for God{" "}
+                                <span className="font-semibold text-emerald-600">both on campus and off campus</span>.
                             </p>
                         </div>
 
                         <div className="card mb-8">
-                            <h2 className="text-3xl font-bold text-slate-800 mb-4">Our Mission</h2>
+                            <h2 className="text-3xl font-bold text-slate-800 mb-4">How We Serve</h2>
                             <p className="text-lg text-slate-600 leading-relaxed mb-4">
-                                Reawakening exists to provide students with:
+                                Reawakening provides students with:
                             </p>
                             <ul className="space-y-3 text-slate-600">
                                 <li className="flex items-start">
@@ -74,51 +77,64 @@ export default function AboutPage() {
                             <h2 className="section-title text-center mb-8">Why Reawakening?</h2>
                             <div className="prose prose-lg max-w-none">
                                 <p className="text-slate-600 leading-relaxed mb-4">
-                                    Many students experience a spiritual high during the school year—attending fellowship, Bible studies, and prayer meetings. But when exams end and holidays begin, that structure often disappears.
+                                    Many students experience a spiritual fire during their time on campus—attending fellowship, Bible studies, and prayer meetings. However, maintaining that fire and zeal for God can be challenging, especially when transitioning between campus life and off-campus periods.
                                 </p>
                                 <p className="text-slate-600 leading-relaxed mb-4">
-                                    Reawakening was born from observing this pattern and wanting to provide a <strong>grace-centered, ministry-focused space</strong> where students can:
+                                    Reawakening was created to provide a <strong>ministry-focused space</strong> where students can:
                                 </p>
                                 <ul className="space-y-2 text-slate-600 mb-4">
-                                    <li>Reflect on what God has done during the semester</li>
-                                    <li>Reset spiritually before returning to school</li>
-                                    <li>Build habits of consistency in Scripture and prayer</li>
-                                    <li>Access resources that encourage growth without guilt or performance pressure</li>
+                                    <li>Be thoroughly equipped to be on fire for God</li>
+                                    <li>Be effectively nurtured in preserving their fire and zeal for God</li>
+                                    <li>Maintain spiritual consistency both on campus and off campus</li>
+                                    <li>Access resources that encourage growth and spiritual development</li>
+                                    <li>Connect with a community that supports their walk with Christ</li>
                                 </ul>
                                 <p className="text-slate-600 leading-relaxed">
-                                    This is not a startup. It&apos;s not a social platform. It&apos;s a <strong>ministry tool</strong>—a digital extension of the conferences we hold, designed to support students in their walk with Christ.
+                                    This is not a startup. It&apos;s not a social platform. It&apos;s a <strong>ministry tool</strong>—a digital extension of the meetings we hold, designed to support students in being equipped and nurtured in their fire for God.
                                 </p>
                             </div>
                         </div>
                     </div>
                 </section>
 
-                {/* Leadership & Oversight */}
+                {/* Leadership & Convener */}
                 <section className="container-custom py-16">
                     <div className="max-w-4xl mx-auto">
                         <div className="card">
-                            <h2 className="text-3xl font-bold text-slate-800 mb-4">Leadership & Oversight</h2>
+                            <h2 className="text-3xl font-bold text-slate-800 mb-4">Convener</h2>
+                            <div className="mb-6 p-6 bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl border border-emerald-200">
+                                <p className="text-2xl font-bold text-slate-900 mb-2">P. Igbagboyemi Oluwatofunmi Ojo</p>
+                                <p className="text-lg text-slate-600">Convener, Reawakening</p>
+                            </div>
                             <p className="text-lg text-slate-600 leading-relaxed mb-4">
-                                Reawakening is <strong>organized, led, and overseen by an individual</strong> with spiritual accountability. This is not a corporate venture or a committee-run organization.
+                                Reawakening is <strong>organized, led, and overseen</strong> with spiritual accountability and a heart to see students equipped and nurtured in their walk with God.
                             </p>
                             <p className="text-slate-600 leading-relaxed mb-4">
-                                The overseer is responsible for:
+                                The convener is responsible for:
                             </p>
                             <ul className="space-y-2 text-slate-600">
                                 <li className="flex items-start">
-                                    <span className="text-blue-600 mr-2">•</span>
+                                    <span className="text-emerald-600 mr-2">•</span>
+                                    <span>Thoroughly equipping students to be on fire for God</span>
+                                </li>
+                                <li className="flex items-start">
+                                    <span className="text-emerald-600 mr-2">•</span>
+                                    <span>Effectively nurturing students in preserving their fire and zeal for God</span>
+                                </li>
+                                <li className="flex items-start">
+                                    <span className="text-emerald-600 mr-2">•</span>
                                     <span>Maintaining theological and spiritual consistency across all content</span>
                                 </li>
                                 <li className="flex items-start">
-                                    <span className="text-blue-600 mr-2">•</span>
+                                    <span className="text-emerald-600 mr-2">•</span>
                                     <span>Curating resources that are biblically sound and spiritually edifying</span>
                                 </li>
                                 <li className="flex items-start">
-                                    <span className="text-blue-600 mr-2">•</span>
-                                    <span>Planning and facilitating post-exam conferences</span>
+                                    <span className="text-emerald-600 mr-2">•</span>
+                                    <span>Planning and facilitating meetings and conferences</span>
                                 </li>
                                 <li className="flex items-start">
-                                    <span className="text-blue-600 mr-2">•</span>
+                                    <span className="text-emerald-600 mr-2">•</span>
                                     <span>Ensuring the platform supports—not replaces—local church involvement</span>
                                 </li>
                             </ul>
@@ -160,11 +176,14 @@ export default function AboutPage() {
                 </section>
 
                 {/* Closing Statement */}
-                <section className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-16">
+                <section className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white py-16">
                     <div className="container-custom text-center">
                         <blockquote className="text-2xl md:text-3xl font-serif italic leading-relaxed max-w-3xl mx-auto">
-                            &quot;This platform exists to help you stay grounded in Christ—not through guilt or pressure, but through grace, truth, and community.&quot;
+                            &quot;Reawakening exists to thoroughly equip you to be on fire for God and effectively nurture you in preserving your fire and zeal for God—both on campus and off campus.&quot;
                         </blockquote>
+                        <p className="mt-6 text-lg opacity-90">
+                            — P. Igbagboyemi Oluwatofunmi Ojo, Convener
+                        </p>
                     </div>
                 </section>
             </main>

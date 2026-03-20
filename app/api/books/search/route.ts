@@ -1,51 +1,43 @@
 import { NextRequest, NextResponse } from 'next/server';
-import dbConnect from '@/lib/mongodb';
-import BookModel from '@/models/BookModel';
+import { rateLimiters } from '@/lib/middleware/ratelimit';
+import { ApiResponse } from '@/lib/api/response';
+import { log } from '@/lib/logger';
+import prisma from '@/lib/prisma';
 
 // GET /api/books/search - Search books
 export async function GET(request: NextRequest) {
-    try {
-        await dbConnect();
+    // Apply rate limiting (stricter for search)
+    const rateLimitResponse = await rateLimiters.search(request);
+    if (rateLimitResponse) {
+        return rateLimitResponse;
+    }
 
+    try {
         const { searchParams } = new URL(request.url);
         const query = searchParams.get('q');
         const limit = parseInt(searchParams.get('limit') || '20');
 
         if (!query || query.trim().length === 0) {
-            return NextResponse.json(
-                { error: 'Please provide a search query' },
-                { status: 400 }
-            );
+            return ApiResponse.error('Please provide a search query', 400);
         }
 
-        // Use text search if available, otherwise use regex
-        const searchQuery = BookModel.find({
-            $text: { $search: query },
-        })
-            .limit(limit)
-            .lean();
+        const searchTerm = query.trim();
 
-        let books;
-        try {
-            books = await searchQuery;
-        } catch (error) {
-            // Fallback to regex search if text index is not available
-            const regexQuery = new RegExp(query, 'i');
-            books = await BookModel.find({
-                $or: [
-                    { title: regexQuery },
-                    { author: regexQuery },
-                    { description: regexQuery },
-                    { tags: { $in: [regexQuery] } },
-                ],
-            })
-                .limit(limit)
-                .lean();
-        }
+        const books = await prisma.book.findMany({
+            where: {
+                OR: [
+                    { title: { contains: searchTerm } },
+                    { author: { contains: searchTerm } },
+                    { description: { contains: searchTerm } },
+                    { tags: { contains: searchTerm } },
+                ]
+            },
+            take: limit
+        });
 
         // Format response
-        const formattedBooks = books.map((book: any) => ({
-            id: book._id.toString(),
+        const formattedBooks = books.map((book) => ({
+            id: book.id,
             title: book.title,
             author: book.author,
             description: book.description,
@@ -53,8 +45,8 @@ export async function GET(request: NextRequest) {
             pdfUrl: book.pdfUrl,
             fileSize: book.fileSize,
             pageCount: book.pageCount,
-            categories: book.categories,
-            tags: book.tags,
+            categories: book.categories ? JSON.parse(book.categories) : [],
+            tags: book.tags ? JSON.parse(book.tags) : [],
             publishYear: book.publishYear,
             publisher: book.publisher,
             isbn: book.isbn,
@@ -70,18 +62,12 @@ export async function GET(request: NextRequest) {
             updatedAt: book.updatedAt,
         }));
 
-        return NextResponse.json(
-            {
-                books: formattedBooks,
-                total: formattedBooks.length,
-            },
-            { status: 200 }
-        );
+        return ApiResponse.success({
+            books: formattedBooks,
+            total: formattedBooks.length,
+        });
     } catch (error: any) {
-        console.error('Search books error:', error);
-        return NextResponse.json(
-            { error: 'An error occurred while searching books' },
-            { status: 500 }
-        );
+        log.error('Search books error', error, { endpoint: '/api/books/search' });
+        return ApiResponse.internalError('An error occurred while searching books');
     }
 }

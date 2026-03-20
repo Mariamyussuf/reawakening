@@ -1,75 +1,71 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { requireAuth } from '@/lib/middleware/auth';
+import { rateLimiters } from '@/lib/middleware/ratelimit';
+import { ApiResponse } from '@/lib/api/response';
+import { log } from '@/lib/logger';
 import dbConnect from '@/lib/mongodb';
 import User from '@/models/User';
 
 export async function GET(request: NextRequest) {
-    try {
-        const session = await getServerSession(authOptions);
+    // Apply rate limiting
+    const rateLimitResponse = await rateLimiters.api(request);
+    if (rateLimitResponse) {
+        return rateLimitResponse;
+    }
 
-        if (!session || !session.user) {
-            return NextResponse.json(
-                { error: 'Unauthorized' },
-                { status: 401 }
-            );
-        }
+    try {
+        const session = await requireAuth();
 
         await dbConnect();
 
-        const user = await User.findById((session.user as any).id).select('-password');
+        const user = await User.findById(session.user.id).select('-password');
 
         if (!user) {
-            return NextResponse.json(
-                { error: 'User not found' },
-                { status: 404 }
-            );
+            return ApiResponse.error('User not found', 404);
         }
 
-        return NextResponse.json({ user }, { status: 200 });
+        return ApiResponse.success({ user });
     } catch (error: any) {
-        console.error('Get user error:', error);
-        return NextResponse.json(
-            { error: 'An error occurred while fetching user data' },
-            { status: 500 }
-        );
+        log.error('Get user error', error, { endpoint: '/api/user' });
+        return ApiResponse.internalError('An error occurred while fetching user data');
     }
 }
 
 export async function PATCH(request: NextRequest) {
-    try {
-        const session = await getServerSession(authOptions);
+    // Apply rate limiting
+    const rateLimitResponse = await rateLimiters.api(request);
+    if (rateLimitResponse) {
+        return rateLimitResponse;
+    }
 
-        if (!session || !session.user) {
-            return NextResponse.json(
-                { error: 'Unauthorized' },
-                { status: 401 }
-            );
+    try {
+        const session = await requireAuth();
+
+        // Validate request body
+        const { validateBody } = await import('@/lib/validation');
+        const { UpdateProfileSchema } = await import('@/lib/validation/schemas');
+        const validation = await validateBody(request, UpdateProfileSchema);
+        if (!validation.success) {
+            return validation.response;
         }
 
-        const updates = await request.json();
+        const updates = validation.data;
 
         await dbConnect();
 
         const user = await User.findByIdAndUpdate(
-            (session.user as any).id,
+            session.user.id,
             { $set: updates },
             { new: true, runValidators: true }
         ).select('-password');
 
         if (!user) {
-            return NextResponse.json(
-                { error: 'User not found' },
-                { status: 404 }
-            );
+            return ApiResponse.error('User not found', 404);
         }
 
-        return NextResponse.json({ user }, { status: 200 });
+        return ApiResponse.success({ user });
     } catch (error: any) {
-        console.error('Update user error:', error);
-        return NextResponse.json(
-            { error: 'An error occurred while updating user data' },
-            { status: 500 }
-        );
+        log.error('Update user error', error, { endpoint: '/api/user' });
+        return ApiResponse.internalError('An error occurred while updating user data');
     }
 }

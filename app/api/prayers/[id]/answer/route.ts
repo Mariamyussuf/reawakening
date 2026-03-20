@@ -1,55 +1,50 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import dbConnect from '@/lib/mongodb';
-import Prayer from '@/models/Prayer';
+import { requireAuth } from '@/lib/middleware/auth';
+import { rateLimiters } from '@/lib/middleware/ratelimit';
+import { ApiResponse } from '@/lib/api/response';
+import { log } from '@/lib/logger';
+import prisma from '@/lib/prisma';
 
 // PATCH /api/prayers/:id/answer - Mark prayer as answered
 export async function PATCH(
     request: NextRequest,
     { params }: { params: { id: string } }
 ) {
+    // Apply rate limiting
+    const rateLimitResponse = await rateLimiters.api(request);
+    if (rateLimitResponse) {
+        return rateLimitResponse;
+    }
+
     try {
-        const session = await getServerSession(authOptions);
+        const session = await requireAuth();
 
-        if (!session || !session.user) {
-            return NextResponse.json(
-                { error: 'Unauthorized' },
-                { status: 401 }
-            );
-        }
+        const existingPrayer = await prisma.prayer.findUnique({
+            where: { id: params.id }
+        });
 
-        await dbConnect();
-
-        const prayer = await Prayer.findById(params.id);
-
-        if (!prayer) {
-            return NextResponse.json(
-                { error: 'Prayer not found' },
-                { status: 404 }
-            );
+        if (!existingPrayer) {
+            return ApiResponse.error('Prayer not found', 404);
         }
 
         // Check if user owns this prayer
-        if (prayer.userId.toString() !== (session.user as any).id) {
-            return NextResponse.json(
-                { error: 'Unauthorized to update this prayer' },
-                { status: 403 }
-            );
+        if (existingPrayer.userId !== session.user.id) {
+            return ApiResponse.forbidden('Unauthorized to update this prayer');
         }
 
-        // Toggle answered status
-        prayer.isAnswered = !prayer.isAnswered;
-        if (prayer.isAnswered) {
-            prayer.answeredDate = new Date();
-        } else {
-            prayer.answeredDate = undefined;
-        }
+        const isAnswered = !existingPrayer.isAnswered;
+        const answeredDate = isAnswered ? new Date() : null;
 
-        await prayer.save();
+        const prayer = await prisma.prayer.update({
+            where: { id: params.id },
+            data: {
+                isAnswered,
+                answeredDate
+            }
+        });
 
         const formattedPrayer = {
-            id: prayer._id.toString(),
+            id: prayer.id,
             title: prayer.title,
             description: prayer.description,
             category: prayer.category,
@@ -61,16 +56,10 @@ export async function PATCH(
             createdAt: prayer.createdAt,
         };
 
-        return NextResponse.json(
-            { message: 'Prayer status updated successfully', prayer: formattedPrayer },
-            { status: 200 }
-        );
+        return ApiResponse.success(formattedPrayer, 200, 'Prayer status updated successfully');
     } catch (error: any) {
-        console.error('Mark prayer as answered error:', error);
-        return NextResponse.json(
-            { error: 'An error occurred while updating prayer status' },
-            { status: 500 }
-        );
+        log.error('Mark prayer as answered error', error, { endpoint: '/api/prayers/[id]/answer', prayerId: params.id });
+        return ApiResponse.internalError('An error occurred while updating prayer status');
     }
 }
 

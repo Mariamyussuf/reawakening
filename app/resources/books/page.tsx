@@ -67,7 +67,7 @@ export default function BooksPage() {
             <Header />
             <main className="min-h-screen">
                 {/* Hero */}
-                <section className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-20">
+                <section className="bg-gradient-to-r from-orange-600 to-amber-600 text-white py-20">
                     <div className="container-custom text-center">
                         <h1 className="text-4xl md:text-5xl font-bold mb-4">Books & Reading</h1>
                         <p className="text-xl opacity-90 max-w-2xl mx-auto">
@@ -83,11 +83,11 @@ export default function BooksPage() {
                         {books.map((book) => (
                             <div key={book.id} className="card hover:shadow-xl transition-all duration-300">
                                 <div className="flex items-start justify-between mb-3">
-                                    <span className="inline-block bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">
+                                    <span className="inline-block bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-sm font-medium">
                                         {book.category}
                                     </span>
                                     {book.hasStudyGuide && (
-                                        <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
+                                        <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded">
                                             Study Guide Available
                                         </span>
                                     )}
@@ -99,7 +99,7 @@ export default function BooksPage() {
                                 </p>
                                 <div className="flex items-center justify-between">
                                     <span className="text-sm text-slate-500">{book.availability}</span>
-                                    <button className="text-blue-600 font-medium hover:text-blue-700 transition-colors">
+                                    <button className="text-orange-600 font-medium hover:text-orange-700 transition-colors">
                                         View Details →
                                     </button>
                                 </div>
@@ -120,7 +120,7 @@ export default function BooksPage() {
                                         <ul className="space-y-2">
                                             {list.books.map((book, bookIdx) => (
                                                 <li key={bookIdx} className="text-slate-600 text-sm flex items-start">
-                                                    <span className="text-blue-600 mr-2">📖</span>
+                                                    <span className="text-orange-600 mr-2">📖</span>
                                                     <span>{book}</span>
                                                 </li>
                                             ))}
@@ -135,9 +135,9 @@ export default function BooksPage() {
                 {/* Important Notice */}
                 <section className="container-custom py-16">
                     <div className="max-w-3xl mx-auto">
-                        <div className="card bg-blue-50 border-2 border-blue-200">
+                        <div className="card bg-amber-50 border-2 border-amber-200">
                             <h3 className="font-bold text-slate-800 mb-3 flex items-center">
-                                <svg className="w-6 h-6 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg className="w-6 h-6 text-orange-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                                 Copyright & Attribution

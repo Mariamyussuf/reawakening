@@ -70,7 +70,7 @@ export default function CommunityPage() {
     ];
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-emerald-50">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50 to-amber-50">
             {/* Header */}
             <header className="bg-white/90 backdrop-blur-md shadow-sm border-b border-slate-200">
                 <div className="container-custom py-4">
@@ -90,10 +90,10 @@ export default function CommunityPage() {
             <main className="container-custom py-8">
                 {/* Community Stats */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div className="card bg-gradient-to-br from-green-500 to-emerald-500 text-white">
+                    <div className="card bg-gradient-to-br from-orange-500 to-amber-500 text-white">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-green-100 text-sm mb-1">Active Members</p>
+                                <p className="text-orange-100 text-sm mb-1">Active Members</p>
                                 <p className="text-3xl font-bold">248</p>
                             </div>
                             <div className="text-5xl opacity-20">👥</div>
@@ -128,16 +128,16 @@ export default function CommunityPage() {
                         <div className="card">
                             <div className="flex items-center justify-between mb-6">
                                 <h2 className="text-2xl font-bold text-slate-800">Prayer Requests</h2>
-                                <button className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition-colors">
+                                <button className="px-4 py-2 bg-orange-600 text-white rounded-lg text-sm font-medium hover:bg-orange-700 transition-colors">
                                     + Add Request
                                 </button>
                             </div>
 
                             <div className="space-y-4">
                                 {prayerRequests.map((request) => (
-                                    <div key={request.id} className="p-4 bg-gradient-to-r from-slate-50 to-green-50 rounded-lg border border-slate-200 hover:shadow-md transition-all duration-300">
+                                    <div key={request.id} className="p-4 bg-gradient-to-r from-slate-50 to-orange-50 rounded-lg border border-slate-200 hover:shadow-md transition-all duration-300">
                                         <div className="flex items-start gap-3">
-                                            <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
+                                            <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-amber-500 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
                                                 {request.avatar}
                                             </div>
                                             <div className="flex-1">
@@ -147,7 +147,7 @@ export default function CommunityPage() {
                                                 </div>
                                                 <p className="text-slate-700 mb-3">{request.request}</p>
                                                 <div className="flex items-center gap-4">
-                                                    <button className="flex items-center gap-2 text-sm text-green-600 hover:text-green-700 font-medium">
+                                                    <button className="flex items-center gap-2 text-sm text-orange-600 hover:text-orange-700 font-medium">
                                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                                         </svg>
@@ -168,7 +168,7 @@ export default function CommunityPage() {
                         <div className="card">
                             <div className="flex items-center justify-between mb-6">
                                 <h2 className="text-2xl font-bold text-slate-800">Discussions</h2>
-                                <button className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition-colors">
+                                <button className="px-4 py-2 bg-orange-600 text-white rounded-lg text-sm font-medium hover:bg-orange-700 transition-colors">
                                     + New Topic
                                 </button>
                             </div>
@@ -179,11 +179,11 @@ export default function CommunityPage() {
                                         <div className="flex items-start justify-between gap-4">
                                             <div className="flex-1">
                                                 <div className="flex items-center gap-2 mb-2">
-                                                    <span className="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-medium">
+                                                    <span className="px-2 py-1 bg-orange-100 text-orange-700 rounded text-xs font-medium">
                                                         {discussion.category}
                                                     </span>
                                                 </div>
-                                                <h3 className="font-semibold text-slate-800 mb-1 hover:text-green-600">
+                                                <h3 className="font-semibold text-slate-800 mb-1 hover:text-orange-600">
                                                     {discussion.title}
                                                 </h3>
                                                 <div className="flex items-center gap-3 text-xs text-slate-500">
@@ -213,7 +213,7 @@ export default function CommunityPage() {
                                 {communityMembers.filter(m => m.online).map((member) => (
                                     <div key={member.id} className="flex items-center gap-3">
                                         <div className="relative">
-                                            <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full flex items-center justify-center text-white font-bold">
+                                            <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-amber-500 rounded-full flex items-center justify-center text-white font-bold">
                                                 {member.avatar}
                                             </div>
                                             <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
@@ -232,7 +232,7 @@ export default function CommunityPage() {
                         </div>
 
                         {/* Quick Links */}
-                        <div className="card bg-gradient-to-br from-green-50 to-emerald-50">
+                        <div className="card bg-gradient-to-br from-orange-50 to-amber-50">
                             <h3 className="text-lg font-bold text-slate-800 mb-4">Quick Links</h3>
                             <div className="space-y-2">
                                 <Link href="/hub/community/groups" className="block p-3 bg-white rounded-lg hover:shadow-md transition-all duration-300">

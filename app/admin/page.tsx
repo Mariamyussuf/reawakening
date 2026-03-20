@@ -94,21 +94,53 @@ export default function AdminPage() {
                         </button>
                     </div>
 
-                    {/* Resources */}
-                    <div className="card hover:shadow-xl transition-all duration-300">
+                    {/* Books */}
+                    <Link href="/admin/books" className="card hover:shadow-xl transition-all duration-300">
                         <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-pink-600 rounded-lg flex items-center justify-center mb-4">
                             <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                             </svg>
                         </div>
-                        <h2 className="text-xl font-bold text-slate-800 mb-2">Resources</h2>
+                        <h2 className="text-xl font-bold text-slate-800 mb-2">Books Library</h2>
                         <p className="text-slate-600 mb-4 text-sm">
-                            Upload materials, courses, and books
+                            Upload, edit, and manage books
                         </p>
-                        <button className="text-pink-600 font-medium hover:text-pink-700 transition-colors">
-                            Manage Resources →
-                        </button>
-                    </div>
+                        <span className="text-pink-600 font-medium hover:text-pink-700 transition-colors">
+                            Manage Books →
+                        </span>
+                    </Link>
+
+                    {/* Devotionals */}
+                    <Link href="/admin/devotionals" className="card hover:shadow-xl transition-all duration-300">
+                        <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center mb-4">
+                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
+                            </svg>
+                        </div>
+                        <h2 className="text-xl font-bold text-slate-800 mb-2">Devotionals</h2>
+                        <p className="text-slate-600 mb-4 text-sm">
+                            Create and manage daily devotionals
+                        </p>
+                        <span className="text-amber-600 font-medium hover:text-amber-700 transition-colors">
+                            Manage Devotionals →
+                        </span>
+                    </Link>
+
+                    {/* Users */}
+                    <Link href="/admin/users" className="card hover:shadow-xl transition-all duration-300">
+                        <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center mb-4">
+                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                            </svg>
+                        </div>
+                        <h2 className="text-xl font-bold text-slate-800 mb-2">User Management</h2>
+                        <p className="text-slate-600 mb-4 text-sm">
+                            Manage users, roles, and permissions
+                        </p>
+                        <span className="text-cyan-600 font-medium hover:text-cyan-700 transition-colors">
+                            Manage Users →
+                        </span>
+                    </Link>
 
                     {/* Archive */}
                     <div className="card hover:shadow-xl transition-all duration-300">

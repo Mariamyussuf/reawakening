@@ -1,36 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { requireAdminOrLeader } from "@/lib/middleware/auth";
+import { rateLimiters } from "@/lib/middleware/ratelimit";
+import { validateFile, FileValidationPresets } from "@/lib/validation/file-upload";
+import { ApiResponse } from "@/lib/api/response";
+import { log } from "@/lib/logger";
 import { writeFile, mkdir } from "fs/promises";
 import { existsSync } from "fs";
 import path from "path";
-import dbConnect from "@/lib/mongodb";
-import BookModel from "@/models/BookModel";
-
-// Maximum file sizes (in bytes)
-const MAX_PDF_SIZE = 50 * 1024 * 1024; // 50 MB
-const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5 MB
+import prisma from "@/lib/prisma";
 
 export async function POST(request: NextRequest) {
+    // Apply rate limiting for uploads
+    const rateLimitResponse = await rateLimiters.upload(request);
+    if (rateLimitResponse) {
+        return rateLimitResponse;
+    }
+
     try {
-        // Check authentication and admin role
-        const session = await getServerSession(authOptions);
-
-        if (!session || !session.user) {
-            return NextResponse.json(
-                { error: "Unauthorized" },
-                { status: 401 }
-            );
-        }
-
-        // Check if user is admin
-        const userRole = (session.user as any).role;
-        if (userRole !== "admin" && userRole !== "leader") {
-            return NextResponse.json(
-                { error: "Forbidden: Admin access required" },
-                { status: 403 }
-            );
-        }
+        await requireAdminOrLeader();
 
         const formData = await request.formData();
 
@@ -40,67 +27,37 @@ export async function POST(request: NextRequest) {
 
         // Validation
         if (!pdfFile) {
-            return NextResponse.json(
-                { error: "PDF file is required" },
-                { status: 400 }
-            );
+            return ApiResponse.error("PDF file is required", 400);
         }
 
         if (!metadataString) {
-            return NextResponse.json(
-                { error: "Book metadata is required" },
-                { status: 400 }
-            );
+            return ApiResponse.error("Book metadata is required", 400);
         }
 
-        // Validate file sizes
-        if (pdfFile.size > MAX_PDF_SIZE) {
-            return NextResponse.json(
-                { error: `PDF file size exceeds maximum of ${MAX_PDF_SIZE / 1024 / 1024} MB` },
-                { status: 400 }
-            );
+        // Validate PDF file with content checking
+        const pdfValidation = await validateFile(pdfFile, FileValidationPresets.pdf);
+        if (!pdfValidation.valid) {
+            return ApiResponse.error(pdfValidation.error || "Invalid PDF file", 400);
         }
 
-        if (coverFile && coverFile.size > MAX_IMAGE_SIZE) {
-            return NextResponse.json(
-                { error: `Cover image size exceeds maximum of ${MAX_IMAGE_SIZE / 1024 / 1024} MB` },
-                { status: 400 }
-            );
-        }
-
-        // Validate file types
-        if (pdfFile.type !== "application/pdf") {
-            return NextResponse.json(
-                { error: "Invalid file type. Only PDF files are allowed." },
-                { status: 400 }
-            );
-        }
-
-        if (coverFile && !coverFile.type.startsWith("image/")) {
-            return NextResponse.json(
-                { error: "Invalid cover image type. Only image files are allowed." },
-                { status: 400 }
-            );
+        // Validate cover image if provided
+        if (coverFile) {
+            const coverValidation = await validateFile(coverFile, FileValidationPresets.coverImage);
+            if (!coverValidation.valid) {
+                return ApiResponse.error(coverValidation.error || "Invalid cover image", 400);
+            }
         }
 
         const metadata = JSON.parse(metadataString);
 
         // Validate required fields
         if (!metadata.title || !metadata.author || !metadata.description) {
-            return NextResponse.json(
-                { error: "Title, author, and description are required" },
-                { status: 400 }
-            );
+            return ApiResponse.error("Title, author, and description are required", 400);
         }
 
         if (!metadata.categories || metadata.categories.length === 0) {
-            return NextResponse.json(
-                { error: "At least one category is required" },
-                { status: 400 }
-            );
+            return ApiResponse.error("At least one category is required", 400);
         }
-
-        await dbConnect();
 
         // Generate unique ID for the book
         const bookId = `book-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -139,51 +96,46 @@ export async function POST(request: NextRequest) {
         const fileSize = parseFloat((pdfFile.size / 1024 / 1024).toFixed(2));
 
         // Save to database
-        const book = await BookModel.create({
-            title: metadata.title.trim(),
-            author: metadata.author.trim(),
-            description: metadata.description.trim(),
-            pdfUrl: `/books/pdfs/${pdfFileName}`,
-            coverImage: coverFileName ? `/images/books/covers/${coverFileName}` : undefined,
-            fileSize,
-            categories: metadata.categories,
-            tags: metadata.tags || [],
-            publishYear: metadata.publishYear || undefined,
-            publisher: metadata.publisher?.trim() || undefined,
-            isbn: metadata.isbn?.trim() || undefined,
-            language: metadata.language || "en",
-            difficulty: metadata.difficulty || "intermediate",
-            featured: metadata.featured || false,
-            popular: metadata.popular || false,
-            newRelease: metadata.newRelease || false,
-            totalDownloads: 0,
-            totalViews: 0,
+        const book = await prisma.book.create({
+            data: {
+                title: metadata.title.trim(),
+                author: metadata.author.trim(),
+                description: metadata.description.trim(),
+                pdfUrl: `/books/pdfs/${pdfFileName}`,
+                coverImage: coverFileName ? `/images/books/covers/${coverFileName}` : undefined,
+                fileSize,
+                categories: JSON.stringify(metadata.categories),
+                tags: JSON.stringify(metadata.tags || []),
+                publishYear: metadata.publishYear || undefined,
+                publisher: metadata.publisher?.trim() || undefined,
+                isbn: metadata.isbn?.trim() || undefined,
+                language: metadata.language || "en",
+                difficulty: metadata.difficulty || "intermediate",
+                featured: metadata.featured || false,
+                popular: metadata.popular || false,
+                newRelease: metadata.newRelease || false,
+                totalDownloads: 0,
+                totalViews: 0,
+            }
         });
 
         const formattedBook = {
-            id: book._id.toString(),
+            id: book.id,
             title: book.title,
             author: book.author,
             description: book.description,
             pdfUrl: book.pdfUrl,
             coverImage: book.coverImage,
             fileSize: book.fileSize,
-            categories: book.categories,
-            tags: book.tags,
+            categories: metadata.categories, // Return original, not JSON string
+            tags: metadata.tags || [], // Return original
             createdAt: book.createdAt,
         };
 
-        return NextResponse.json({
-            success: true,
-            message: "Book uploaded successfully",
-            book: formattedBook,
-        });
+        return ApiResponse.created(formattedBook, "Book uploaded successfully");
 
     } catch (error: any) {
-        console.error("Upload error:", error);
-        return NextResponse.json(
-            { error: error.message || "Failed to upload book" },
-            { status: 500 }
-        );
+        log.error("Upload error", error, { endpoint: '/api/admin/books/upload' });
+        return ApiResponse.internalError(error.message || "Failed to upload book");
     }
 }

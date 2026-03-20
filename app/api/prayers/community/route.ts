@@ -1,57 +1,68 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import dbConnect from '@/lib/mongodb';
-import Prayer from '@/models/Prayer';
-import User from '@/models/User';
+import { requireAuth } from '@/lib/middleware/auth';
+import { rateLimiters } from '@/lib/middleware/ratelimit';
+import { ApiResponse } from '@/lib/api/response';
+import { log } from '@/lib/logger';
+import prisma from '@/lib/prisma';
 
 // GET /api/prayers/community - Get community prayers (excluding user's own)
 export async function GET(request: NextRequest) {
+    // Apply rate limiting
+    const rateLimitResponse = await rateLimiters.api(request);
+    if (rateLimitResponse) {
+        return rateLimitResponse;
+    }
+
     try {
-        const session = await getServerSession(authOptions);
+        const session = await requireAuth();
 
-        if (!session || !session.user) {
-            return NextResponse.json(
-                { error: 'Unauthorized' },
-                { status: 401 }
-            );
-        }
-
-        await dbConnect();
-
-        const userId = (session.user as any).id;
+        const userId = session.user.id;
 
         // Get community prayers (not anonymous, not user's own, optionally filter by answered)
-        const prayers = await Prayer.find({
-            userId: { $ne: userId },
-            isAnonymous: false,
-        })
-            .sort({ createdAt: -1 })
-            .limit(50)
-            .populate('userId', 'name email')
-            .lean();
+        const prayers = await prisma.prayer.findMany({
+            where: {
+                userId: { not: userId },
+                isAnonymous: false,
+            },
+            orderBy: { createdAt: 'desc' },
+            take: 50,
+            include: {
+                user: {
+                    select: {
+                        name: true,
+                        email: true
+                    }
+                }
+            }
+        });
 
         // Format response
-        const formattedPrayers = prayers.map((prayer: any) => ({
-            id: prayer._id.toString(),
-            author: prayer.userId?.name || 'Anonymous',
-            avatar: prayer.userId?.name?.charAt(0).toUpperCase() || 'A',
-            title: prayer.title,
-            description: prayer.description,
-            category: prayer.category,
-            prayerCount: prayer.prayerCount,
-            date: formatDate(prayer.createdAt),
-            createdAt: prayer.createdAt,
-            hasPrayed: prayer.prayedBy?.some((id: any) => id.toString() === userId) || false,
-        }));
+        const formattedPrayers = prayers.map((prayer) => {
+            let prayedBy: string[] = [];
+            try {
+                prayedBy = prayer.prayedBy ? JSON.parse(prayer.prayedBy) : [];
+            } catch (e) {
+                prayedBy = [];
+            }
 
-        return NextResponse.json({ prayers: formattedPrayers }, { status: 200 });
+            return {
+                id: prayer.id,
+                author: prayer.user?.name || 'Anonymous',
+                avatar: prayer.user?.name?.charAt(0).toUpperCase() || 'A',
+                title: prayer.title,
+                description: prayer.description,
+                category: prayer.category,
+                prayerCount: prayer.prayerCount,
+                date: formatDate(prayer.createdAt),
+                createdAt: prayer.createdAt,
+                hasPrayed: prayedBy.includes(session.user.id),
+            };
+        });
+
+        return ApiResponse.success({ prayers: formattedPrayers });
     } catch (error: any) {
-        console.error('Get community prayers error:', error);
-        return NextResponse.json(
-            { error: 'An error occurred while fetching community prayers' },
-            { status: 500 }
-        );
+        log.error('Get community prayers error', error, { endpoint: '/api/prayers/community' });
+        return ApiResponse.internalError('An error occurred while fetching community prayers');
     }
 }
 

@@ -235,7 +235,7 @@ export default function SettingsPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-emerald-50 flex items-center justify-center">
+            <div className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50 to-amber-50 flex items-center justify-center">
                 <div className="text-center">
                     <div className="text-6xl mb-4">⚙️</div>
                     <p className="text-slate-700 font-semibold">Loading settings...</p>
@@ -245,7 +245,7 @@ export default function SettingsPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-emerald-50">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50 to-amber-50">
             {/* Header */}
             <header className="bg-white/90 backdrop-blur-md shadow-sm border-b border-slate-200">
                 <div className="container-custom py-4">
@@ -281,13 +281,13 @@ export default function SettingsPage() {
 
                     <form onSubmit={handleProfileUpdate} className="space-y-6">
                         <div className="flex items-center gap-6">
-                            <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full flex items-center justify-center text-white font-bold text-2xl">
+                            <div className="w-20 h-20 bg-gradient-to-br from-orange-500 to-amber-500 rounded-full flex items-center justify-center text-white font-bold text-2xl">
                                 {userData?.name?.charAt(0).toUpperCase() || "U"}
                             </div>
                             <div className="flex-1">
                                 <button
                                     type="button"
-                                    className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition-colors mr-2"
+                                    className="px-4 py-2 bg-orange-600 text-white rounded-lg text-sm font-medium hover:bg-orange-700 transition-colors mr-2"
                                 >
                                     Change Photo
                                 </button>
@@ -309,7 +309,7 @@ export default function SettingsPage() {
                                     type="text"
                                     value={profileForm.name}
                                     onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })}
-                                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                                     required
                                 />
                             </div>
@@ -336,7 +336,7 @@ export default function SettingsPage() {
                                     value={profileForm.phone}
                                     onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
                                     placeholder="+1 (555) 000-0000"
-                                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                                 />
                             </div>
 
@@ -349,7 +349,7 @@ export default function SettingsPage() {
                                     value={profileForm.campus}
                                     onChange={(e) => setProfileForm({ ...profileForm, campus: e.target.value })}
                                     placeholder="Main Campus"
-                                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                                 />
                             </div>
                         </div>
@@ -363,7 +363,7 @@ export default function SettingsPage() {
                                 value={profileForm.bio}
                                 onChange={(e) => setProfileForm({ ...profileForm, bio: e.target.value })}
                                 placeholder="Tell us about yourself..."
-                                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                                 maxLength={500}
                             />
                             <p className="text-xs text-slate-500 mt-1">{profileForm.bio.length}/500 characters</p>
@@ -373,7 +373,7 @@ export default function SettingsPage() {
                             <button
                                 type="submit"
                                 disabled={saving}
-                                className="px-6 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="px-6 py-2 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {saving ? "Saving..." : "Save Changes"}
                             </button>
@@ -405,7 +405,7 @@ export default function SettingsPage() {
                                 <button
                                     type="button"
                                     onClick={() => handleNotificationToggle(key, !value)}
-                                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${value ? 'bg-green-600' : 'bg-slate-300'
+                                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${value ? 'bg-orange-600' : 'bg-slate-300'
                                         }`}
                                 >
                                     <span
@@ -440,7 +440,7 @@ export default function SettingsPage() {
                                 <button
                                     type="button"
                                     onClick={() => handlePrivacyToggle(key, !value)}
-                                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${value ? 'bg-green-600' : 'bg-slate-300'
+                                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${value ? 'bg-orange-600' : 'bg-slate-300'
                                         }`}
                                 >
                                     <span
@@ -549,7 +549,7 @@ export default function SettingsPage() {
                                         type="password"
                                         value={passwordForm.currentPassword}
                                         onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
-                                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                                         required
                                     />
                                 </div>
@@ -561,7 +561,7 @@ export default function SettingsPage() {
                                         type="password"
                                         value={passwordForm.newPassword}
                                         onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
-                                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                                         required
                                         minLength={6}
                                     />
@@ -574,7 +574,7 @@ export default function SettingsPage() {
                                         type="password"
                                         value={passwordForm.confirmPassword}
                                         onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
-                                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                                         required
                                         minLength={6}
                                     />
@@ -594,7 +594,7 @@ export default function SettingsPage() {
                                     <button
                                         type="submit"
                                         disabled={saving}
-                                        className="px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors disabled:opacity-50"
+                                        className="px-4 py-2 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700 transition-colors disabled:opacity-50"
                                     >
                                         {saving ? "Changing..." : "Change Password"}
                                     </button>
@@ -651,8 +651,6 @@ export default function SettingsPage() {
                         </div>
                     </div>
                 )}
-                    </div>
-                </div>
             </main>
         </div>
     );

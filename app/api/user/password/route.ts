@@ -1,66 +1,47 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { requireAuth } from '@/lib/middleware/auth';
+import { rateLimiters } from '@/lib/middleware/ratelimit';
+import { validateBody } from '@/lib/validation';
+import { ChangePasswordSchema } from '@/lib/validation/schemas';
+import { ApiResponse } from '@/lib/api/response';
+import { log } from '@/lib/logger';
 import bcrypt from 'bcryptjs';
 import dbConnect from '@/lib/mongodb';
 import User from '@/models/User';
 
 // PUT /api/user/password - Change password
 export async function PUT(request: NextRequest) {
+    // Apply rate limiting (stricter for password changes)
+    const rateLimitResponse = await rateLimiters.auth(request);
+    if (rateLimitResponse) {
+        return rateLimitResponse;
+    }
+
     try {
-        const session = await getServerSession(authOptions);
+        const session = await requireAuth();
 
-        if (!session || !session.user) {
-            return NextResponse.json(
-                { error: 'Unauthorized' },
-                { status: 401 }
-            );
+        // Validate request body
+        const validation = await validateBody(request, ChangePasswordSchema);
+        if (!validation.success) {
+            return validation.response;
         }
 
-        const { currentPassword, newPassword } = await request.json();
-
-        // Validation
-        if (!currentPassword || !newPassword) {
-            return NextResponse.json(
-                { error: 'Please provide both current and new password' },
-                { status: 400 }
-            );
-        }
-
-        if (newPassword.length < 6) {
-            return NextResponse.json(
-                { error: 'New password must be at least 6 characters' },
-                { status: 400 }
-            );
-        }
-
-        if (currentPassword === newPassword) {
-            return NextResponse.json(
-                { error: 'New password must be different from current password' },
-                { status: 400 }
-            );
-        }
+        const { currentPassword, newPassword } = validation.data;
 
         await dbConnect();
 
         // Get user with password field
-        const user = await User.findById((session.user as any).id).select('+password');
+        const user = await User.findById(session.user.id).select('+password');
 
         if (!user) {
-            return NextResponse.json(
-                { error: 'User not found' },
-                { status: 404 }
-            );
+            return ApiResponse.error('User not found', 404);
         }
 
         // Verify current password
         const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
 
         if (!isPasswordValid) {
-            return NextResponse.json(
-                { error: 'Current password is incorrect' },
-                { status: 400 }
-            );
+            return ApiResponse.error('Current password is incorrect', 400);
         }
 
         // Hash new password
@@ -70,15 +51,9 @@ export async function PUT(request: NextRequest) {
         user.password = hashedPassword;
         await user.save();
 
-        return NextResponse.json(
-            { message: 'Password changed successfully' },
-            { status: 200 }
-        );
+        return ApiResponse.success(null, 'Password changed successfully');
     } catch (error: any) {
-        console.error('Change password error:', error);
-        return NextResponse.json(
-            { error: 'An error occurred while changing password' },
-            { status: 500 }
-        );
+        log.error('Change password error', error, { endpoint: '/api/user/password' });
+        return ApiResponse.internalError('An error occurred while changing password');
     }
 }

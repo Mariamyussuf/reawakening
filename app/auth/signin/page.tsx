@@ -40,14 +40,16 @@ export default function SignInPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-emerald-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50 to-amber-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-md w-full">
                 {/* Logo and Header */}
                 <div className="text-center mb-8">
                     <Link href="/" className="inline-flex items-center space-x-2 mb-6">
-                        <div className="w-12 h-12 bg-gradient-to-br from-green-600 to-emerald-600 rounded-lg flex items-center justify-center shadow-md">
-                            <span className="text-white font-bold text-2xl">R</span>
-                        </div>
+                        <img
+                            src="/images/logo.png"
+                            alt="Reawakening Logo"
+                            className="w-12 h-12 object-contain"
+                        />
                         <span className="text-2xl font-bold text-slate-800">Reawakening</span>
                     </Link>
                     <h2 className="text-3xl font-bold text-slate-800 mb-2">Welcome Back!</h2>
@@ -75,7 +77,7 @@ export default function SignInPage() {
                                 required
                                 value={formData.email}
                                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
                                 placeholder="you@example.com"
                             />
                         </div>
@@ -92,7 +94,7 @@ export default function SignInPage() {
                                 required
                                 value={formData.password}
                                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
                                 placeholder="••••••••"
                             />
                         </div>
@@ -103,7 +105,7 @@ export default function SignInPage() {
                                     id="remember-me"
                                     name="remember-me"
                                     type="checkbox"
-                                    className="h-4 w-4 text-green-600 focus:ring-green-500 border-slate-300 rounded"
+                                    className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-slate-300 rounded"
                                 />
                                 <label htmlFor="remember-me" className="ml-2 block text-sm text-slate-700">
                                     Remember me
@@ -111,7 +113,7 @@ export default function SignInPage() {
                             </div>
 
                             <div className="text-sm">
-                                <Link href="/auth/forgot-password" className="font-medium text-green-600 hover:text-green-700">
+                                <Link href="/auth/forgot-password" className="font-medium text-orange-600 hover:text-orange-700">
                                     Forgot password?
                                 </Link>
                             </div>

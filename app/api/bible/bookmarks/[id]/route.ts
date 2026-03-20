@@ -1,53 +1,59 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import dbConnect from '@/lib/mongodb';
-import BibleBookmark from '@/models/BibleBookmark';
+import { requireAuth } from '@/lib/middleware/auth';
+import { rateLimiters } from '@/lib/middleware/ratelimit';
+import { validateBody } from '@/lib/validation';
+import { UpdateBibleBookmarkSchema } from '@/lib/validation/schemas';
+import { ApiResponse } from '@/lib/api/response';
+import { log } from '@/lib/logger';
+import prisma from '@/lib/prisma';
 
 // PUT /api/bible/bookmarks/:id - Update bookmark
 export async function PUT(
     request: NextRequest,
     { params }: { params: { id: string } }
 ) {
-    try {
-        const session = await getServerSession(authOptions);
+    // Apply rate limiting
+    const rateLimitResponse = await rateLimiters.api(request);
+    if (rateLimitResponse) {
+        return rateLimitResponse;
+    }
 
-        if (!session || !session.user) {
-            return NextResponse.json(
-                { error: 'Unauthorized' },
-                { status: 401 }
-            );
+    try {
+        const session = await requireAuth();
+
+        // Validate request body
+        const validation = await validateBody(request, UpdateBibleBookmarkSchema);
+        if (!validation.success) {
+            return validation.response;
         }
 
-        const { note, color } = await request.json();
+        const { note, color } = validation.data;
 
-        await dbConnect();
+        const existingBookmark = await prisma.bibleBookmark.findUnique({
+            where: { id: params.id }
+        });
 
-        const bookmark = await BibleBookmark.findById(params.id);
-
-        if (!bookmark) {
-            return NextResponse.json(
-                { error: 'Bookmark not found' },
-                { status: 404 }
-            );
+        if (!existingBookmark) {
+            return ApiResponse.error('Bookmark not found', 404);
         }
 
         // Check if user owns this bookmark
-        if (bookmark.userId.toString() !== (session.user as any).id) {
-            return NextResponse.json(
-                { error: 'Unauthorized to update this bookmark' },
-                { status: 403 }
-            );
+        if (existingBookmark.userId !== session.user.id) {
+            return ApiResponse.forbidden('Unauthorized to update this bookmark');
         }
 
         // Update fields
-        if (note !== undefined) bookmark.note = note || undefined;
-        if (color !== undefined) bookmark.color = color;
+        const data: any = {};
+        if (note !== undefined) data.note = note || null;
+        if (color !== undefined) data.color = color;
 
-        await bookmark.save();
+        const bookmark = await prisma.bibleBookmark.update({
+            where: { id: params.id },
+            data
+        });
 
         const formattedBookmark = {
-            id: bookmark._id.toString(),
+            id: bookmark.id,
             version: bookmark.version,
             bookId: bookmark.bookId,
             bookName: bookmark.bookName,
@@ -61,16 +67,10 @@ export async function PUT(
             updatedAt: bookmark.updatedAt,
         };
 
-        return NextResponse.json(
-            { message: 'Bookmark updated successfully', bookmark: formattedBookmark },
-            { status: 200 }
-        );
+        return ApiResponse.success(formattedBookmark, 200, 'Bookmark updated successfully');
     } catch (error: any) {
-        console.error('Update bookmark error:', error);
-        return NextResponse.json(
-            { error: 'An error occurred while updating bookmark' },
-            { status: 500 }
-        );
+        log.error('Update bookmark error', error, { endpoint: '/api/bible/bookmarks/[id]', bookmarkId: params.id });
+        return ApiResponse.internalError('An error occurred while updating bookmark');
     }
 }
 
@@ -79,46 +79,35 @@ export async function DELETE(
     request: NextRequest,
     { params }: { params: { id: string } }
 ) {
+    // Apply rate limiting
+    const rateLimitResponse = await rateLimiters.api(request);
+    if (rateLimitResponse) {
+        return rateLimitResponse;
+    }
+
     try {
-        const session = await getServerSession(authOptions);
+        const session = await requireAuth();
 
-        if (!session || !session.user) {
-            return NextResponse.json(
-                { error: 'Unauthorized' },
-                { status: 401 }
-            );
-        }
-
-        await dbConnect();
-
-        const bookmark = await BibleBookmark.findById(params.id);
+        const bookmark = await prisma.bibleBookmark.findUnique({
+            where: { id: params.id }
+        });
 
         if (!bookmark) {
-            return NextResponse.json(
-                { error: 'Bookmark not found' },
-                { status: 404 }
-            );
+            return ApiResponse.error('Bookmark not found', 404);
         }
 
         // Check if user owns this bookmark
-        if (bookmark.userId.toString() !== (session.user as any).id) {
-            return NextResponse.json(
-                { error: 'Unauthorized to delete this bookmark' },
-                { status: 403 }
-            );
+        if (bookmark.userId !== session.user.id) {
+            return ApiResponse.forbidden('Unauthorized to delete this bookmark');
         }
 
-        await BibleBookmark.findByIdAndDelete(params.id);
+        await prisma.bibleBookmark.delete({
+            where: { id: params.id }
+        });
 
-        return NextResponse.json(
-            { message: 'Bookmark deleted successfully' },
-            { status: 200 }
-        );
+        return ApiResponse.success(null, 200, 'Bookmark deleted successfully');
     } catch (error: any) {
-        console.error('Delete bookmark error:', error);
-        return NextResponse.json(
-            { error: 'An error occurred while deleting bookmark' },
-            { status: 500 }
-        );
+        log.error('Delete bookmark error', error, { endpoint: '/api/bible/bookmarks/[id]', bookmarkId: params.id });
+        return ApiResponse.internalError('An error occurred while deleting bookmark');
     }
 }

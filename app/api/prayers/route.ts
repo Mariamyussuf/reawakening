@@ -1,42 +1,47 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAuth } from '@/lib/middleware/auth';
+import { rateLimiters } from '@/lib/middleware/ratelimit';
+import { ApiResponse } from '@/lib/api/response';
+import { log } from '@/lib/logger';
+import prisma from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import dbConnect from '@/lib/mongodb';
-import Prayer from '@/models/Prayer';
 
 // GET /api/prayers - Get user's prayers
 export async function GET(request: NextRequest) {
+    // Apply rate limiting
+    const rateLimitResponse = await rateLimiters.api(request);
+    if (rateLimitResponse) {
+        return rateLimitResponse;
+    }
+
     try {
-        const session = await getServerSession(authOptions);
-
-        if (!session || !session.user) {
-            return NextResponse.json(
-                { error: 'Unauthorized' },
-                { status: 401 }
-            );
-        }
-
-        await dbConnect();
+        const session = await requireAuth();
 
         const { searchParams } = new URL(request.url);
         const filter = searchParams.get('filter'); // 'all', 'active', 'answered'
 
-        const query: any = { userId: (session.user as any).id };
+        const where: any = { userId: session.user.id };
 
         if (filter === 'active') {
-            query.isAnswered = false;
+            where.isAnswered = false;
         } else if (filter === 'answered') {
-            query.isAnswered = true;
+            where.isAnswered = true;
         }
 
-        const prayers = await Prayer.find(query)
-            .sort({ createdAt: -1 })
-            .populate('userId', 'name email')
-            .lean();
+        const prayers = await prisma.prayer.findMany({
+            where,
+            orderBy: { createdAt: 'desc' },
+            include: {
+                user: {
+                    select: { name: true, email: true }
+                }
+            }
+        });
 
         // Format response
         const formattedPrayers = prayers.map((prayer: any) => ({
-            id: prayer._id.toString(),
+            id: prayer.id,
             title: prayer.title,
             description: prayer.description,
             category: prayer.category,
@@ -50,7 +55,7 @@ export async function GET(request: NextRequest) {
 
         return NextResponse.json({ prayers: formattedPrayers }, { status: 200 });
     } catch (error: any) {
-        console.error('Get prayers error:', error);
+        log.error('Get prayers error', error, { endpoint: '/api/prayers' });
         return NextResponse.json(
             { error: 'An error occurred while fetching prayers' },
             { status: 500 }
@@ -94,18 +99,19 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        await dbConnect();
-
-        const prayer = await Prayer.create({
-            userId: (session.user as any).id,
-            title: title.trim(),
-            description: description.trim(),
-            category: category || 'general',
-            isAnonymous: isAnonymous || false,
+        const prayer = await prisma.prayer.create({
+            data: {
+                userId: session.user.id,
+                title: title.trim(),
+                description: description.trim(),
+                category: category || 'GENERAL',
+                isAnonymous: isAnonymous || false,
+                prayedBy: '[]',
+            }
         });
 
         const formattedPrayer = {
-            id: prayer._id.toString(),
+            id: prayer.id,
             title: prayer.title,
             description: prayer.description,
             category: prayer.category,
@@ -116,16 +122,10 @@ export async function POST(request: NextRequest) {
             createdAt: prayer.createdAt,
         };
 
-        return NextResponse.json(
-            { message: 'Prayer request created successfully', prayer: formattedPrayer },
-            { status: 201 }
-        );
+        return ApiResponse.created(formattedPrayer, 'Prayer request created successfully');
     } catch (error: any) {
-        console.error('Create prayer error:', error);
-        return NextResponse.json(
-            { error: 'An error occurred while creating prayer request' },
-            { status: 500 }
-        );
+        log.error('Create prayer error', error, { endpoint: '/api/prayers' });
+        return ApiResponse.internalError('An error occurred while creating prayer request');
     }
 }
 

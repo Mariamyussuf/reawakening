@@ -147,7 +147,7 @@ export default function ChapterPage() {
                     <div className="flex items-center justify-between mb-4">
                         <Link
                             href={`/hub/bible?version=${version}`}
-                            className="text-green-600 hover:text-green-700 font-medium"
+                            className="text-orange-600 hover:text-orange-700 font-medium"
                         >
                             ← Back to Books
                         </Link>
@@ -177,8 +177,8 @@ export default function ChapterPage() {
                                 onClick={() => goToChapter(chapterNum - 1)}
                                 disabled={chapterNum <= 1}
                                 className={`px-4 py-2 rounded-lg font-medium transition-all ${chapterNum <= 1
-                                        ? 'opacity-50 cursor-not-allowed'
-                                        : 'bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:scale-105'
+                                    ? 'opacity-50 cursor-not-allowed'
+                                    : 'bg-gradient-to-r from-orange-600 to-amber-600 text-white hover:scale-105'
                                     }`}
                             >
                                 ← Previous
@@ -197,8 +197,8 @@ export default function ChapterPage() {
                                 onClick={() => goToChapter(chapterNum + 1)}
                                 disabled={chapterNum >= book.chapters}
                                 className={`px-4 py-2 rounded-lg font-medium transition-all ${chapterNum >= book.chapters
-                                        ? 'opacity-50 cursor-not-allowed'
-                                        : 'bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:scale-105'
+                                    ? 'opacity-50 cursor-not-allowed'
+                                    : 'bg-gradient-to-r from-orange-600 to-amber-600 text-white hover:scale-105'
                                     }`}
                             >
                                 Next →
@@ -212,7 +212,7 @@ export default function ChapterPage() {
                         <div className="flex gap-2">
                             <button
                                 onClick={() => setReadingMode('light')}
-                                className={`px-3 py-1 rounded ${readingMode === 'light' ? 'bg-white border-2 border-green-600' : 'bg-gray-100'
+                                className={`px-3 py-1 rounded ${readingMode === 'light' ? 'bg-white border-2 border-orange-600' : 'bg-gray-100'
                                     }`}
                                 title="Light Mode"
                             >
@@ -220,7 +220,7 @@ export default function ChapterPage() {
                             </button>
                             <button
                                 onClick={() => setReadingMode('sepia')}
-                                className={`px-3 py-1 rounded ${readingMode === 'sepia' ? 'bg-amber-50 border-2 border-green-600' : 'bg-gray-100'
+                                className={`px-3 py-1 rounded ${readingMode === 'sepia' ? 'bg-amber-50 border-2 border-orange-600' : 'bg-gray-100'
                                     }`}
                                 title="Sepia Mode"
                             >
@@ -228,7 +228,7 @@ export default function ChapterPage() {
                             </button>
                             <button
                                 onClick={() => setReadingMode('dark')}
-                                className={`px-3 py-1 rounded ${readingMode === 'dark' ? 'bg-gray-900 text-white border-2 border-green-600' : 'bg-gray-100'
+                                className={`px-3 py-1 rounded ${readingMode === 'dark' ? 'bg-gray-900 text-white border-2 border-orange-600' : 'bg-gray-100'
                                     }`}
                                 title="Dark Mode"
                             >
@@ -240,10 +240,10 @@ export default function ChapterPage() {
                         <button
                             onClick={() => setShowVerseNumbers(!showVerseNumbers)}
                             className={`px-4 py-1 rounded ${showVerseNumbers
-                                    ? 'bg-green-600 text-white'
-                                    : readingMode === 'dark'
-                                        ? 'bg-gray-700'
-                                        : 'bg-gray-100'
+                                ? 'bg-orange-600 text-white'
+                                : readingMode === 'dark'
+                                    ? 'bg-gray-700'
+                                    : 'bg-gray-100'
                                 }`}
                         >
                             {showVerseNumbers ? 'Hide' : 'Show'} Verse Numbers
@@ -256,7 +256,7 @@ export default function ChapterPage() {
             <div className="max-w-4xl mx-auto px-4 py-8">
                 {loading ? (
                     <div className="text-center py-12">
-                        <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-green-600 border-t-transparent"></div>
+                        <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-orange-600 border-t-transparent"></div>
                         <p className="mt-4">Loading chapter...</p>
                     </div>
                 ) : chapter ? (
@@ -278,18 +278,17 @@ export default function ChapterPage() {
                                         <div key={verse.id} className="group relative">
                                             <p className="leading-relaxed">
                                                 {showVerseNumbers && (
-                                                    <sup className="text-green-600 font-bold mr-2">{verse.verseNumber}</sup>
+                                                    <sup className="text-orange-600 font-bold mr-2">{verse.verseNumber}</sup>
                                                 )}
                                                 <span>{verse.text}</span>
                                             </p>
                                             <button
                                                 onClick={() => handleBookmark(verse.verseNumber, verse.text)}
                                                 disabled={bookmarking === verseKey}
-                                                className={`absolute -right-8 top-0 opacity-0 group-hover:opacity-100 transition-opacity p-2 rounded-lg ${
-                                                    isBookmarked
+                                                className={`absolute -right-8 top-0 opacity-0 group-hover:opacity-100 transition-opacity p-2 rounded-lg ${isBookmarked
                                                         ? 'text-yellow-500 opacity-100'
                                                         : 'text-gray-400 hover:text-yellow-500'
-                                                }`}
+                                                    }`}
                                                 title={isBookmarked ? 'Remove bookmark' : 'Bookmark this verse'}
                                             >
                                                 {bookmarking === verseKey ? (
@@ -324,7 +323,7 @@ export default function ChapterPage() {
                         <button className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:scale-105 transition-transform shadow-lg">
                             📝 Add Note
                         </button>
-                        <button className="px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:scale-105 transition-transform shadow-lg">
+                        <button className="px-6 py-3 bg-gradient-to-r from-orange-600 to-amber-600 text-white rounded-lg hover:scale-105 transition-transform shadow-lg">
                             📤 Share
                         </button>
                     </div>
@@ -338,8 +337,8 @@ export default function ChapterPage() {
                                 onClick={() => goToChapter(chapterNum - 1)}
                                 disabled={chapterNum <= 1}
                                 className={`px-6 py-3 rounded-lg font-medium transition-all ${chapterNum <= 1
-                                        ? 'opacity-50 cursor-not-allowed'
-                                        : 'bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:scale-105'
+                                    ? 'opacity-50 cursor-not-allowed'
+                                    : 'bg-gradient-to-r from-orange-600 to-amber-600 text-white hover:scale-105'
                                     }`}
                             >
                                 ← {book.name} {chapterNum - 1}
@@ -356,8 +355,8 @@ export default function ChapterPage() {
                                 onClick={() => goToChapter(chapterNum + 1)}
                                 disabled={chapterNum >= book.chapters}
                                 className={`px-6 py-3 rounded-lg font-medium transition-all ${chapterNum >= book.chapters
-                                        ? 'opacity-50 cursor-not-allowed'
-                                        : 'bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:scale-105'
+                                    ? 'opacity-50 cursor-not-allowed'
+                                    : 'bg-gradient-to-r from-orange-600 to-amber-600 text-white hover:scale-105'
                                     }`}
                             >
                                 {book.name} {chapterNum + 1} →

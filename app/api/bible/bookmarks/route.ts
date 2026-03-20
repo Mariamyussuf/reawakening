@@ -1,41 +1,42 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import dbConnect from '@/lib/mongodb';
-import BibleBookmark from '@/models/BibleBookmark';
+import { requireAuth } from '@/lib/middleware/auth';
+import { rateLimiters } from '@/lib/middleware/ratelimit';
+import { validateBody } from '@/lib/validation';
+import { BibleBookmarkSchema } from '@/lib/validation/schemas';
+import { ApiResponse } from '@/lib/api/response';
+import { log } from '@/lib/logger';
+import prisma from '@/lib/prisma';
 
 // GET /api/bible/bookmarks - Get user's bookmarks
 export async function GET(request: NextRequest) {
+    // Apply rate limiting
+    const rateLimitResponse = await rateLimiters.api(request);
+    if (rateLimitResponse) {
+        return rateLimitResponse;
+    }
+
     try {
-        const session = await getServerSession(authOptions);
-
-        if (!session || !session.user) {
-            return NextResponse.json(
-                { error: 'Unauthorized' },
-                { status: 401 }
-            );
-        }
-
-        await dbConnect();
+        const session = await requireAuth();
 
         const { searchParams } = new URL(request.url);
         const bookId = searchParams.get('bookId');
         const chapter = searchParams.get('chapter');
         const version = searchParams.get('version');
 
-        const query: any = { userId: (session.user as any).id };
+        const where: any = { userId: session.user.id };
 
-        if (bookId) query.bookId = bookId;
-        if (chapter) query.chapter = parseInt(chapter);
-        if (version) query.version = version;
+        if (bookId) where.bookId = bookId;
+        if (chapter) where.chapter = parseInt(chapter);
+        if (version) where.version = version;
 
-        const bookmarks = await BibleBookmark.find(query)
-            .sort({ createdAt: -1 })
-            .lean();
+        const bookmarks = await prisma.bibleBookmark.findMany({
+            where,
+            orderBy: { createdAt: 'desc' }
+        });
 
         // Format response
-        const formattedBookmarks = bookmarks.map((bookmark: any) => ({
-            id: bookmark._id.toString(),
+        const formattedBookmarks = bookmarks.map((bookmark) => ({
+            id: bookmark.id,
             version: bookmark.version,
             bookId: bookmark.bookId,
             bookName: bookmark.bookName,
@@ -49,71 +50,64 @@ export async function GET(request: NextRequest) {
             updatedAt: bookmark.updatedAt,
         }));
 
-        return NextResponse.json({ bookmarks: formattedBookmarks }, { status: 200 });
+        return ApiResponse.success({ bookmarks: formattedBookmarks });
     } catch (error: any) {
-        console.error('Get bookmarks error:', error);
-        return NextResponse.json(
-            { error: 'An error occurred while fetching bookmarks' },
-            { status: 500 }
-        );
+        log.error('Get bookmarks error', error, { endpoint: '/api/bible/bookmarks' });
+        return ApiResponse.internalError('An error occurred while fetching bookmarks');
     }
 }
 
 // POST /api/bible/bookmarks - Create bookmark
 export async function POST(request: NextRequest) {
+    // Apply rate limiting
+    const rateLimitResponse = await rateLimiters.api(request);
+    if (rateLimitResponse) {
+        return rateLimitResponse;
+    }
+
     try {
-        const session = await getServerSession(authOptions);
+        const session = await requireAuth();
 
-        if (!session || !session.user) {
-            return NextResponse.json(
-                { error: 'Unauthorized' },
-                { status: 401 }
-            );
+        // Validate request body
+        const validation = await validateBody(request, BibleBookmarkSchema);
+        if (!validation.success) {
+            return validation.response;
         }
 
-        const { version, bookId, bookName, chapter, verse, verseText, reference, note, color } = await request.json();
-
-        // Validation
-        if (!version || !bookId || !bookName || !chapter || !reference) {
-            return NextResponse.json(
-                { error: 'Please provide version, bookId, bookName, chapter, and reference' },
-                { status: 400 }
-            );
-        }
-
-        await dbConnect();
+        const { version, bookId, bookName, chapter, verse, verseText, reference, note, color } = validation.data;
 
         // Check if bookmark already exists
-        const existing = await BibleBookmark.findOne({
-            userId: (session.user as any).id,
-            version,
-            bookId,
-            chapter,
-            verse: verse || null,
+        const existing = await prisma.bibleBookmark.findFirst({
+            where: {
+                userId: session.user.id,
+                version,
+                bookId,
+                chapter,
+                verse: verse || null,
+            }
         });
 
         if (existing) {
-            return NextResponse.json(
-                { error: 'Bookmark already exists' },
-                { status: 400 }
-            );
+            return ApiResponse.error('Bookmark already exists', 400);
         }
 
-        const bookmark = await BibleBookmark.create({
-            userId: (session.user as any).id,
-            version,
-            bookId,
-            bookName,
-            chapter,
-            verse: verse || undefined,
-            verseText: verseText || undefined,
-            reference,
-            note: note || undefined,
-            color: color || 'yellow',
+        const bookmark = await prisma.bibleBookmark.create({
+            data: {
+                userId: session.user.id,
+                version,
+                bookId,
+                bookName,
+                chapter,
+                verse: verse || null,
+                verseText: verseText || null,
+                reference,
+                note: note || null,
+                color: color || 'YELLOW',
+            }
         });
 
         const formattedBookmark = {
-            id: bookmark._id.toString(),
+            id: bookmark.id,
             version: bookmark.version,
             bookId: bookmark.bookId,
             bookName: bookmark.bookName,
@@ -127,15 +121,9 @@ export async function POST(request: NextRequest) {
             updatedAt: bookmark.updatedAt,
         };
 
-        return NextResponse.json(
-            { message: 'Bookmark created successfully', bookmark: formattedBookmark },
-            { status: 201 }
-        );
+        return ApiResponse.created(formattedBookmark, 'Bookmark created successfully');
     } catch (error: any) {
-        console.error('Create bookmark error:', error);
-        return NextResponse.json(
-            { error: 'An error occurred while creating bookmark' },
-            { status: 500 }
-        );
+        log.error('Create bookmark error', error, { endpoint: '/api/bible/bookmarks' });
+        return ApiResponse.internalError('An error occurred while creating bookmark');
     }
 }

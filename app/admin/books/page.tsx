@@ -4,12 +4,16 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { bookService } from "@/lib/books/book-service";
 import { Book } from "@/models/Book";
+import EditBookModal from "@/components/admin/EditBookModal";
 
 export default function AdminBooksPage() {
     const [books, setBooks] = useState<Book[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
+    const [selectedBooks, setSelectedBooks] = useState<Set<string>>(new Set());
+    const [editingBook, setEditingBook] = useState<Book | null>(null);
+    const [showEditModal, setShowEditModal] = useState(false);
 
     useEffect(() => {
         loadBooks();
@@ -51,8 +55,63 @@ export default function AdminBooksPage() {
     };
 
     const handleEdit = (book: Book) => {
-        // TODO: Implement edit modal or navigate to edit page
-        alert("Edit functionality coming soon! For now, you can delete and re-upload the book.");
+        setEditingBook(book);
+        setShowEditModal(true);
+    };
+
+    const handleBulkAction = async (action: "delete" | "feature" | "unfeature") => {
+        if (selectedBooks.size === 0) {
+            setError("Please select at least one book");
+            return;
+        }
+
+        if (action === "delete") {
+            if (!confirm(`Are you sure you want to delete ${selectedBooks.size} book(s)? This action cannot be undone.`)) {
+                return;
+            }
+        }
+
+        try {
+            const promises = Array.from(selectedBooks).map(async (bookId) => {
+                if (action === "delete") {
+                    return fetch(`/api/admin/books/${bookId}`, { method: "DELETE" });
+                } else {
+                    const book = books.find((b) => b.id === bookId);
+                    return fetch(`/api/admin/books/${bookId}`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ featured: action === "feature" }),
+                    });
+                }
+            });
+
+            await Promise.all(promises);
+            setSuccess(`${action === "delete" ? "Deleted" : action === "feature" ? "Featured" : "Unfeatured"} ${selectedBooks.size} book(s) successfully!`);
+            setSelectedBooks(new Set());
+            await loadBooks();
+        } catch (err: any) {
+            setError(err.message || `Failed to ${action} books`);
+        }
+    };
+
+    const toggleBookSelection = (bookId: string) => {
+        setSelectedBooks((prev) => {
+            const next = new Set(prev);
+            if (next.has(bookId)) {
+                next.delete(bookId);
+            } else {
+                next.add(bookId);
+            }
+            return next;
+        });
+    };
+
+    const selectAll = () => {
+        if (selectedBooks.size === books.length) {
+            setSelectedBooks(new Set());
+        } else {
+            setSelectedBooks(new Set(books.map((b) => b.id)));
+        }
     };
 
     // Clear messages after 5 seconds
@@ -166,30 +225,98 @@ export default function AdminBooksPage() {
                             <h2 className="text-2xl font-bold text-slate-800 mb-1">Manage Books</h2>
                             <p className="text-slate-600">Upload, edit, and manage your book library</p>
                         </div>
-                        <Link
-                            href="/admin/books/upload"
-                            className="px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition-colors flex items-center gap-2"
-                        >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                            </svg>
-                            Upload New Book
-                        </Link>
+                        <div className="flex gap-3">
+                            <Link
+                                href="/admin/books/stats"
+                                className="px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center gap-2"
+                            >
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                </svg>
+                                Statistics
+                            </Link>
+                            <Link
+                                href="/admin/books/upload"
+                                className="px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition-colors flex items-center gap-2"
+                            >
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                </svg>
+                                Upload New Book
+                            </Link>
+                        </div>
                     </div>
                 </div>
 
+                {/* Bulk Actions */}
+                {selectedBooks.size > 0 && (
+                    <div className="card bg-purple-50 border-2 border-purple-200 mb-6">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="font-semibold text-purple-800">
+                                    {selectedBooks.size} book{selectedBooks.size === 1 ? "" : "s"} selected
+                                </p>
+                            </div>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => handleBulkAction("feature")}
+                                    className="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700 transition-colors"
+                                >
+                                    Feature Selected
+                                </button>
+                                <button
+                                    onClick={() => handleBulkAction("unfeature")}
+                                    className="px-4 py-2 bg-slate-600 text-white rounded-lg text-sm font-medium hover:bg-slate-700 transition-colors"
+                                >
+                                    Unfeature Selected
+                                </button>
+                                <button
+                                    onClick={() => handleBulkAction("delete")}
+                                    className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-colors"
+                                >
+                                    Delete Selected
+                                </button>
+                                <button
+                                    onClick={() => setSelectedBooks(new Set())}
+                                    className="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-300 transition-colors"
+                                >
+                                    Clear Selection
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 {/* Books List */}
                 <div className="card">
-                    <h2 className="text-2xl font-bold text-slate-800 mb-6">All Books ({books.length})</h2>
+                    <div className="flex items-center justify-between mb-6">
+                        <h2 className="text-2xl font-bold text-slate-800">All Books ({books.length})</h2>
+                        <button
+                            onClick={selectAll}
+                            className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200 transition-colors"
+                        >
+                            {selectedBooks.size === books.length ? "Deselect All" : "Select All"}
+                        </button>
+                    </div>
 
                     {books.length > 0 ? (
                         <div className="space-y-4">
                             {books.map((book) => (
                                 <div
                                     key={book.id}
-                                    className="p-4 bg-slate-50 rounded-lg border border-slate-200 hover:shadow-md transition-all"
+                                    className={`p-4 rounded-lg border-2 transition-all ${
+                                        selectedBooks.has(book.id)
+                                            ? "bg-purple-50 border-purple-300"
+                                            : "bg-slate-50 border-slate-200 hover:shadow-md"
+                                    }`}
                                 >
                                     <div className="flex items-start gap-4">
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedBooks.has(book.id)}
+                                            onChange={() => toggleBookSelection(book.id)}
+                                            className="mt-2 w-4 h-4 rounded border-slate-300 text-purple-600 focus:ring-purple-500"
+                                        />
                                         {/* Cover Thumbnail */}
                                         <div className="w-16 h-24 bg-gradient-to-br from-slate-200 to-slate-300 rounded flex-shrink-0 overflow-hidden">
                                             {book.coverImage ? (
@@ -293,6 +420,17 @@ export default function AdminBooksPage() {
                     )}
                 </div>
             </main>
+
+            {/* Edit Book Modal */}
+            <EditBookModal
+                book={editingBook}
+                isOpen={showEditModal}
+                onClose={() => {
+                    setShowEditModal(false);
+                    setEditingBook(null);
+                }}
+                onSave={loadBooks}
+            />
         </div>
     );
 }

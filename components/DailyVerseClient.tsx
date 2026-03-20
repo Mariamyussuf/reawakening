@@ -98,12 +98,12 @@ export default function DailyVerseClient() {
     return (
         <div className="space-y-8">
             {/* Streak Display */}
-            <div className="card bg-gradient-to-br from-blue-50 to-purple-50 border-2 border-blue-200">
+            <div className="card bg-gradient-to-br from-orange-50 to-amber-50 border-2 border-orange-200">
                 <div className="text-center">
                     <h3 className="text-lg font-medium text-slate-700 mb-4">Your Journey</h3>
                     <div className="grid grid-cols-2 gap-6">
                         <div>
-                            <div className="text-4xl font-bold text-blue-600 mb-1">
+                            <div className="text-4xl font-bold text-orange-600 mb-1">
                                 {streakData.currentStreak}
                             </div>
                             <div className="text-sm text-slate-600">Day Streak</div>
@@ -116,7 +116,7 @@ export default function DailyVerseClient() {
                             </p>
                         </div>
                         <div>
-                            <div className="text-4xl font-bold text-purple-600 mb-1">
+                            <div className="text-4xl font-bold text-amber-600 mb-1">
                                 {streakData.totalReads}
                             </div>
                             <div className="text-sm text-slate-600">Total Reads</div>
@@ -125,8 +125,8 @@ export default function DailyVerseClient() {
                             </p>
                         </div>
                     </div>
-                    <div className="mt-4 p-3 bg-blue-100 rounded-lg">
-                        <p className="text-sm text-blue-800">
+                    <div className="mt-4 p-3 bg-orange-100 rounded-lg">
+                        <p className="text-sm text-orange-800">
                             <strong>Grace Period:</strong> You have 1 day of grace if you miss a day. Your streak won&apos;t reset immediately.
                         </p>
                     </div>
@@ -136,13 +136,13 @@ export default function DailyVerseClient() {
             {/* Daily Verse */}
             <div className="card">
                 <div className="text-center mb-6">
-                    <span className="inline-block bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-medium mb-4">
+                    <span className="inline-block bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-sm font-medium mb-4">
                         {dailyVerse.date}
                     </span>
                     <h2 className="text-2xl md:text-3xl font-serif text-slate-800 leading-relaxed mb-4">
                         &quot;{dailyVerse.text}&quot;
                     </h2>
-                    <p className="text-lg font-medium text-blue-600">{dailyVerse.reference}</p>
+                    <p className="text-lg font-medium text-orange-600">{dailyVerse.reference}</p>
                 </div>
 
                 <div className="border-t border-slate-200 pt-6">
@@ -155,8 +155,8 @@ export default function DailyVerseClient() {
                         onClick={markAsRead}
                         disabled={hasReadToday}
                         className={`w-full py-3 rounded-lg font-medium transition-all duration-300 ${hasReadToday
-                                ? "bg-green-100 text-green-700 cursor-not-allowed"
-                                : "btn-primary"
+                            ? "bg-amber-100 text-amber-700 cursor-not-allowed"
+                            : "btn-primary"
                             }`}
                     >
                         {hasReadToday ? (
@@ -175,13 +175,13 @@ export default function DailyVerseClient() {
 
             {/* Encouragement Message */}
             {showEncouragement && (
-                <div className="fixed bottom-8 right-8 bg-green-500 text-white px-6 py-4 rounded-lg shadow-xl animate-bounce">
+                <div className="fixed bottom-8 right-8 bg-amber-500 text-white px-6 py-4 rounded-lg shadow-xl animate-bounce">
                     <p className="font-medium">🎉 Well done! Keep growing in faith!</p>
                 </div>
             )}
 
             {/* Grace-Centered Message */}
-            <div className="card bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+            <div className="card bg-gradient-to-r from-orange-600 to-amber-600 text-white">
                 <h3 className="text-xl font-bold mb-3">Remember</h3>
                 <p className="leading-relaxed opacity-90">
                     This streak is meant to encourage consistency, not create pressure. God&apos;s grace isn&apos;t measured in numbers. Whether your streak is 1 day or 100 days, you&apos;re growing in your walk with Christ.

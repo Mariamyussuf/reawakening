@@ -6,17 +6,17 @@
 
 @layer base {
   :root {
-    /* Professional Color Palette */
-    --primary-50: 240 253 250;
-    --primary-100: 204 251 241;
-    --primary-200: 153 246 228;
-    --primary-300: 94 234 212;
-    --primary-400: 45 212 191;
-    --primary-500: 20 184 166;
-    --primary-600: 13 148 136;
-    --primary-700: 15 118 110;
-    --primary-800: 17 94 89;
-    --primary-900: 19 78 74;
+    /* Warm Golden-Orange Palette (Logo Colors) */
+    --primary-50: 255 251 245;
+    --primary-100: 255 245 230;
+    --primary-200: 255 235 205;
+    --primary-300: 255 220 170;
+    --primary-400: 255 200 130;
+    --primary-500: 255 165 80;
+    --primary-600: 255 140 60;
+    --primary-700: 255 107 53;
+    --primary-800: 230 85 45;
+    --primary-900: 200 70 40;
 
     /* Neutral Grays */
     --neutral-50: 250 250 250;
@@ -31,10 +31,10 @@
     --neutral-900: 24 24 27;
 
     /* Accent Colors */
-    --accent-emerald: 16 185 129;
-    --accent-blue: 59 130 246;
-    --accent-purple: 139 92 246;
-    --accent-amber: 245 158 11;
+    --accent-gold: 244 208 63;
+    --accent-orange: 255 140 0;
+    --accent-coral: 255 127 80;
+    --accent-peach: 255 179 140;
 
     /* Refined Shadows */
     --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.03);
@@ -54,7 +54,12 @@
     font-variation-settings: 'opsz' 32;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: 'Crimson Pro', Georgia, serif;
     font-weight: 600;
     letter-spacing: -0.025em;
@@ -63,7 +68,7 @@
 }
 
 @layer components {
-  
+
   /* Container */
   .container-custom {
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
@@ -71,15 +76,15 @@
 
   /* Professional Buttons */
   .btn-primary {
-    @apply relative inline-flex items-center justify-center px-6 py-3 text-sm font-semibold text-white bg-gradient-to-r from-teal-600 to-emerald-600 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2;
+    @apply relative inline-flex items-center justify-center px-6 py-3 text-sm font-semibold text-white bg-gradient-to-r from-orange-600 to-amber-600 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2;
   }
 
   .btn-secondary {
-    @apply relative inline-flex items-center justify-center px-6 py-3 text-sm font-semibold text-neutral-700 bg-white border border-neutral-300 rounded-lg shadow-sm hover:bg-neutral-50 hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2;
+    @apply relative inline-flex items-center justify-center px-6 py-3 text-sm font-semibold text-neutral-700 bg-white border border-neutral-300 rounded-lg shadow-sm hover:bg-neutral-50 hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2;
   }
 
   .btn-ghost {
-    @apply relative inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-100 rounded-lg transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2;
+    @apply relative inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-100 rounded-lg transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2;
   }
 
   /* Professional Cards */
@@ -96,12 +101,12 @@
   }
 
   .card-premium {
-    @apply relative bg-gradient-to-br from-white via-teal-50/30 to-emerald-50/30 rounded-xl border border-teal-100/50 shadow-md hover:shadow-lg transition-all duration-200 p-8;
+    @apply relative bg-gradient-to-br from-white via-orange-50/30 to-amber-50/30 rounded-xl border border-orange-100/50 shadow-md hover:shadow-lg transition-all duration-200 p-8;
   }
 
   /* Stats Card */
   .stat-card {
-    @apply relative bg-white rounded-xl border border-neutral-200 p-6 hover:border-teal-200 hover:shadow-md transition-all duration-200;
+    @apply relative bg-white rounded-xl border border-neutral-200 p-6 hover:border-orange-200 hover:shadow-md transition-all duration-200;
   }
 
   /* Section Headers */
@@ -115,15 +120,15 @@
 
   /* Professional Gradient Text */
   .gradient-text {
-    @apply bg-gradient-to-r from-teal-600 to-emerald-600 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-orange-600 to-amber-500 bg-clip-text text-transparent;
   }
 
-  .gradient-text-blue {
-    @apply bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent;
+  .gradient-text-gold {
+    @apply bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text text-transparent;
   }
 
-  .gradient-text-purple {
-    @apply bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent;
+  .gradient-text-warm {
+    @apply bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent;
   }
 
   /* Icon Containers */
@@ -133,7 +138,7 @@
 
   /* Input Fields */
   .input-field {
-    @apply w-full px-4 py-2.5 text-sm rounded-lg border border-neutral-300 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-150 placeholder:text-neutral-400;
+    @apply w-full px-4 py-2.5 text-sm rounded-lg border border-neutral-300 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-150 placeholder:text-neutral-400;
   }
 
   /* Badges */
@@ -167,8 +172,13 @@
 
 /* Refined Animations */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideUp {
@@ -176,6 +186,7 @@
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -202,9 +213,9 @@
 
 /* Selection */
 ::selection {
-  @apply bg-teal-100 text-teal-900;
+  @apply bg-orange-100 text-orange-900;
 }
 
 ::-moz-selection {
-  @apply bg-teal-100 text-teal-900;
+  @apply bg-orange-100 text-orange-900;
 }

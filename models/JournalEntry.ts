@@ -56,6 +56,8 @@ const JournalEntrySchema = new Schema<IJournalEntry>(
 JournalEntrySchema.index({ userId: 1, createdAt: -1 });
 JournalEntrySchema.index({ userId: 1, category: 1 });
 JournalEntrySchema.index({ userId: 1, tags: 1 });
+// Full-text search index
+JournalEntrySchema.index({ title: 'text', content: 'text', tags: 'text' });
 
 const JournalEntry: Model<IJournalEntry> = mongoose.models.JournalEntry || mongoose.model<IJournalEntry>('JournalEntry', JournalEntrySchema);
 

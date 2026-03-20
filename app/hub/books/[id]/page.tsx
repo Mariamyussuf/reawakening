@@ -38,7 +38,7 @@ export default function BookDetailPage() {
 
         // Increment download count and get PDF URL
         const result = await bookService.incrementDownloads(bookId);
-        
+
         if (result) {
             // Trigger download
             const link = document.createElement("a");
@@ -47,7 +47,7 @@ export default function BookDetailPage() {
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            
+
             // Update local book state with new download count
             setBook({ ...book, totalDownloads: book.totalDownloads + 1 });
         } else {
@@ -63,7 +63,7 @@ export default function BookDetailPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-emerald-50 flex items-center justify-center">
+            <div className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50 to-amber-50 flex items-center justify-center">
                 <div className="text-center">
                     <div className="text-6xl mb-4">📖</div>
                     <p className="text-slate-700 font-semibold">Loading book...</p>
@@ -74,7 +74,7 @@ export default function BookDetailPage() {
 
     if (!book) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-emerald-50 flex items-center justify-center">
+            <div className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50 to-amber-50 flex items-center justify-center">
                 <div className="text-center">
                     <div className="text-6xl mb-4">📚</div>
                     <p className="text-slate-700 font-semibold text-xl mb-2">Book not found</p>
@@ -87,7 +87,7 @@ export default function BookDetailPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-emerald-50">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50 to-amber-50">
             {/* Header */}
             <header className="bg-white/90 backdrop-blur-md shadow-sm border-b border-slate-200">
                 <div className="container-custom py-4">
@@ -125,7 +125,7 @@ export default function BookDetailPage() {
                             <div className="space-y-3">
                                 <Link
                                     href={`/hub/books/${book.id}/read`}
-                                    className="block w-full px-6 py-3 bg-green-600 text-white rounded-lg font-semibold text-center hover:bg-green-700 transition-colors"
+                                    className="block w-full px-6 py-3 bg-orange-600 text-white rounded-lg font-semibold text-center hover:bg-orange-700 transition-colors"
                                 >
                                     📖 Read in Browser
                                 </Link>
@@ -138,7 +138,7 @@ export default function BookDetailPage() {
                                     </svg>
                                     Download PDF
                                 </button>
-                                <button className="w-full px-6 py-3 bg-white border-2 border-green-600 text-green-600 rounded-lg font-semibold hover:bg-green-50 transition-colors flex items-center justify-center gap-2">
+                                <button className="w-full px-6 py-3 bg-white border-2 border-orange-600 text-orange-600 rounded-lg font-semibold hover:bg-orange-50 transition-colors flex items-center justify-center gap-2">
                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
                                     </svg>
@@ -199,7 +199,7 @@ export default function BookDetailPage() {
                                         <Link
                                             key={index}
                                             href={`/hub/books/browse?category=${encodeURIComponent(category)}`}
-                                            className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium hover:bg-green-200 transition-colors"
+                                            className="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm font-medium hover:bg-orange-200 transition-colors"
                                         >
                                             {category}
                                         </Link>

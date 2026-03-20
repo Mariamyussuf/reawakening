@@ -1,63 +1,56 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import dbConnect from '@/lib/mongodb';
-import JournalEntry from '@/models/JournalEntry';
+import { requireAuth } from '@/lib/middleware/auth';
+import { rateLimiters } from '@/lib/middleware/ratelimit';
+import { validateBody } from '@/lib/validation';
+import { UpdateJournalEntrySchema } from '@/lib/validation/schemas';
+import { ApiResponse } from '@/lib/api/response';
+import { log } from '@/lib/logger';
+import prisma from '@/lib/prisma';
 
 // GET /api/journal/entries/:id - Get single journal entry
 export async function GET(
     request: NextRequest,
     { params }: { params: { id: string } }
 ) {
+    // Apply rate limiting
+    const rateLimitResponse = await rateLimiters.api(request);
+    if (rateLimitResponse) {
+        return rateLimitResponse;
+    }
+
     try {
-        const session = await getServerSession(authOptions);
+        const session = await requireAuth();
 
-        if (!session || !session.user) {
-            return NextResponse.json(
-                { error: 'Unauthorized' },
-                { status: 401 }
-            );
-        }
-
-        await dbConnect();
-
-        const entry = await JournalEntry.findById(params.id);
+        const entry = await prisma.journalEntry.findUnique({
+            where: { id: params.id }
+        });
 
         if (!entry) {
-            return NextResponse.json(
-                { error: 'Journal entry not found' },
-                { status: 404 }
-            );
+            return ApiResponse.error('Journal entry not found', 404);
         }
 
         // Check if user owns this entry
-        if (entry.userId.toString() !== (session.user as any).id) {
-            return NextResponse.json(
-                { error: 'Unauthorized to view this entry' },
-                { status: 403 }
-            );
+        if (entry.userId !== session.user.id) {
+            return ApiResponse.forbidden('Unauthorized to view this entry');
         }
 
         const formattedEntry = {
-            id: entry._id.toString(),
+            id: entry.id,
             title: entry.title,
             content: entry.content,
             category: entry.category,
             mood: entry.mood,
-            tags: entry.tags || [],
+            tags: entry.tags ? JSON.parse(entry.tags) : [],
             date: formatDate(entry.createdAt),
             time: formatTime(entry.createdAt),
             createdAt: entry.createdAt,
             updatedAt: entry.updatedAt,
         };
 
-        return NextResponse.json({ entry: formattedEntry }, { status: 200 });
+        return ApiResponse.success({ entry: formattedEntry });
     } catch (error: any) {
-        console.error('Get journal entry error:', error);
-        return NextResponse.json(
-            { error: 'An error occurred while fetching journal entry' },
-            { status: 500 }
-        );
+        log.error('Get journal entry error', error, { endpoint: '/api/journal/entries/[id]', entryId: params.id });
+        return ApiResponse.internalError('An error occurred while fetching journal entry');
     }
 }
 
@@ -66,84 +59,67 @@ export async function PUT(
     request: NextRequest,
     { params }: { params: { id: string } }
 ) {
-    try {
-        const session = await getServerSession(authOptions);
+    // Apply rate limiting
+    const rateLimitResponse = await rateLimiters.api(request);
+    if (rateLimitResponse) {
+        return rateLimitResponse;
+    }
 
-        if (!session || !session.user) {
-            return NextResponse.json(
-                { error: 'Unauthorized' },
-                { status: 401 }
-            );
+    try {
+        const session = await requireAuth();
+
+        // Validate request body
+        const validation = await validateBody(request, UpdateJournalEntrySchema);
+        if (!validation.success) {
+            return validation.response;
         }
 
-        const { title, content, category, mood, tags } = await request.json();
+        const { title, content, category, mood, tags } = validation.data;
 
-        await dbConnect();
+        // Check compatibility first
+        const existingEntry = await prisma.journalEntry.findUnique({
+            where: { id: params.id }
+        });
 
-        const entry = await JournalEntry.findById(params.id);
-
-        if (!entry) {
-            return NextResponse.json(
-                { error: 'Journal entry not found' },
-                { status: 404 }
-            );
+        if (!existingEntry) {
+            return ApiResponse.error('Journal entry not found', 404);
         }
 
         // Check if user owns this entry
-        if (entry.userId.toString() !== (session.user as any).id) {
-            return NextResponse.json(
-                { error: 'Unauthorized to update this entry' },
-                { status: 403 }
-            );
-        }
-
-        // Validation
-        if (content && content.length > 5000) {
-            return NextResponse.json(
-                { error: 'Content cannot be more than 5000 characters' },
-                { status: 400 }
-            );
-        }
-
-        if (title && title.length > 200) {
-            return NextResponse.json(
-                { error: 'Title cannot be more than 200 characters' },
-                { status: 400 }
-            );
+        if (existingEntry.userId !== session.user.id) {
+            return ApiResponse.forbidden('Unauthorized to update this entry');
         }
 
         // Update fields
-        if (title !== undefined) entry.title = title?.trim() || undefined;
-        if (content !== undefined) entry.content = content.trim();
-        if (category !== undefined) entry.category = category;
-        if (mood !== undefined) entry.mood = mood || undefined;
-        if (tags !== undefined) entry.tags = tags || [];
+        const data: any = {};
+        if (title !== undefined) data.title = title?.trim() || null;
+        if (content !== undefined) data.content = content.trim();
+        if (category !== undefined) data.category = category;
+        if (mood !== undefined) data.mood = mood || null;
+        if (tags !== undefined) data.tags = JSON.stringify(tags || []);
 
-        await entry.save();
+        const entry = await prisma.journalEntry.update({
+            where: { id: params.id },
+            data
+        });
 
         const formattedEntry = {
-            id: entry._id.toString(),
+            id: entry.id,
             title: entry.title,
             content: entry.content,
             category: entry.category,
             mood: entry.mood,
-            tags: entry.tags || [],
+            tags: entry.tags ? JSON.parse(entry.tags) : [],
             date: formatDate(entry.createdAt),
             time: formatTime(entry.updatedAt),
             createdAt: entry.createdAt,
             updatedAt: entry.updatedAt,
         };
 
-        return NextResponse.json(
-            { message: 'Journal entry updated successfully', entry: formattedEntry },
-            { status: 200 }
-        );
+        return ApiResponse.success(formattedEntry, 200, 'Journal entry updated successfully');
     } catch (error: any) {
-        console.error('Update journal entry error:', error);
-        return NextResponse.json(
-            { error: 'An error occurred while updating journal entry' },
-            { status: 500 }
-        );
+        log.error('Update journal entry error', error, { endpoint: '/api/journal/entries/[id]', entryId: params.id });
+        return ApiResponse.internalError('An error occurred while updating journal entry');
     }
 }
 
@@ -152,47 +128,36 @@ export async function DELETE(
     request: NextRequest,
     { params }: { params: { id: string } }
 ) {
+    // Apply rate limiting
+    const rateLimitResponse = await rateLimiters.api(request);
+    if (rateLimitResponse) {
+        return rateLimitResponse;
+    }
+
     try {
-        const session = await getServerSession(authOptions);
+        const session = await requireAuth();
 
-        if (!session || !session.user) {
-            return NextResponse.json(
-                { error: 'Unauthorized' },
-                { status: 401 }
-            );
-        }
-
-        await dbConnect();
-
-        const entry = await JournalEntry.findById(params.id);
+        const entry = await prisma.journalEntry.findUnique({
+            where: { id: params.id }
+        });
 
         if (!entry) {
-            return NextResponse.json(
-                { error: 'Journal entry not found' },
-                { status: 404 }
-            );
+            return ApiResponse.error('Journal entry not found', 404);
         }
 
         // Check if user owns this entry
-        if (entry.userId.toString() !== (session.user as any).id) {
-            return NextResponse.json(
-                { error: 'Unauthorized to delete this entry' },
-                { status: 403 }
-            );
+        if (entry.userId !== session.user.id) {
+            return ApiResponse.forbidden('Unauthorized to delete this entry');
         }
 
-        await JournalEntry.findByIdAndDelete(params.id);
+        await prisma.journalEntry.delete({
+            where: { id: params.id }
+        });
 
-        return NextResponse.json(
-            { message: 'Journal entry deleted successfully' },
-            { status: 200 }
-        );
+        return ApiResponse.success(null, 200, 'Journal entry deleted successfully');
     } catch (error: any) {
-        console.error('Delete journal entry error:', error);
-        return NextResponse.json(
-            { error: 'An error occurred while deleting journal entry' },
-            { status: 500 }
-        );
+        log.error('Delete journal entry error', error, { endpoint: '/api/journal/entries/[id]', entryId: params.id });
+        return ApiResponse.internalError('An error occurred while deleting journal entry');
     }
 }
 
