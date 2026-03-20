@@ -9,7 +9,7 @@ import { z } from 'zod';
 // Schema for required environment variables
 const envSchema = z.object({
     // Database
-    MONGODB_URI: z.string().url('MONGODB_URI must be a valid URL').min(1, 'MONGODB_URI is required'),
+    DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
 
     // NextAuth
     NEXTAUTH_SECRET: z.string().min(32, 'NEXTAUTH_SECRET must be at least 32 characters'),
@@ -49,7 +49,7 @@ export function getEnv(): Env {
 
     try {
         validatedEnv = envSchema.parse({
-            MONGODB_URI: process.env.MONGODB_URI,
+            DATABASE_URL: process.env.DATABASE_URL,
             NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
             NEXTAUTH_URL: process.env.NEXTAUTH_URL,
             UPSTASH_REDIS_REST_URL: process.env.UPSTASH_REDIS_REST_URL,
@@ -62,7 +62,7 @@ export function getEnv(): Env {
         return validatedEnv;
     } catch (error) {
         if (error instanceof z.ZodError) {
-            const missingVars = error.errors.map((err) => `${err.path.join('.')}: ${err.message}`);
+            const missingVars = error.issues.map((err: z.ZodIssue) => `${err.path.join('.')}: ${err.message}`);
             throw new Error(
                 `Environment variable validation failed:\n${missingVars.join('\n')}\n\n` +
                     'Please check your .env file and ensure all required variables are set.'
@@ -82,8 +82,8 @@ export function validateEnv(): void {
 
 // Export individual env vars for convenience (validated)
 export const env = {
-    get MONGODB_URI() {
-        return getEnv().MONGODB_URI;
+    get DATABASE_URL() {
+        return getEnv().DATABASE_URL;
     },
     get NEXTAUTH_SECRET() {
         return getEnv().NEXTAUTH_SECRET;

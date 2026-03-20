@@ -3,47 +3,128 @@
 import { useState } from "react";
 import Link from "next/link";
 
+const adminModules = [
+    {
+        id: "verses",
+        title: "Daily Verses",
+        description: "Add and manage daily Bible verses with reflections.",
+        icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>,
+        href: "/admin/verses",
+        color: "gold"
+    },
+    {
+        id: "conferences",
+        title: "Conferences",
+        description: "Create and edit conference details and registrations.",
+        icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>,
+        href: "/admin/conferences",
+        color: "navy"
+    },
+    {
+        id: "books",
+        title: "Books Library",
+        description: "Upload, edit, and manage digital books for members.",
+        icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>,
+        href: "/admin/books",
+        color: "gold"
+    },
+    {
+        id: "devotionals",
+        title: "Devotionals",
+        description: "Create and manage daily spiritual reflections.",
+        icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>,
+        href: "/admin/devotionals",
+        color: "navy"
+    },
+    {
+        id: "users",
+        title: "User Management",
+        description: "Manage users, roles, and community permissions.",
+        icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>,
+        href: "/admin/users",
+        color: "gold"
+    },
+    {
+        id: "archive",
+        title: "Past Archive",
+        description: "Add past conferences and messages to the archive.",
+        icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" /></svg>,
+        href: "/admin/archive",
+        color: "navy"
+    },
+];
+
 export default function AdminPage() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
 
     const handleLogin = (e: React.FormEvent) => {
         e.preventDefault();
+        setError("");
         // Simple password check (in production, use proper authentication)
         if (password === "reawakening2026") {
             setIsAuthenticated(true);
         } else {
-            alert("Incorrect password");
+            setError("Incorrect administrator password.");
         }
     };
 
     if (!isAuthenticated) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
-                <div className="card max-w-md w-full">
-                    <h1 className="text-3xl font-bold text-slate-800 mb-6 text-center">Admin Login</h1>
-                    <form onSubmit={handleLogin} className="space-y-4">
-                        <div>
-                            <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-2">
-                                Password
-                            </label>
-                            <input
-                                type="password"
-                                id="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                placeholder="Enter admin password"
-                                required
-                            />
-                        </div>
-                        <button type="submit" className="btn-primary w-full">
-                            Login
-                        </button>
-                    </form>
-                    <div className="mt-6 text-center">
-                        <Link href="/" className="text-blue-600 hover:text-blue-700 text-sm">
-                            ← Back to Home
+            <div className="min-h-screen flex items-center justify-center bg-cream-50 overflow-hidden relative">
+                {/* Background Decor */}
+                <div className="absolute top-0 left-0 w-full h-1 bg-navy-950" />
+                <div className="absolute top-1 left-0 w-full h-px bg-gold-500/30" />
+                
+                <div className="w-full max-w-md px-6 relative z-10">
+                    <div className="text-center mb-10">
+                        <Link href="/" className="inline-flex flex-col items-center group">
+                            <div className="relative mb-6">
+                                <div className="absolute inset-0 bg-navy-900/10 rounded-2xl blur-xl" />
+                                <img src="/images/logo.png" alt="Reawakening" className="relative w-16 h-16 object-contain" />
+                            </div>
+                            <h1 className="font-display text-3xl font-semibold text-navy-900 leading-none">Admin Portal</h1>
+                            <div className="gold-line mx-auto my-4 w-12" />
+                            <p className="font-sans text-xs font-semibold tracking-[0.2em] uppercase text-gold-600">Secure Access Only</p>
+                        </Link>
+                    </div>
+
+                    <div className="card-glass p-8 rounded-3xl shadow-premium">
+                        <form onSubmit={handleLogin} className="space-y-6">
+                            {error && (
+                                <div className="flex items-center gap-3 p-4 rounded-xl bg-red-50 border border-red-100 mb-6 animate-fade-in">
+                                    <svg className="w-4 h-4 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                    <p className="font-sans text-xs font-semibold text-red-600 uppercase tracking-wide">{error}</p>
+                                </div>
+                            )}
+
+                            <div>
+                                <label htmlFor="password" title="Enter Password" className="block font-sans text-[10px] font-bold tracking-[0.2em] uppercase text-ink-400 mb-3">
+                                    Administrative Key
+                                </label>
+                                <input
+                                    type="password"
+                                    id="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    className="input-field pr-12 text-center tracking-[0.5em] font-bold"
+                                    placeholder="••••••••"
+                                    required
+                                />
+                            </div>
+
+                            <button type="submit" className="btn-navy w-full py-4 text-xs font-bold tracking-widest uppercase flex items-center justify-center gap-3 group">
+                                Authorize Access
+                                <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+                            </button>
+                        </form>
+                    </div>
+
+                    <div className="mt-10 text-center">
+                        <Link href="/" className="font-sans text-xs font-bold text-ink-400 hover:text-navy-900 transition-colors uppercase tracking-[0.1em] flex items-center justify-center gap-2">
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M15 19l-7-7 7-7" /></svg>
+                            Back to Ministry Site
                         </Link>
                     </div>
                 </div>
@@ -52,189 +133,163 @@ export default function AdminPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
-            <div className="container-custom py-8">
-                <div className="flex items-center justify-between mb-8">
-                    <h1 className="text-4xl font-bold text-slate-800">Admin Dashboard</h1>
-                    <Link href="/" className="btn-secondary">
-                        View Site
-                    </Link>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {/* Daily Verses */}
-                    <div className="card hover:shadow-xl transition-all duration-300">
-                        <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center mb-4">
-                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                            </svg>
+        <div className="min-h-screen bg-faint-gold/5 flex">
+            
+            {/* Admin Header / Side Decoration */}
+            <div className="hidden lg:block w-80 bg-navy-950 relative overflow-hidden flex-shrink-0">
+                <div className="absolute inset-0 bg-hero-pattern opacity-100" />
+                <div className="absolute inset-0 bg-gradient-to-b from-navy-950 via-navy-900/50 to-navy-950" />
+                
+                <div className="relative z-10 p-10 h-full flex flex-col">
+                    <Link href="/" className="flex items-center gap-4 mb-16 group">
+                        <div className="relative">
+                            <div className="absolute inset-0 bg-gold-400/20 rounded-xl blur-md group-hover:bg-gold-400/30 transition-all" />
+                            <img src="/images/logo.png" alt="Reawakening" className="relative w-10 h-10 object-contain" />
                         </div>
-                        <h2 className="text-xl font-bold text-slate-800 mb-2">Daily Verses</h2>
-                        <p className="text-slate-600 mb-4 text-sm">
-                            Add and manage daily Bible verses with reflections
-                        </p>
-                        <button className="text-blue-600 font-medium hover:text-blue-700 transition-colors">
-                            Manage Verses →
-                        </button>
-                    </div>
-
-                    {/* Conferences */}
-                    <div className="card hover:shadow-xl transition-all duration-300">
-                        <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center mb-4">
-                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                            </svg>
+                        <div>
+                            <span className="font-display text-xl font-bold text-cream-50 block leading-none">Admin</span>
+                            <span className="text-[10px] font-sans font-medium tracking-[0.25em] uppercase text-gold-500/70">Terminal</span>
                         </div>
-                        <h2 className="text-xl font-bold text-slate-800 mb-2">Conferences</h2>
-                        <p className="text-slate-600 mb-4 text-sm">
-                            Create and edit conference details and registrations
-                        </p>
-                        <button className="text-purple-600 font-medium hover:text-purple-700 transition-colors">
-                            Manage Conferences →
-                        </button>
-                    </div>
-
-                    {/* Books */}
-                    <Link href="/admin/books" className="card hover:shadow-xl transition-all duration-300">
-                        <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-pink-600 rounded-lg flex items-center justify-center mb-4">
-                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                            </svg>
-                        </div>
-                        <h2 className="text-xl font-bold text-slate-800 mb-2">Books Library</h2>
-                        <p className="text-slate-600 mb-4 text-sm">
-                            Upload, edit, and manage books
-                        </p>
-                        <span className="text-pink-600 font-medium hover:text-pink-700 transition-colors">
-                            Manage Books →
-                        </span>
                     </Link>
 
-                    {/* Devotionals */}
-                    <Link href="/admin/devotionals" className="card hover:shadow-xl transition-all duration-300">
-                        <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center mb-4">
-                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
-                            </svg>
+                    <div className="flex-1 space-y-10">
+                        <div>
+                            <p className="font-sans text-[10px] font-bold tracking-[0.3em] uppercase text-gold-500/50 mb-6">Status</p>
+                            <div className="space-y-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                                    <span className="font-sans text-xs text-navy-300">Database Connected</span>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-gold-500" />
+                                    <span className="font-sans text-xs text-navy-300">Version 2.0.4 Premium</span>
+                                </div>
+                            </div>
                         </div>
-                        <h2 className="text-xl font-bold text-slate-800 mb-2">Devotionals</h2>
-                        <p className="text-slate-600 mb-4 text-sm">
-                            Create and manage daily devotionals
-                        </p>
-                        <span className="text-amber-600 font-medium hover:text-amber-700 transition-colors">
-                            Manage Devotionals →
-                        </span>
-                    </Link>
 
-                    {/* Users */}
-                    <Link href="/admin/users" className="card hover:shadow-xl transition-all duration-300">
-                        <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center mb-4">
-                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                            </svg>
+                        <div className="pt-10 border-t border-navy-800/80">
+                            <p className="font-sans text-[10px] font-bold tracking-[0.3em] uppercase text-gold-500/50 mb-6">Admin Note</p>
+                            <p className="font-display italic text-base text-navy-300 leading-relaxed">
+                                &ldquo;Whatever you do, work at it with all your heart, as working for the Lord.&rdquo;
+                            </p>
+                            <p className="text-[10px] font-sans text-gold-600 uppercase tracking-widest mt-4">— Colossians 3:23</p>
                         </div>
-                        <h2 className="text-xl font-bold text-slate-800 mb-2">User Management</h2>
-                        <p className="text-slate-600 mb-4 text-sm">
-                            Manage users, roles, and permissions
-                        </p>
-                        <span className="text-cyan-600 font-medium hover:text-cyan-700 transition-colors">
-                            Manage Users →
-                        </span>
-                    </Link>
-
-                    {/* Archive */}
-                    <div className="card hover:shadow-xl transition-all duration-300">
-                        <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-lg flex items-center justify-center mb-4">
-                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-                            </svg>
-                        </div>
-                        <h2 className="text-xl font-bold text-slate-800 mb-2">Archive</h2>
-                        <p className="text-slate-600 mb-4 text-sm">
-                            Add past conferences to the archive
-                        </p>
-                        <button className="text-indigo-600 font-medium hover:text-indigo-700 transition-colors">
-                            Manage Archive →
-                        </button>
                     </div>
 
-                    {/* Registrations */}
-                    <div className="card hover:shadow-xl transition-all duration-300">
-                        <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center mb-4">
-                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                        </div>
-                        <h2 className="text-xl font-bold text-slate-800 mb-2">Registrations</h2>
-                        <p className="text-slate-600 mb-4 text-sm">
-                            View conference and contact form submissions
-                        </p>
-                        <button className="text-green-600 font-medium hover:text-green-700 transition-colors">
-                            View Submissions →
-                        </button>
-                    </div>
-
-                    {/* Settings */}
-                    <div className="card hover:shadow-xl transition-all duration-300">
-                        <div className="w-12 h-12 bg-gradient-to-br from-slate-500 to-slate-600 rounded-lg flex items-center justify-center mb-4">
-                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                        </div>
-                        <h2 className="text-xl font-bold text-slate-800 mb-2">Settings</h2>
-                        <p className="text-slate-600 mb-4 text-sm">
-                            Configure site settings and preferences
-                        </p>
-                        <button className="text-slate-600 font-medium hover:text-slate-700 transition-colors">
-                            Open Settings →
-                        </button>
-                    </div>
-                </div>
-
-                {/* Quick Stats */}
-                <div className="mt-12">
-                    <h2 className="text-2xl font-bold text-slate-800 mb-6">Quick Stats</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                        <div className="card text-center">
-                            <div className="text-3xl font-bold text-blue-600 mb-1">0</div>
-                            <div className="text-sm text-slate-600">Conference Registrations</div>
-                        </div>
-                        <div className="card text-center">
-                            <div className="text-3xl font-bold text-purple-600 mb-1">0</div>
-                            <div className="text-sm text-slate-600">Resources Published</div>
-                        </div>
-                        <div className="card text-center">
-                            <div className="text-3xl font-bold text-pink-600 mb-1">0</div>
-                            <div className="text-sm text-slate-600">Contact Messages</div>
-                        </div>
-                        <div className="card text-center">
-                            <div className="text-3xl font-bold text-green-600 mb-1">0</div>
-                            <div className="text-sm text-slate-600">Email Subscribers</div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Important Note */}
-                <div className="mt-12 card bg-yellow-50 border-2 border-yellow-200">
-                    <h3 className="font-bold text-slate-800 mb-2 flex items-center">
-                        <svg className="w-5 h-5 text-yellow-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                        </svg>
-                        Development Note
-                    </h3>
-                    <p className="text-slate-700 text-sm">
-                        This is a basic admin interface. In production, you should implement:
-                    </p>
-                    <ul className="mt-2 space-y-1 text-sm text-slate-600">
-                        <li>• Proper authentication (e.g., NextAuth.js)</li>
-                        <li>• Database integration (e.g., PostgreSQL, MongoDB)</li>
-                        <li>• File upload handling (e.g., AWS S3, Cloudinary)</li>
-                        <li>• Form validation and error handling</li>
-                        <li>• Role-based access control</li>
-                    </ul>
+                    <button 
+                        onClick={() => setIsAuthenticated(false)}
+                        className="mt-auto flex items-center gap-3 text-navy-400 hover:text-red-400 transition-colors py-4 border-t border-navy-800/80 font-sans text-xs font-bold uppercase tracking-widest"
+                    >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                        End Session
+                    </button>
                 </div>
             </div>
+
+            {/* Main Content Area */}
+            <main className="flex-1 min-w-0 bg-cream-50 overflow-y-auto">
+                {/* Mobile Top Bar */}
+                <div className="lg:hidden flex items-center justify-between p-6 bg-navy-950 border-b border-gold-500/20">
+                     <Link href="/" className="flex items-center gap-3">
+                        <img src="/images/logo.png" alt="" className="w-7 h-7" />
+                        <span className="font-display text-lg font-bold text-cream-50">Admin Panel</span>
+                    </Link>
+                    <button onClick={() => setIsAuthenticated(false)} className="text-gold-500">
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                    </button>
+                </div>
+
+                <div className="max-w-6xl mx-auto px-6 lg:px-12 py-12">
+                    
+                    {/* Welcome */}
+                    <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6 pb-8 border-b border-cream-200">
+                        <div>
+                            <p className="font-sans text-[10px] font-bold tracking-[0.3em] uppercase text-gold-600 mb-2">Management Console</p>
+                            <h2 className="font-display text-5xl font-semibold text-navy-950">Administrative Control</h2>
+                        </div>
+                        <div className="flex gap-3">
+                            <Link href="/" className="btn-outline py-3 px-6 text-xs font-bold tracking-widest uppercase">Visit Site</Link>
+                            <button className="btn-navy py-3 px-6 text-xs font-bold tracking-widest uppercase shadow-glow-navy">Deploy Update</button>
+                        </div>
+                    </div>
+
+                    {/* Stats Ribbon */}
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
+                        {[
+                            { label: "Total Members", val: "542", icon: "M12 4.354a4 4 0 110 5.292" },
+                            { label: "Conf. Reg.", val: "128", icon: "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" },
+                            { label: "Active Prayers", val: "24", icon: "M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733" },
+                            { label: "Books Shared", val: "12", icon: "M12 6.253v13m0-13C10.832 5.477" }
+                        ].map((s, i) => (
+                            <div key={i} className="bg-white p-6 rounded-2xl border border-cream-200 shadow-sm flex items-center justify-between">
+                                <div>
+                                    <p className="font-sans text-[10px] font-bold tracking-widest uppercase text-ink-300 mb-1">{s.label}</p>
+                                    <p className="font-display text-3xl font-bold text-navy-900">{s.val}</p>
+                                </div>
+                                <div className="w-10 h-10 rounded-xl bg-faint-gold/10 flex items-center justify-center text-gold-600">
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={s.icon} /></svg>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Module Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+                        {adminModules.map((mod) => (
+                            <Link 
+                                key={mod.id} 
+                                href={mod.href}
+                                className="group relative bg-white p-8 rounded-3xl border border-cream-200 shadow-sm hover:shadow-premium hover:-translate-y-1 transition-all duration-300"
+                            >
+                                {/* Accent Corner */}
+                                <div className={`absolute top-0 right-0 w-24 h-24 bg-gradient-to-br transition-opacity duration-300 opacity-0 group-hover:opacity-100 rounded-bl-[100px] border-l border-b border-cream-100 ${
+                                    mod.color === 'gold' ? 'from-gold-50/40 to-white' : 'from-navy-50/40 to-white'
+                                }`} />
+                                
+                                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-all duration-500 group-hover:scale-110 shadow-sm ${
+                                    mod.color === 'gold' 
+                                        ? 'bg-gradient-to-br from-gold-400 to-gold-600 text-white' 
+                                        : 'bg-navy-900 text-gold-400'
+                                }`}>
+                                    {mod.icon}
+                                </div>
+
+                                <h3 className="font-display text-2xl font-semibold text-navy-950 mb-3 group-hover:text-gold-600 transition-colors uppercase tracking-tight">{mod.title}</h3>
+                                <p className="font-sans text-sm text-ink-400 leading-relaxed mb-8">{mod.description}</p>
+                                
+                                <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-gold-600 group-hover:gap-4 transition-all">
+                                    Launch Module
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+
+                    {/* Security Footer */}
+                    <div className="card-navy p-10 rounded-3xl relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-gold-400/5 rounded-full blur-3xl -mr-32 -mt-32" />
+                        <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+                            <div className="max-w-md text-center md:text-left">
+                                <h3 className="font-display text-2xl font-bold text-cream-50 mb-4 tracking-tight">Security & Oversight</h3>
+                                <p className="font-sans text-xs text-navy-400 leading-relaxed uppercase tracking-widest">
+                                    All administrative actions are logged and timestamped under this session. Ensure you sign out after completing your tasks.
+                                </p>
+                            </div>
+                            <div className="flex gap-4">
+                                <div className="flex flex-col items-center px-6 py-4 rounded-2xl bg-navy-900/50 border border-navy-800">
+                                    <span className="font-display text-2xl font-bold text-gold-400">AES-256</span>
+                                    <span className="font-sans text-[8px] font-bold tracking-[0.3em] uppercase text-navy-500 mt-1">Encryption</span>
+                                </div>
+                                <div className="flex flex-col items-center px-6 py-4 rounded-2xl bg-navy-900/50 border border-navy-800">
+                                    <span className="font-display text-2xl font-bold text-gold-400">TLS 1.3</span>
+                                    <span className="font-sans text-[8px] font-bold tracking-[0.3em] uppercase text-navy-500 mt-1">Handshake</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </main>
         </div>
     );
 }
