@@ -25,6 +25,18 @@ export default function DevotionalDetailPage({ params }: { params: { id: string 
         loadDevotional();
     }, [params.id]);
 
+    const extractDevotional = (payload: any): Devotional | null => {
+        if (payload?.devotional) {
+            return payload.devotional;
+        }
+
+        if (payload?.data?.devotional) {
+            return payload.data.devotional;
+        }
+
+        return null;
+    };
+
     const loadDevotional = async () => {
         try {
             setLoading(true);
@@ -34,7 +46,7 @@ export default function DevotionalDetailPage({ params }: { params: { id: string 
             }
 
             const data = await response.json();
-            setDevotional(data.devotional);
+            setDevotional(extractDevotional(data));
         } catch (error) {
             console.error("Error loading devotional:", error);
             setError("Failed to load devotional");

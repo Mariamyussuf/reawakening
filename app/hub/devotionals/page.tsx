@@ -26,6 +26,18 @@ export default function DevotionalsPage() {
         loadDevotionals();
     }, [selectedTag, searchQuery]);
 
+    const extractDevotionals = (payload: any): Devotional[] => {
+        if (Array.isArray(payload?.devotionals)) {
+            return payload.devotionals;
+        }
+
+        if (Array.isArray(payload?.data?.devotionals)) {
+            return payload.data.devotionals;
+        }
+
+        return [];
+    };
+
     const loadDevotionals = async () => {
         try {
             setLoading(true);
@@ -43,7 +55,7 @@ export default function DevotionalsPage() {
             }
 
             const data = await response.json();
-            setDevotionals(data.devotionals);
+            setDevotionals(extractDevotionals(data));
         } catch (error) {
             console.error("Error loading devotionals:", error);
             setError("Failed to load devotionals");
@@ -54,7 +66,7 @@ export default function DevotionalsPage() {
 
     // Get all unique tags
     const allTags = Array.from(
-        new Set(devotionals.flatMap((d) => d.tags))
+        new Set(devotionals.flatMap((d) => d.tags || []))
     ).sort();
 
     if (loading) {
