@@ -145,10 +145,10 @@ if (process.env.NODE_ENV !== 'test') {
     } catch (error) {
         // Only throw in production - in development, allow missing optional vars
         if (process.env.NODE_ENV === 'production') {
-            console.error('❌ Environment validation failed:', error);
+            console.error('Environment validation failed:', error);
             throw error;
         } else {
-            console.warn('⚠️  Environment validation warning:', error);
+            console.warn('Environment validation warning:', error);
         }
     }
 }

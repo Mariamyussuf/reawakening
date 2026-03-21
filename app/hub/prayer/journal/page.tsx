@@ -499,30 +499,30 @@ export default function PrayerJournalPage() {
                             <h3 className="text-lg font-bold text-slate-800 mb-4">Journaling Tips</h3>
                             <div className="space-y-3 text-sm text-slate-700">
                                 <div className="flex items-start gap-2">
-                                    <span className="text-blue-600 mt-0.5">✓</span>
+                                    <span className="text-blue-600 mt-0.5">-</span>
                                     <p>Be honest and authentic in your prayers</p>
                                 </div>
                                 <div className="flex items-start gap-2">
-                                    <span className="text-blue-600 mt-0.5">✓</span>
+                                    <span className="text-blue-600 mt-0.5">-</span>
                                     <p>Record answered prayers to build faith</p>
                                 </div>
                                 <div className="flex items-start gap-2">
-                                    <span className="text-blue-600 mt-0.5">✓</span>
+                                    <span className="text-blue-600 mt-0.5">-</span>
                                     <p>Include Scripture verses that speak to you</p>
                                 </div>
                                 <div className="flex items-start gap-2">
-                                    <span className="text-blue-600 mt-0.5">✓</span>
-                                    <p>Review past entries to see God's faithfulness</p>
+                                    <span className="text-blue-600 mt-0.5">-</span>
+                                    <p>Review past entries to see God&apos;s faithfulness</p>
                                 </div>
                             </div>
                         </div>
 
                         {/* Scripture Inspiration */}
                         <div className="card bg-gradient-to-br from-orange-50 to-amber-50">
-                            <h3 className="text-lg font-bold text-slate-800 mb-3">Today's Inspiration</h3>
+                            <h3 className="text-lg font-bold text-slate-800 mb-3">Today&apos;s Inspiration</h3>
                             <div className="p-3 bg-white rounded-lg border border-orange-200">
                                 <p className="text-sm text-slate-700 italic mb-2">
-                                    "This is the confidence we have in approaching God: that if we ask anything according to his will, he hears us."
+                                    &quot;This is the confidence we have in approaching God: that if we ask anything according to his will, he hears us.&quot;
                                 </p>
                                 <p className="text-xs font-semibold text-orange-600">1 John 5:14</p>
                             </div>

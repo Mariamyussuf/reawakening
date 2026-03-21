@@ -100,7 +100,7 @@ export default function BooksPage() {
                                 <div className="flex items-center justify-between">
                                     <span className="text-sm text-slate-500">{book.availability}</span>
                                     <button className="text-orange-600 font-medium hover:text-orange-700 transition-colors">
-                                        View Details →
+                                        View Details
                                     </button>
                                 </div>
                             </div>
@@ -120,7 +120,7 @@ export default function BooksPage() {
                                         <ul className="space-y-2">
                                             {list.books.map((book, bookIdx) => (
                                                 <li key={bookIdx} className="text-slate-600 text-sm flex items-start">
-                                                    <span className="text-orange-600 mr-2">📖</span>
+                                                    <span className="text-orange-600 mr-2">-</span>
                                                     <span>{book}</span>
                                                 </li>
                                             ))}

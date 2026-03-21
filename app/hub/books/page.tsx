@@ -51,7 +51,7 @@ export default function BooksLibraryPage() {
         return (
             <div className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50 to-amber-50 flex items-center justify-center">
                 <div className="text-center">
-                    <div className="text-6xl mb-4">📚</div>
+                    <div className="text-5xl font-bold text-orange-600 mb-4">Books</div>
                     <p className="text-slate-700 font-semibold">Loading library...</p>
                 </div>
             </div>
@@ -106,7 +106,7 @@ export default function BooksLibraryPage() {
                 {featuredBooks.length > 0 && (
                     <div className="card bg-gradient-to-r from-orange-600 to-amber-600 text-white mb-8">
                         <div className="flex items-center gap-2 mb-4">
-                            <span className="text-2xl">⭐</span>
+                            <span className="text-sm font-semibold uppercase tracking-wide">Featured</span>
                             <h2 className="text-2xl font-bold">Featured Book</h2>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -119,7 +119,7 @@ export default function BooksLibraryPage() {
                                             className="max-h-full rounded"
                                         />
                                     ) : (
-                                        <div className="text-8xl">📖</div>
+                                        <div className="text-6xl font-bold">Book</div>
                                     )}
                                 </div>
                             </div>
@@ -132,7 +132,7 @@ export default function BooksLibraryPage() {
                                         href={`/hub/books/${featuredBooks[0].id}`}
                                         className="px-6 py-3 bg-white text-orange-600 rounded-lg font-semibold hover:bg-orange-50 transition-colors"
                                     >
-                                        View Details →
+                                        View Details
                                     </Link>
                                     <Link
                                         href={`/hub/books/${featuredBooks[0].id}/read`}
@@ -173,7 +173,7 @@ export default function BooksLibraryPage() {
                         <div className="flex items-center justify-between mb-4">
                             <h2 className="text-2xl font-bold text-slate-800">Popular Books</h2>
                             <Link href="/hub/books/browse?sort=popular" className="text-orange-600 hover:text-orange-700 font-semibold text-sm">
-                                View All →
+                                View All
                             </Link>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -197,7 +197,7 @@ export default function BooksLibraryPage() {
                         </div>
                     ) : (
                         <div className="card text-center py-12">
-                            <div className="text-6xl mb-4">📚</div>
+                            <div className="text-5xl font-bold text-orange-600 mb-4">Books</div>
                             <p className="text-slate-600 text-lg">No books found</p>
                             <p className="text-slate-500 text-sm mt-2">Try a different search term</p>
                         </div>
@@ -211,22 +211,22 @@ export default function BooksLibraryPage() {
 // Helper function to get category icon
 function getCategoryIcon(category: BookCategory): string {
     const icons: Record<string, string> = {
-        [BookCategory.THEOLOGY]: "📖",
-        [BookCategory.DEVOTIONAL]: "🙏",
-        [BookCategory.BIOGRAPHY]: "👤",
-        [BookCategory.PRAYER]: "🕊️",
-        [BookCategory.LEADERSHIP]: "👨‍💼",
-        [BookCategory.FAMILY]: "👨‍👩‍👧‍👦",
-        [BookCategory.YOUTH]: "🎓",
-        [BookCategory.APOLOGETICS]: "🛡️",
-        [BookCategory.CHRISTIAN_LIVING]: "✨",
-        [BookCategory.BIBLE_STUDY]: "📕",
-        [BookCategory.CHURCH_HISTORY]: "⛪",
-        [BookCategory.MISSIONS]: "🌍",
-        [BookCategory.EVANGELISM]: "📢",
-        [BookCategory.DISCIPLESHIP]: "🌱",
-        [BookCategory.WOMEN]: "👩",
-        [BookCategory.MEN]: "👨",
+        [BookCategory.THEOLOGY]: "Theo",
+        [BookCategory.DEVOTIONAL]: "Devo",
+        [BookCategory.BIOGRAPHY]: "Bio",
+        [BookCategory.PRAYER]: "Pray",
+        [BookCategory.LEADERSHIP]: "Lead",
+        [BookCategory.FAMILY]: "Fam",
+        [BookCategory.YOUTH]: "Youth",
+        [BookCategory.APOLOGETICS]: "Def",
+        [BookCategory.CHRISTIAN_LIVING]: "Life",
+        [BookCategory.BIBLE_STUDY]: "Study",
+        [BookCategory.CHURCH_HISTORY]: "Hist",
+        [BookCategory.MISSIONS]: "Mission",
+        [BookCategory.EVANGELISM]: "Reach",
+        [BookCategory.DISCIPLESHIP]: "Grow",
+        [BookCategory.WOMEN]: "Women",
+        [BookCategory.MEN]: "Men",
     };
-    return icons[category] || "📚";
+    return icons[category] || "Books";
 }

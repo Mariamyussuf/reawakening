@@ -346,7 +346,7 @@ export default function PrayerPage() {
                                             : "border-transparent text-slate-600 hover:text-slate-800"
                                             }`}
                                     >
-                                        I'm Praying For
+                                        I&apos;m Praying For
                                     </button>
                                 </div>
                             </div>
@@ -375,7 +375,7 @@ export default function PrayerPage() {
                                                             <h3 className="font-bold text-slate-800">{prayer.title}</h3>
                                                             {prayer.isAnswered && (
                                                                 <span className="px-2 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-medium">
-                                                                    ✓ Answered
+                                                                    Answered
                                                                 </span>
                                                             )}
                                                         </div>
@@ -384,7 +384,7 @@ export default function PrayerPage() {
                                                             <span>{prayer.date}</span>
                                                             <span>•</span>
                                                             <span className="flex items-center gap-1">
-                                                                <span>🙏</span>
+                                                                <span>Prayer</span>
                                                                 <span>{prayer.prayerCount} {prayer.prayerCount === 1 ? 'person' : 'people'} praying</span>
                                                             </span>
                                                         </div>
@@ -495,7 +495,7 @@ export default function PrayerPage() {
 
                         {/* Scripture for Prayer */}
                         <div className="card bg-gradient-to-br from-blue-50 to-indigo-50">
-                            <h3 className="text-lg font-bold text-slate-800 mb-3">Today's Prayer Verse</h3>
+                            <h3 className="text-lg font-bold text-slate-800 mb-3">Today&apos;s Prayer Verse</h3>
                             <div className="p-3 bg-white rounded-lg border border-blue-200">
                                 <p className="text-sm text-slate-700 italic mb-2">
                                     &quot;Do not be anxious about anything, but in every situation, by prayer and petition, with thanksgiving, present your requests to God.&quot;

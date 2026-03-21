@@ -133,7 +133,7 @@ export default function AdminBooksPage() {
         return (
             <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-pink-50 flex items-center justify-center">
                 <div className="text-center">
-                    <div className="text-6xl mb-4">📚</div>
+                    <div className="text-5xl font-bold text-purple-600 mb-4">Books</div>
                     <p className="text-slate-700 font-semibold">Loading books...</p>
                 </div>
             </div>
@@ -179,7 +179,7 @@ export default function AdminBooksPage() {
                                 <p className="text-purple-100 text-sm mb-1">Total Books</p>
                                 <p className="text-3xl font-bold">{books.length}</p>
                             </div>
-                            <div className="text-4xl opacity-20">📚</div>
+                            <div className="text-lg font-semibold opacity-40">Books</div>
                         </div>
                     </div>
 
@@ -189,7 +189,7 @@ export default function AdminBooksPage() {
                                 <p className="text-green-100 text-sm mb-1">Featured</p>
                                 <p className="text-3xl font-bold">{books.filter(b => b.featured).length}</p>
                             </div>
-                            <div className="text-4xl opacity-20">⭐</div>
+                            <div className="text-lg font-semibold opacity-40">Featured</div>
                         </div>
                     </div>
 
@@ -201,7 +201,7 @@ export default function AdminBooksPage() {
                                     {books.reduce((sum, b) => sum + b.totalViews, 0).toLocaleString()}
                                 </p>
                             </div>
-                            <div className="text-4xl opacity-20">👁️</div>
+                            <div className="text-lg font-semibold opacity-40">Views</div>
                         </div>
                     </div>
 
@@ -213,7 +213,7 @@ export default function AdminBooksPage() {
                                     {books.reduce((sum, b) => sum + b.totalDownloads, 0).toLocaleString()}
                                 </p>
                             </div>
-                            <div className="text-4xl opacity-20">📥</div>
+                            <div className="text-lg font-semibold opacity-40">Downloads</div>
                         </div>
                     </div>
                 </div>
@@ -327,7 +327,7 @@ export default function AdminBooksPage() {
                                                 />
                                             ) : (
                                                 <div className="w-full h-full flex items-center justify-center text-2xl">
-                                                    📖
+                                                    Book
                                                 </div>
                                             )}
                                         </div>
@@ -342,12 +342,12 @@ export default function AdminBooksPage() {
                                                 <div className="flex gap-2">
                                                     {book.featured && (
                                                         <span className="px-2 py-1 bg-yellow-100 text-yellow-700 rounded text-xs font-semibold">
-                                                            ⭐ Featured
+                                                            Featured
                                                         </span>
                                                     )}
                                                     {book.newRelease && (
                                                         <span className="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-semibold">
-                                                            ✨ New
+                                                            New
                                                         </span>
                                                     )}
                                                 </div>
@@ -375,9 +375,9 @@ export default function AdminBooksPage() {
                                             {/* Stats & Actions */}
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center gap-4 text-xs text-slate-500">
-                                                    <span>👁️ {book.totalViews.toLocaleString()} views</span>
-                                                    <span>📥 {book.totalDownloads.toLocaleString()} downloads</span>
-                                                    {book.fileSize && <span>💾 {book.fileSize} MB</span>}
+                                                    <span>Views: {book.totalViews.toLocaleString()}</span>
+                                                    <span>Downloads: {book.totalDownloads.toLocaleString()}</span>
+                                                    {book.fileSize && <span>Size: {book.fileSize} MB</span>}
                                                 </div>
 
                                                 <div className="flex gap-2">
@@ -408,7 +408,7 @@ export default function AdminBooksPage() {
                         </div>
                     ) : (
                         <div className="text-center py-12">
-                            <div className="text-6xl mb-4">📚</div>
+                            <div className="text-5xl font-bold text-purple-600 mb-4">Books</div>
                             <p className="text-slate-600 text-lg mb-4">No books uploaded yet</p>
                             <Link
                                 href="/admin/books/upload"

@@ -20,7 +20,7 @@ export default function BookCard({ book }: BookCardProps) {
                     ) : (
                         <div className="w-full h-full flex items-center justify-center">
                             <div className="text-center p-6">
-                                <div className="text-6xl mb-2">📖</div>
+                                <div className="text-6xl mb-2">Book</div>
                                 <p className="text-sm font-semibold text-slate-600">{book.title}</p>
                             </div>
                         </div>
@@ -30,12 +30,12 @@ export default function BookCard({ book }: BookCardProps) {
                     <div className="absolute top-2 right-2 flex flex-col gap-2">
                         {book.featured && (
                             <span className="px-2 py-1 bg-yellow-500 text-white text-xs font-bold rounded-full">
-                                ⭐ Featured
+                                Featured
                             </span>
                         )}
                         {book.newRelease && (
                             <span className="px-2 py-1 bg-green-500 text-white text-xs font-bold rounded-full">
-                                ✨ New
+                                New
                             </span>
                         )}
                     </div>

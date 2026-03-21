@@ -153,7 +153,7 @@ export default function BiblePage() {
 
                         {filteredBooks.length === 0 && (
                             <div className="text-center py-32 bg-white rounded-3xl border border-dashed border-cream-300">
-                                <div className="text-4xl mb-6 grayscale opacity-20">📜</div>
+                                <div className="text-2xl font-semibold mb-6 opacity-40">Bible</div>
                                 <h3 className="font-display text-2xl text-navy-950 mb-2">Book Not Found</h3>
                                 <p className="font-sans text-sm text-ink-400 italic mb-8">No scrolls match your current search.</p>
                                 <button onClick={() => setSearchQuery('')} className="text-gold-600 font-bold text-xs uppercase tracking-widest underline decoration-2 underline-offset-4">Clear Search</button>
@@ -182,10 +182,10 @@ export default function BiblePage() {
                     </Link>
 
                     <Link href="/daily-verse" className="card-glass bg-white p-8 rounded-3xl group border-cream-200 hover:border-gold-300">
-                        <h3 className="font-display text-2xl font-semibold text-navy-950 mb-2">Today's Bread</h3>
+                        <h3 className="font-display text-2xl font-semibold text-navy-950 mb-2">Today&apos;s Bread</h3>
                         <p className="font-sans text-xs text-ink-400 mb-8 uppercase tracking-widest">Inspiration for now</p>
                         <div className="flex items-center gap-2 text-gold-600 font-bold text-[10px] uppercase tracking-widest group-hover:gap-4 transition-all">
-                            Read Today's Verse <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+                            Read Today&apos;s Verse <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
                         </div>
                     </Link>
                 </div>

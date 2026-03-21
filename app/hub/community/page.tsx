@@ -96,7 +96,7 @@ export default function CommunityPage() {
                                 <p className="text-orange-100 text-sm mb-1">Active Members</p>
                                 <p className="text-3xl font-bold">248</p>
                             </div>
-                            <div className="text-5xl opacity-20">👥</div>
+                            <div className="text-5xl opacity-20">Members</div>
                         </div>
                     </div>
 
@@ -106,7 +106,7 @@ export default function CommunityPage() {
                                 <p className="text-purple-100 text-sm mb-1">Prayer Requests</p>
                                 <p className="text-3xl font-bold">42</p>
                             </div>
-                            <div className="text-5xl opacity-20">🙏</div>
+                            <div className="text-5xl opacity-20">Prayer</div>
                         </div>
                     </div>
 
@@ -116,7 +116,7 @@ export default function CommunityPage() {
                                 <p className="text-blue-100 text-sm mb-1">Active Discussions</p>
                                 <p className="text-3xl font-bold">18</p>
                             </div>
-                            <div className="text-5xl opacity-20">💬</div>
+                            <div className="text-5xl opacity-20">Talk</div>
                         </div>
                     </div>
                 </div>
@@ -151,7 +151,7 @@ export default function CommunityPage() {
                                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                                         </svg>
-                                                        I'm Praying ({request.prayers})
+                                                        I&apos;m Praying ({request.prayers})
                                                     </button>
                                                     <button className="text-sm text-slate-600 hover:text-slate-800">
                                                         Comment
@@ -223,7 +223,7 @@ export default function CommunityPage() {
                                             <p className="text-xs text-slate-500">{member.role}</p>
                                         </div>
                                         <div className="flex items-center gap-1 text-xs text-orange-600">
-                                            <span>🔥</span>
+                                            <span>Streak</span>
                                             <span>{member.streak}</span>
                                         </div>
                                     </div>
@@ -237,19 +237,19 @@ export default function CommunityPage() {
                             <div className="space-y-2">
                                 <Link href="/hub/community/groups" className="block p-3 bg-white rounded-lg hover:shadow-md transition-all duration-300">
                                     <div className="flex items-center gap-3">
-                                        <span className="text-xl">👥</span>
+                                        <span className="text-xl">Members</span>
                                         <span className="font-medium text-slate-700">Study Groups</span>
                                     </div>
                                 </Link>
                                 <Link href="/hub/community/events" className="block p-3 bg-white rounded-lg hover:shadow-md transition-all duration-300">
                                     <div className="flex items-center gap-3">
-                                        <span className="text-xl">📅</span>
+                                        <span className="text-xl">Events</span>
                                         <span className="font-medium text-slate-700">Community Events</span>
                                     </div>
                                 </Link>
                                 <Link href="/hub/community/testimonies" className="block p-3 bg-white rounded-lg hover:shadow-md transition-all duration-300">
                                     <div className="flex items-center gap-3">
-                                        <span className="text-xl">✨</span>
+                                        <span className="text-xl">Stories</span>
                                         <span className="font-medium text-slate-700">Testimonies</span>
                                     </div>
                                 </Link>

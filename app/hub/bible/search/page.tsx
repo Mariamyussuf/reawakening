@@ -35,13 +35,13 @@ export default function BibleSearchPage() {
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                     <div className="flex items-center justify-between mb-4">
                         <h1 className="text-3xl font-bold text-gray-900" style={{ fontFamily: 'Merriweather, serif' }}>
-                            🔍 Search the Bible
+                            Search the Bible
                         </h1>
                         <Link
                             href="/hub/bible"
                             className="px-4 py-2 bg-gradient-to-r from-orange-600 to-amber-600 text-white rounded-lg hover:scale-105 transition-transform"
                         >
-                            ← Back
+                            Back
                         </Link>
                     </div>
 
@@ -98,8 +98,8 @@ export default function BibleSearchPage() {
 
                 {!loading && searched && results.length === 0 && (
                     <div className="text-center py-12">
-                        <div className="text-6xl mb-4">📖</div>
-                        <p className="text-gray-600 text-lg">No results found for "{searchQuery}"</p>
+                        <div className="text-5xl font-bold text-orange-600 mb-4">Bible</div>
+                        <p className="text-gray-600 text-lg">No results found for &quot;{searchQuery}&quot;</p>
                         <p className="text-gray-500 mt-2">Try different keywords or check your spelling</p>
                     </div>
                 )}
@@ -107,7 +107,7 @@ export default function BibleSearchPage() {
                 {!loading && results.length > 0 && (
                     <div className="space-y-4">
                         <p className="text-gray-600 mb-4">
-                            Found {results.length} result{results.length !== 1 ? 's' : ''} for "{searchQuery}"
+                            Found {results.length} result{results.length !== 1 ? 's' : ''} for &quot;{searchQuery}&quot;
                         </p>
                         {results.map((result, index) => (
                             <div
@@ -118,13 +118,13 @@ export default function BibleSearchPage() {
                                 <p className="text-gray-800 leading-relaxed">{result.text}</p>
                                 <div className="mt-4 flex gap-2">
                                     <button className="px-4 py-2 bg-orange-50 text-orange-600 rounded-lg hover:bg-orange-100 transition-colors text-sm">
-                                        🔖 Bookmark
+                                        Bookmark
                                     </button>
                                     <button className="px-4 py-2 bg-amber-50 text-amber-600 rounded-lg hover:bg-amber-100 transition-colors text-sm">
-                                        ✨ Highlight
+                                        Highlight
                                     </button>
                                     <button className="px-4 py-2 bg-yellow-50 text-yellow-600 rounded-lg hover:bg-yellow-100 transition-colors text-sm">
-                                        📤 Share
+                                        Share
                                     </button>
                                 </div>
                             </div>
@@ -134,8 +134,8 @@ export default function BibleSearchPage() {
 
                 {!searched && (
                     <div className="text-center py-12">
-                        <div className="text-6xl mb-4">🔍</div>
-                        <h2 className="text-2xl font-bold text-gray-900 mb-2">Search God's Word</h2>
+                        <div className="text-5xl font-bold text-orange-600 mb-4">Search</div>
+                        <h2 className="text-2xl font-bold text-gray-900 mb-2">Search God&apos;s Word</h2>
                         <p className="text-gray-600 mb-6">
                             Enter keywords, topics, or phrases to find relevant Bible verses
                         </p>

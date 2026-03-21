@@ -70,8 +70,8 @@ export default function MaterialsPage() {
                                     {material.description}
                                 </p>
                                 <div className="flex items-center justify-between text-sm text-slate-500 mb-4">
-                                    <span>📅 {material.duration}</span>
-                                    <span>📄 {material.format}</span>
+                                    <span>Duration: {material.duration}</span>
+                                    <span>Format: {material.format}</span>
                                 </div>
                                 <button className="btn-primary w-full">
                                     Download Material

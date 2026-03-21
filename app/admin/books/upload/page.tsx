@@ -150,7 +150,7 @@ export default function AdminUploadBookPage() {
                 {uploadSuccess && (
                     <div className="card bg-green-50 border-2 border-green-200 mb-6">
                         <div className="flex items-center gap-3">
-                            <div className="text-3xl">✅</div>
+                            <div className="text-3xl">Done</div>
                             <div>
                                 <h3 className="font-bold text-green-800">Book Uploaded Successfully!</h3>
                                 <p className="text-green-700 text-sm">The book has been added to the library.</p>
@@ -163,7 +163,7 @@ export default function AdminUploadBookPage() {
                 {error && (
                     <div className="card bg-red-50 border-2 border-red-200 mb-6">
                         <div className="flex items-center gap-3">
-                            <div className="text-3xl">⚠️</div>
+                            <div className="text-3xl">Error</div>
                             <div>
                                 <h3 className="font-bold text-red-800">Upload Failed</h3>
                                 <p className="text-red-700 text-sm">{error}</p>
@@ -238,7 +238,7 @@ export default function AdminUploadBookPage() {
                             />
                             {pdfFile && (
                                 <p className="text-sm text-green-600 mt-2">
-                                    ✓ Selected: {pdfFile.name} ({(pdfFile.size / 1024 / 1024).toFixed(2)} MB)
+                                    Selected: {pdfFile.name} ({(pdfFile.size / 1024 / 1024).toFixed(2)} MB)
                                 </p>
                             )}
                         </div>
@@ -256,7 +256,7 @@ export default function AdminUploadBookPage() {
                             />
                             {coverImage && (
                                 <p className="text-sm text-green-600 mt-2">
-                                    ✓ Selected: {coverImage.name}
+                                    Selected: {coverImage.name}
                                 </p>
                             )}
                         </div>

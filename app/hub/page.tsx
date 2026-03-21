@@ -183,7 +183,7 @@ export default function MemberHub() {
                             <div className="flex items-center justify-between mb-5">
                                 <h2 className="font-display text-xl text-deep">Upcoming Events</h2>
                                 <Link href="/conference" className="text-xs text-gold hover:text-gold-dark font-medium">
-                                    View all â†’
+                                    View all
                                 </Link>
                             </div>
                             <div className="space-y-3">
@@ -192,7 +192,7 @@ export default function MemberHub() {
                                         <div>
                                             <h3 className="font-display text-deep">{event.title}</h3>
                                             <p className="text-sm text-deep/50">
-                                                {event.date} Â· {event.time} Â· {event.location}
+                                                {event.date} | {event.time} | {event.location}
                                             </p>
                                         </div>
                                         {event.registered ? (
@@ -228,7 +228,7 @@ export default function MemberHub() {
                             <h3 className="font-display text-lg text-cream mb-2">Community</h3>
                             <p className="text-sm text-cream/60 mb-4">Connect with fellow members and grow together.</p>
                             <Link href="/hub/community" className="text-sm font-medium text-gold hover:text-gold-light">
-                                Join now â†’
+                                Join now
                             </Link>
                         </div>
                     </div>

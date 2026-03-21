@@ -65,7 +65,7 @@ export default function BookDetailPage() {
         return (
             <div className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50 to-amber-50 flex items-center justify-center">
                 <div className="text-center">
-                    <div className="text-6xl mb-4">📖</div>
+                    <div className="text-5xl font-bold text-orange-600 mb-4">Book</div>
                     <p className="text-slate-700 font-semibold">Loading book...</p>
                 </div>
             </div>
@@ -76,10 +76,10 @@ export default function BookDetailPage() {
         return (
             <div className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50 to-amber-50 flex items-center justify-center">
                 <div className="text-center">
-                    <div className="text-6xl mb-4">📚</div>
+                    <div className="text-5xl font-bold text-orange-600 mb-4">Books</div>
                     <p className="text-slate-700 font-semibold text-xl mb-2">Book not found</p>
                     <Link href="/hub/books" className="text-green-600 hover:text-green-700 font-medium">
-                        ← Back to Library
+                        Back to Library
                     </Link>
                 </div>
             </div>
@@ -115,7 +115,7 @@ export default function BookDetailPage() {
                                     />
                                 ) : (
                                     <div className="text-center p-6">
-                                        <div className="text-8xl mb-4">📖</div>
+                                        <div className="text-6xl font-bold mb-4">Book</div>
                                         <p className="text-lg font-semibold text-slate-600">{book.title}</p>
                                     </div>
                                 )}
@@ -127,7 +127,7 @@ export default function BookDetailPage() {
                                     href={`/hub/books/${book.id}/read`}
                                     className="block w-full px-6 py-3 bg-orange-600 text-white rounded-lg font-semibold text-center hover:bg-orange-700 transition-colors"
                                 >
-                                    📖 Read in Browser
+                                    Read in Browser
                                 </Link>
                                 <button
                                     onClick={handleDownload}
@@ -169,7 +169,7 @@ export default function BookDetailPage() {
                                 {book.averageRating && (
                                     <div className="flex items-center justify-between text-sm">
                                         <span className="text-slate-600">Rating</span>
-                                        <span className="font-semibold text-slate-800">⭐ {book.averageRating}/5</span>
+                                        <span className="font-semibold text-slate-800">Rating {book.averageRating}/5</span>
                                     </div>
                                 )}
                             </div>
@@ -188,7 +188,7 @@ export default function BookDetailPage() {
                                     </div>
                                     {book.featured && (
                                         <span className="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm font-semibold">
-                                            ⭐ Featured
+                                            Featured
                                         </span>
                                     )}
                                 </div>

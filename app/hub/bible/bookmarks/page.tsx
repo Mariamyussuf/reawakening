@@ -128,7 +128,7 @@ export default function BookmarksPage() {
                     <div className="flex items-center justify-between">
                         <div>
                             <h1 className="text-3xl font-bold text-gray-900" style={{ fontFamily: 'Merriweather, serif' }}>
-                                🔖 My Bookmarks & Highlights
+                                My Bookmarks and Highlights
                             </h1>
                             <p className="text-gray-600 mt-1">Your saved verses and notes</p>
                         </div>
@@ -136,7 +136,7 @@ export default function BookmarksPage() {
                             href="/hub/bible"
                             className="px-4 py-2 bg-gradient-to-r from-orange-600 to-amber-600 text-white rounded-lg hover:scale-105 transition-transform"
                         >
-                            ← Back
+                            Back
                         </Link>
                     </div>
                 </div>
@@ -153,7 +153,7 @@ export default function BookmarksPage() {
 
                 {loading ? (
                     <div className="text-center py-12">
-                        <div className="text-6xl mb-4">📖</div>
+                        <div className="text-5xl font-bold text-orange-600 mb-4">Bible</div>
                         <p className="text-gray-600">Loading bookmarks...</p>
                     </div>
                 ) : (
@@ -166,7 +166,7 @@ export default function BookmarksPage() {
                                         <p className="text-gray-600 text-sm">Bookmarks</p>
                                         <p className="text-3xl font-bold text-gray-900">{regularBookmarks.length}</p>
                                     </div>
-                                    <div className="text-4xl">🔖</div>
+                                    <div className="text-lg font-semibold">Saved</div>
                                 </div>
                             </div>
                             <div className="bg-white rounded-xl p-6 shadow-sm">
@@ -175,7 +175,7 @@ export default function BookmarksPage() {
                                         <p className="text-gray-600 text-sm">Highlights</p>
                                         <p className="text-3xl font-bold text-gray-900">{highlights.length}</p>
                                     </div>
-                                    <div className="text-4xl">✨</div>
+                                    <div className="text-lg font-semibold">Highlights</div>
                                 </div>
                             </div>
                             <div className="bg-white rounded-xl p-6 shadow-sm">
@@ -186,7 +186,7 @@ export default function BookmarksPage() {
                                             {bookmarks.filter((b) => b.note).length}
                                         </p>
                                     </div>
-                                    <div className="text-4xl">📝</div>
+                                    <div className="text-lg font-semibold">Notes</div>
                                 </div>
                             </div>
                         </div>
@@ -194,7 +194,7 @@ export default function BookmarksPage() {
                         {/* Bookmarks Section */}
                         <div className="mb-12">
                             <h2 className="text-2xl font-bold text-gray-900 mb-4" style={{ fontFamily: 'Merriweather, serif' }}>
-                                📚 Bookmarks
+                                Bookmarks
                             </h2>
                             {regularBookmarks.length === 0 ? (
                                 <div className="text-center py-8 text-gray-500">
@@ -267,19 +267,19 @@ export default function BookmarksPage() {
                                                             onClick={() => handleEdit(bookmark)}
                                                             className="px-4 py-2 bg-white rounded-lg hover:bg-gray-50 transition-colors text-sm border border-gray-200"
                                                         >
-                                                            📝 Edit Note
+                                                            Edit Note
                                                         </button>
                                                         <Link
                                                             href={`/hub/bible/${bookmark.bookId}/${bookmark.chapter}?version=${bookmark.version}`}
                                                             className="px-4 py-2 bg-white rounded-lg hover:bg-gray-50 transition-colors text-sm border border-gray-200"
                                                         >
-                                                            📖 View
+                                                            View
                                                         </Link>
                                                         <button
                                                             onClick={() => handleDelete(bookmark.id)}
                                                             className="px-4 py-2 bg-white rounded-lg hover:bg-red-50 transition-colors text-sm border border-gray-200 text-red-600"
                                                         >
-                                                            🗑️ Remove
+                                                            Remove
                                                         </button>
                                                     </div>
                                                 </>
@@ -293,7 +293,7 @@ export default function BookmarksPage() {
                         {/* Highlights Section */}
                         <div>
                             <h2 className="text-2xl font-bold text-gray-900 mb-4" style={{ fontFamily: 'Merriweather, serif' }}>
-                                ✨ Highlights
+                                Highlights
                             </h2>
                             {highlights.length === 0 ? (
                                 <div className="text-center py-8 text-gray-500">
@@ -366,19 +366,19 @@ export default function BookmarksPage() {
                                                             onClick={() => handleEdit(highlight)}
                                                             className="px-4 py-2 bg-white rounded-lg hover:bg-gray-50 transition-colors text-sm border border-gray-200"
                                                         >
-                                                            📝 {highlight.note ? 'Edit Note' : 'Add Note'}
+                                                            {highlight.note ? 'Edit Note' : 'Add Note'}
                                                         </button>
                                                         <Link
                                                             href={`/hub/bible/${highlight.bookId}/${highlight.chapter}?version=${highlight.version}`}
                                                             className="px-4 py-2 bg-white rounded-lg hover:bg-gray-50 transition-colors text-sm border border-gray-200"
                                                         >
-                                                            📖 View
+                                                            View
                                                         </Link>
                                                         <button
                                                             onClick={() => handleDelete(highlight.id)}
                                                             className="px-4 py-2 bg-white rounded-lg hover:bg-red-50 transition-colors text-sm border border-gray-200 text-red-600"
                                                         >
-                                                            🗑️ Remove
+                                                            Remove
                                                         </button>
                                                     </div>
                                                 </>
@@ -392,7 +392,7 @@ export default function BookmarksPage() {
                         {/* Empty State (if no bookmarks) */}
                         {bookmarks.length === 0 && (
                             <div className="text-center py-12">
-                                <div className="text-6xl mb-4">📖</div>
+                                <div className="text-5xl font-bold text-orange-600 mb-4">Bible</div>
                                 <h2 className="text-2xl font-bold text-gray-900 mb-2">No bookmarks yet</h2>
                                 <p className="text-gray-600 mb-6">
                                     Start reading the Bible and bookmark your favorite verses
