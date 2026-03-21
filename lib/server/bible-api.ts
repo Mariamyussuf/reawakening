@@ -2,7 +2,7 @@ import 'server-only';
 
 import { BIBLE_VERSIONS, type BibleVersion, type Book, type Chapter, type Verse } from '@/lib/bibleAPI';
 
-const BIBLE_API_BASE = 'https://api.scripture.api.bible/v1';
+const BIBLE_API_BASE = 'https://rest.api.bible/v1';
 const INVALID_ENV_LITERALS = new Set(['', 'undefined', 'null']);
 
 function normalizeEnvValue(value: string | undefined): string | undefined {
