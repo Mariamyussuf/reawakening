@@ -1,6 +1,13 @@
 import 'server-only';
 
-import { BIBLE_VERSIONS, type BibleVersion, type Book, type Chapter, type Verse } from '@/lib/bibleAPI';
+import {
+    BIBLE_VERSIONS,
+    FALLBACK_BOOK_CHAPTERS,
+    type BibleVersion,
+    type Book,
+    type Chapter,
+    type Verse,
+} from '@/lib/bibleAPI';
 
 const BIBLE_API_BASE = 'https://rest.api.bible/v1';
 const INVALID_ENV_LITERALS = new Set(['', 'undefined', 'null']);
@@ -74,7 +81,10 @@ export async function getBibleBooks(version: BibleVersion = 'KJV'): Promise<Book
         id: book.id,
         name: book.name,
         abbreviation: book.abbreviation,
-        chapters: book.chapters?.length || 0,
+        chapters:
+            (Array.isArray(book.chapters) ? book.chapters.length : undefined) ??
+            FALLBACK_BOOK_CHAPTERS[book.id] ??
+            0,
     }));
 }
 

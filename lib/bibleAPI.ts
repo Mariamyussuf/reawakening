@@ -40,6 +40,55 @@ export interface Chapter {
     };
 }
 
+export const FALLBACK_BOOKS: Book[] = [
+    { id: 'GEN', name: 'Genesis', abbreviation: 'Gen', chapters: 50 },
+    { id: 'EXO', name: 'Exodus', abbreviation: 'Exo', chapters: 40 },
+    { id: 'LEV', name: 'Leviticus', abbreviation: 'Lev', chapters: 27 },
+    { id: 'NUM', name: 'Numbers', abbreviation: 'Num', chapters: 36 },
+    { id: 'DEU', name: 'Deuteronomy', abbreviation: 'Deu', chapters: 34 },
+    { id: 'JOS', name: 'Joshua', abbreviation: 'Jos', chapters: 24 },
+    { id: 'JDG', name: 'Judges', abbreviation: 'Jdg', chapters: 21 },
+    { id: 'RUT', name: 'Ruth', abbreviation: 'Rut', chapters: 4 },
+    { id: '1SA', name: '1 Samuel', abbreviation: '1Sa', chapters: 31 },
+    { id: '2SA', name: '2 Samuel', abbreviation: '2Sa', chapters: 24 },
+    { id: '1KI', name: '1 Kings', abbreviation: '1Ki', chapters: 22 },
+    { id: '2KI', name: '2 Kings', abbreviation: '2Ki', chapters: 25 },
+    { id: 'PSA', name: 'Psalms', abbreviation: 'Psa', chapters: 150 },
+    { id: 'PRO', name: 'Proverbs', abbreviation: 'Pro', chapters: 31 },
+    { id: 'ISA', name: 'Isaiah', abbreviation: 'Isa', chapters: 66 },
+    { id: 'JER', name: 'Jeremiah', abbreviation: 'Jer', chapters: 52 },
+    { id: 'MAT', name: 'Matthew', abbreviation: 'Mat', chapters: 28 },
+    { id: 'MRK', name: 'Mark', abbreviation: 'Mrk', chapters: 16 },
+    { id: 'LUK', name: 'Luke', abbreviation: 'Luk', chapters: 24 },
+    { id: 'JHN', name: 'John', abbreviation: 'Jhn', chapters: 21 },
+    { id: 'ACT', name: 'Acts', abbreviation: 'Act', chapters: 28 },
+    { id: 'ROM', name: 'Romans', abbreviation: 'Rom', chapters: 16 },
+    { id: '1CO', name: '1 Corinthians', abbreviation: '1Co', chapters: 16 },
+    { id: '2CO', name: '2 Corinthians', abbreviation: '2Co', chapters: 13 },
+    { id: 'GAL', name: 'Galatians', abbreviation: 'Gal', chapters: 6 },
+    { id: 'EPH', name: 'Ephesians', abbreviation: 'Eph', chapters: 6 },
+    { id: 'PHP', name: 'Philippians', abbreviation: 'Php', chapters: 4 },
+    { id: 'COL', name: 'Colossians', abbreviation: 'Col', chapters: 4 },
+    { id: '1TH', name: '1 Thessalonians', abbreviation: '1Th', chapters: 5 },
+    { id: '2TH', name: '2 Thessalonians', abbreviation: '2Th', chapters: 3 },
+    { id: '1TI', name: '1 Timothy', abbreviation: '1Ti', chapters: 6 },
+    { id: '2TI', name: '2 Timothy', abbreviation: '2Ti', chapters: 4 },
+    { id: 'TIT', name: 'Titus', abbreviation: 'Tit', chapters: 3 },
+    { id: 'HEB', name: 'Hebrews', abbreviation: 'Heb', chapters: 13 },
+    { id: 'JAS', name: 'James', abbreviation: 'Jas', chapters: 5 },
+    { id: '1PE', name: '1 Peter', abbreviation: '1Pe', chapters: 5 },
+    { id: '2PE', name: '2 Peter', abbreviation: '2Pe', chapters: 3 },
+    { id: '1JN', name: '1 John', abbreviation: '1Jn', chapters: 5 },
+    { id: '2JN', name: '2 John', abbreviation: '2Jn', chapters: 1 },
+    { id: '3JN', name: '3 John', abbreviation: '3Jn', chapters: 1 },
+    { id: 'JUD', name: 'Jude', abbreviation: 'Jud', chapters: 1 },
+    { id: 'REV', name: 'Revelation', abbreviation: 'Rev', chapters: 22 },
+];
+
+export const FALLBACK_BOOK_CHAPTERS = Object.fromEntries(
+    FALLBACK_BOOKS.map((book) => [book.id, book.chapters])
+) as Record<string, number>;
+
 class BibleAPIService {
     private async fetchJSON<T>(url: string): Promise<T> {
         const response = await fetch(url, {
@@ -106,50 +155,7 @@ class BibleAPIService {
     }
 
     private getFallbackBooks(): Book[] {
-        return [
-            { id: 'GEN', name: 'Genesis', abbreviation: 'Gen', chapters: 50 },
-            { id: 'EXO', name: 'Exodus', abbreviation: 'Exo', chapters: 40 },
-            { id: 'LEV', name: 'Leviticus', abbreviation: 'Lev', chapters: 27 },
-            { id: 'NUM', name: 'Numbers', abbreviation: 'Num', chapters: 36 },
-            { id: 'DEU', name: 'Deuteronomy', abbreviation: 'Deu', chapters: 34 },
-            { id: 'JOS', name: 'Joshua', abbreviation: 'Jos', chapters: 24 },
-            { id: 'JDG', name: 'Judges', abbreviation: 'Jdg', chapters: 21 },
-            { id: 'RUT', name: 'Ruth', abbreviation: 'Rut', chapters: 4 },
-            { id: '1SA', name: '1 Samuel', abbreviation: '1Sa', chapters: 31 },
-            { id: '2SA', name: '2 Samuel', abbreviation: '2Sa', chapters: 24 },
-            { id: '1KI', name: '1 Kings', abbreviation: '1Ki', chapters: 22 },
-            { id: '2KI', name: '2 Kings', abbreviation: '2Ki', chapters: 25 },
-            { id: 'PSA', name: 'Psalms', abbreviation: 'Psa', chapters: 150 },
-            { id: 'PRO', name: 'Proverbs', abbreviation: 'Pro', chapters: 31 },
-            { id: 'ISA', name: 'Isaiah', abbreviation: 'Isa', chapters: 66 },
-            { id: 'JER', name: 'Jeremiah', abbreviation: 'Jer', chapters: 52 },
-            { id: 'MAT', name: 'Matthew', abbreviation: 'Mat', chapters: 28 },
-            { id: 'MRK', name: 'Mark', abbreviation: 'Mrk', chapters: 16 },
-            { id: 'LUK', name: 'Luke', abbreviation: 'Luk', chapters: 24 },
-            { id: 'JHN', name: 'John', abbreviation: 'Jhn', chapters: 21 },
-            { id: 'ACT', name: 'Acts', abbreviation: 'Act', chapters: 28 },
-            { id: 'ROM', name: 'Romans', abbreviation: 'Rom', chapters: 16 },
-            { id: '1CO', name: '1 Corinthians', abbreviation: '1Co', chapters: 16 },
-            { id: '2CO', name: '2 Corinthians', abbreviation: '2Co', chapters: 13 },
-            { id: 'GAL', name: 'Galatians', abbreviation: 'Gal', chapters: 6 },
-            { id: 'EPH', name: 'Ephesians', abbreviation: 'Eph', chapters: 6 },
-            { id: 'PHP', name: 'Philippians', abbreviation: 'Php', chapters: 4 },
-            { id: 'COL', name: 'Colossians', abbreviation: 'Col', chapters: 4 },
-            { id: '1TH', name: '1 Thessalonians', abbreviation: '1Th', chapters: 5 },
-            { id: '2TH', name: '2 Thessalonians', abbreviation: '2Th', chapters: 3 },
-            { id: '1TI', name: '1 Timothy', abbreviation: '1Ti', chapters: 6 },
-            { id: '2TI', name: '2 Timothy', abbreviation: '2Ti', chapters: 4 },
-            { id: 'TIT', name: 'Titus', abbreviation: 'Tit', chapters: 3 },
-            { id: 'HEB', name: 'Hebrews', abbreviation: 'Heb', chapters: 13 },
-            { id: 'JAS', name: 'James', abbreviation: 'Jas', chapters: 5 },
-            { id: '1PE', name: '1 Peter', abbreviation: '1Pe', chapters: 5 },
-            { id: '2PE', name: '2 Peter', abbreviation: '2Pe', chapters: 3 },
-            { id: '1JN', name: '1 John', abbreviation: '1Jn', chapters: 5 },
-            { id: '2JN', name: '2 John', abbreviation: '2Jn', chapters: 1 },
-            { id: '3JN', name: '3 John', abbreviation: '3Jn', chapters: 1 },
-            { id: 'JUD', name: 'Jude', abbreviation: 'Jud', chapters: 1 },
-            { id: 'REV', name: 'Revelation', abbreviation: 'Rev', chapters: 22 },
-        ];
+        return FALLBACK_BOOKS;
     }
 }
 
