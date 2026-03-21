@@ -7,25 +7,16 @@ import { useEffect, useRef } from "react";
 
 // SVG Icons - Elegant Cross with glow and float animation
 const CrossIcon = () => (
-    <svg width="64" height="64" viewBox="0 0 64 64" fill="none" className="text-gold animate-cross">
-        <defs>
-            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-                <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
-                <feMerge>
-                    <feMergeNode in="coloredBlur"/>
-                    <feMergeNode in="SourceGraphic"/>
-                </feMerge>
-            </filter>
-        </defs>
-        {/* Outer ring */}
-        <circle cx="32" cy="32" r="30" stroke="currentColor" strokeWidth="0.5" strokeOpacity="0.3" fill="none" />
-        <circle cx="32" cy="32" r="26" stroke="currentColor" strokeWidth="0.5" strokeOpacity="0.2" fill="none" />
-        {/* Cross vertical beam */}
-        <rect x="29" y="12" width="6" height="40" rx="1" fill="currentColor" filter="url(#glow)"/>
-        {/* Cross horizontal beam */}
-        <rect x="12" y="29" width="40" height="6" rx="1" fill="currentColor" filter="url(#glow)"/>
-        {/* Center accent */}
-        <circle cx="32" cy="32" r="4" fill="#ECC07A" />
+    <svg
+        width="64"
+        height="64"
+        viewBox="0 0 64 64"
+        fill="none"
+        className="h-16 w-16 text-gold md:h-[72px] md:w-[72px]"
+        aria-hidden="true"
+    >
+        <rect x="29.5" y="8" width="5" height="48" rx="2.5" fill="currentColor" />
+        <rect x="20" y="21" width="24" height="5" rx="2.5" fill="currentColor" />
     </svg>
 );
 
@@ -191,7 +182,8 @@ export default function Home() {
                     <div className="relative z-10 container-page text-center py-20">
                         {/* Cross icon with enhanced animation */}
                         <div className="animate-fade-down hero-delay-1 mb-8 flex justify-center">
-                            <div className="animate-cross">
+                            <div className="animate-cross relative flex h-24 w-24 items-center justify-center md:h-28 md:w-28">
+                                <div className="absolute h-16 w-16 rounded-full bg-gold/18 blur-2xl md:h-20 md:w-20" />
                                 <CrossIcon />
                             </div>
                         </div>
