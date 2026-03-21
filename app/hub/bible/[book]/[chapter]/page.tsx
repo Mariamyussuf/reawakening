@@ -422,13 +422,13 @@ export default function ChapterPage() {
                         <button
                             onClick={handleChapterBookmark}
                             disabled={bookmarking === `${chapterNum}:chapter`}
-                            className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:scale-105 transition-transform shadow-lg disabled:opacity-60 disabled:cursor-not-allowed"
+                            className="px-6 py-3 bg-gradient-to-r from-orange-600 to-amber-600 text-white rounded-lg hover:scale-105 transition-transform shadow-lg disabled:opacity-60 disabled:cursor-not-allowed"
                         >
                             Bookmark Chapter
                         </button>
                         <button
                             onClick={() => setTemporaryMessage('Chapter notes are coming soon.')}
-                            className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:scale-105 transition-transform shadow-lg"
+                            className="px-6 py-3 bg-gradient-to-r from-orange-600 to-amber-600 text-white rounded-lg hover:scale-105 transition-transform shadow-lg"
                         >
                             Add Note Soon
                         </button>
