@@ -13,7 +13,6 @@
         "db:studio": "prisma studio",
         "db:push": "prisma db push",
         "db:sync": "node scripts/sync-to-turso.js",
-        "db:seed": "node scripts/migrate-data.js",
         "db:reset": "prisma migrate reset",
         "postinstall": "prisma generate"
     },
@@ -35,7 +34,6 @@
         "dompurify": "^3.3.1",
         "formidable": "^3.5.4",
         "isomorphic-dompurify": "^2.35.0",
-        "mongoose": "^9.1.5",
         "next": "14.2.3",
         "next-auth": "^4.24.13",
         "pdfkit": "^0.17.2",

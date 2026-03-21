@@ -1,12 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { requireAuth } from '@/lib/middleware/auth';
 import { rateLimiters } from '@/lib/middleware/ratelimit';
 import { validateBody } from '@/lib/validation';
 import { UpdatePreferencesSchema } from '@/lib/validation/schemas';
 import { ApiResponse } from '@/lib/api/response';
 import { log } from '@/lib/logger';
-import dbConnect from '@/lib/mongodb';
-import User from '@/models/User';
+import prisma from '@/lib/prisma';
 
 // PUT /api/user/preferences - Update notification and privacy preferences
 export async function PUT(request: NextRequest) {
@@ -26,14 +25,20 @@ export async function PUT(request: NextRequest) {
         }
 
         const updates = validation.data;
+        const prismaUpdates = {
+            dailyVerse: updates.notifications?.dailyVerse,
+            eventReminders: updates.notifications?.eventReminders,
+            prayerRequests: updates.notifications?.prayerRequests,
+            weeklyDigest: updates.notifications?.weeklyDigest,
+            showProfile: updates.privacy?.showProfile,
+            showActivity: updates.privacy?.showActivity,
+            allowMessages: updates.privacy?.allowMessages,
+        };
 
-        await dbConnect();
-
-        const user = await User.findByIdAndUpdate(
-            session.user.id,
-            { $set: filteredUpdates },
-            { new: true, runValidators: true }
-        ).select('-password');
+        const user = await prisma.user.update({
+            where: { id: session.user.id },
+            data: prismaUpdates,
+        });
 
         if (!user) {
             return ApiResponse.error('User not found', 404);
@@ -41,10 +46,19 @@ export async function PUT(request: NextRequest) {
 
         return ApiResponse.success({
             preferences: {
-                notifications: user.notifications,
-                privacy: user.privacy,
+                notifications: {
+                    dailyVerse: user.dailyVerse,
+                    eventReminders: user.eventReminders,
+                    prayerRequests: user.prayerRequests,
+                    weeklyDigest: user.weeklyDigest,
+                },
+                privacy: {
+                    showProfile: user.showProfile,
+                    showActivity: user.showActivity,
+                    allowMessages: user.allowMessages,
+                },
             },
-        }, 'Preferences updated successfully');
+        }, 200, 'Preferences updated successfully');
     } catch (error: any) {
         log.error('Update preferences error', error, { endpoint: '/api/user/preferences' });
         return ApiResponse.internalError('An error occurred while updating preferences');

@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { requireAuth } from '@/lib/middleware/auth';
 import { rateLimiters } from '@/lib/middleware/ratelimit';
 import { validateBody } from '@/lib/validation';
@@ -6,8 +6,7 @@ import { ChangePasswordSchema } from '@/lib/validation/schemas';
 import { ApiResponse } from '@/lib/api/response';
 import { log } from '@/lib/logger';
 import bcrypt from 'bcryptjs';
-import dbConnect from '@/lib/mongodb';
-import User from '@/models/User';
+import prisma from '@/lib/prisma';
 
 // PUT /api/user/password - Change password
 export async function PUT(request: NextRequest) {
@@ -27,11 +26,9 @@ export async function PUT(request: NextRequest) {
         }
 
         const { currentPassword, newPassword } = validation.data;
-
-        await dbConnect();
-
-        // Get user with password field
-        const user = await User.findById(session.user.id).select('+password');
+        const user = await prisma.user.findUnique({
+            where: { id: session.user.id },
+        });
 
         if (!user) {
             return ApiResponse.error('User not found', 404);
@@ -47,9 +44,10 @@ export async function PUT(request: NextRequest) {
         // Hash new password
         const hashedPassword = await bcrypt.hash(newPassword, 12);
 
-        // Update password
-        user.password = hashedPassword;
-        await user.save();
+        await prisma.user.update({
+            where: { id: session.user.id },
+            data: { password: hashedPassword },
+        });
 
         return ApiResponse.success(null, 200, 'Password changed successfully');
     } catch (error: any) {

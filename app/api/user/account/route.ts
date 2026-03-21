@@ -1,12 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { requireAuth } from '@/lib/middleware/auth';
 import { rateLimiters } from '@/lib/middleware/ratelimit';
 import { validateBody } from '@/lib/validation';
 import { DeleteAccountSchema } from '@/lib/validation/schemas';
 import { ApiResponse } from '@/lib/api/response';
 import { log } from '@/lib/logger';
-import dbConnect from '@/lib/mongodb';
-import User from '@/models/User';
+import prisma from '@/lib/prisma';
 
 // DELETE /api/user/account - Delete user account
 export async function DELETE(request: NextRequest) {
@@ -26,11 +25,9 @@ export async function DELETE(request: NextRequest) {
         }
 
         const { password } = validation.data;
-
-        await dbConnect();
-
-        // Get user with password field
-        const user = await User.findById(session.user.id).select('+password');
+        const user = await prisma.user.findUnique({
+            where: { id: session.user.id },
+        });
 
         if (!user) {
             return ApiResponse.error('User not found', 404);
@@ -44,8 +41,9 @@ export async function DELETE(request: NextRequest) {
             return ApiResponse.error('Incorrect password', 400);
         }
 
-        // Delete user account
-        await User.findByIdAndDelete(session.user.id);
+        await prisma.user.delete({
+            where: { id: session.user.id },
+        });
 
         return ApiResponse.success(null, 200, 'Account deleted successfully');
     } catch (error: any) {

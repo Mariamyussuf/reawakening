@@ -127,15 +127,15 @@ export const DeleteAccountSchema = z.object({
 // Preferences schema
 export const UpdatePreferencesSchema = z.object({
     notifications: z.object({
-        email: z.boolean().optional(),
-        push: z.boolean().optional(),
-        prayer: z.boolean().optional(),
-        devotional: z.boolean().optional(),
+        dailyVerse: z.boolean().optional(),
+        eventReminders: z.boolean().optional(),
+        prayerRequests: z.boolean().optional(),
+        weeklyDigest: z.boolean().optional(),
     }).optional(),
     privacy: z.object({
-        profileVisibility: z.enum(['public', 'members', 'private']).optional(),
-        showEmail: z.boolean().optional(),
-        showPhone: z.boolean().optional(),
+        showProfile: z.boolean().optional(),
+        showActivity: z.boolean().optional(),
+        allowMessages: z.boolean().optional(),
     }).optional(),
 });
 

@@ -1,12 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { requireAdmin } from '@/lib/middleware/auth';
 import { rateLimiters } from '@/lib/middleware/ratelimit';
 import { validateBody } from '@/lib/validation';
 import { UpdateUserRoleSchema } from '@/lib/validation/schemas';
 import { ApiResponse } from '@/lib/api/response';
 import { log } from '@/lib/logger';
-import dbConnect from '@/lib/mongodb';
-import User from '@/models/User';
+import prisma from '@/lib/prisma';
 
 // PUT /api/admin/users/:id/role - Update user role
 export async function PUT(
@@ -29,26 +28,31 @@ export async function PUT(
         }
 
         const { role } = validation.data;
+        const normalizedRole = role.toUpperCase();
+        const currentUser = await prisma.user.findUnique({
+            where: { id: params.id },
+        });
+
+        if (!currentUser) {
+            return ApiResponse.error('User not found', 404);
+        }
 
         // Prevent removing the last admin
-        if (role !== 'admin') {
-            await dbConnect();
-            const currentUser = await User.findById(params.id);
-            if (currentUser?.role === 'admin') {
-                const adminCount = await User.countDocuments({ role: 'admin' });
+        if (normalizedRole !== 'ADMIN') {
+            if (currentUser.role.toUpperCase() === 'ADMIN') {
+                const adminCount = await prisma.user.count({
+                    where: { role: 'ADMIN' },
+                });
                 if (adminCount <= 1) {
                     return ApiResponse.error('Cannot remove the last admin user', 400);
                 }
             }
         }
 
-        await dbConnect();
-
-        const user = await User.findByIdAndUpdate(
-            params.id,
-            { role },
-            { new: true, runValidators: true }
-        ).select('-password');
+        const user = await prisma.user.update({
+            where: { id: params.id },
+            data: { role: normalizedRole },
+        });
 
         if (!user) {
             return ApiResponse.error('User not found', 404);
@@ -56,7 +60,7 @@ export async function PUT(
 
         return ApiResponse.success({
             user: {
-                id: user._id.toString(),
+                id: user.id,
                 name: user.name,
                 email: user.email,
                 role: user.role,

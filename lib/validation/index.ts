@@ -18,7 +18,7 @@ export async function validateBody<T>(
         return { success: true, data };
     } catch (error) {
         if (error instanceof z.ZodError) {
-            const errors = error.errors.map((err) => ({
+            const errors = error.issues.map((err) => ({
                 path: err.path.join('.'),
                 message: err.message,
             }));
@@ -58,7 +58,7 @@ export function validateQuery<T>(
         return { success: true, data };
     } catch (error) {
         if (error instanceof z.ZodError) {
-            const errors = error.errors.map((err) => ({
+            const errors = error.issues.map((err) => ({
                 path: err.path.join('.'),
                 message: err.message,
             }));
@@ -111,7 +111,7 @@ export function validateFormData<T>(
         return { success: true, data: validated };
     } catch (error) {
         if (error instanceof z.ZodError) {
-            const errors = error.errors.map((err) => ({
+            const errors = error.issues.map((err) => ({
                 path: err.path.join('.'),
                 message: err.message,
             }));

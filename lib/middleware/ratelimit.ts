@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 // Initialize Redis client (optional - falls back to in-memory if not configured)
 let redis: Redis | null = null;
 let ratelimiters: Map<string, Ratelimit> = new Map();
+const localRateLimitStore = new Map<string, { count: number; reset: number }>();
 
 // Initialize Redis if UPSTASH_REDIS_REST_URL is provided
 import { env } from '@/lib/env';
@@ -53,24 +54,71 @@ function getRateLimiter(key: string, config: { window: string; limit: number }):
         return ratelimiters.get(key)!;
     }
 
-    const ratelimit = redis
-        ? new Ratelimit({
-              redis,
-              limiter: Ratelimit.slidingWindow(config.limit, config.window),
-              analytics: true,
-          })
-        : // Fallback to in-memory if Redis not configured
-          new Ratelimit({
-              redis: {
-                  sadd: async () => {},
-                  eval: async () => ({ remaining: config.limit, reset: Date.now() + 60000 }),
-              } as any,
-              limiter: Ratelimit.slidingWindow(config.limit, config.window),
-              analytics: true,
-          });
+    if (!redis) {
+        throw new Error('Upstash Redis is not configured');
+    }
+
+    const ratelimit = new Ratelimit({
+        redis,
+        limiter: Ratelimit.slidingWindow(config.limit, config.window as `${number} ${'ms' | 's' | 'm' | 'h' | 'd'}`),
+        analytics: true,
+    });
 
     ratelimiters.set(key, ratelimit);
     return ratelimit;
+}
+
+function parseWindow(window: string): number {
+    const match = window.match(/^(\d+)\s?(ms|s|m|h|d)$/i);
+
+    if (!match) {
+        throw new Error(`Unable to parse rate limit window: ${window}`);
+    }
+
+    const value = Number.parseInt(match[1], 10);
+    const unit = match[2].toLowerCase();
+
+    switch (unit) {
+        case 'ms':
+            return value;
+        case 's':
+            return value * 1000;
+        case 'm':
+            return value * 60 * 1000;
+        case 'h':
+            return value * 60 * 60 * 1000;
+        case 'd':
+            return value * 24 * 60 * 60 * 1000;
+        default:
+            throw new Error(`Unsupported rate limit unit: ${unit}`);
+    }
+}
+
+function limitInMemory(identifier: string, config: { window: string; limit: number }) {
+    const now = Date.now();
+    const windowMs = parseWindow(config.window);
+    const existing = localRateLimitStore.get(identifier);
+
+    if (!existing || existing.reset <= now) {
+        const reset = now + windowMs;
+        localRateLimitStore.set(identifier, { count: 1, reset });
+        return {
+            success: true,
+            limit: config.limit,
+            remaining: config.limit - 1,
+            reset,
+        };
+    }
+
+    const nextCount = existing.count + 1;
+    existing.count = nextCount;
+
+    return {
+        success: nextCount <= config.limit,
+        limit: config.limit,
+        remaining: Math.max(0, config.limit - nextCount),
+        reset: existing.reset,
+    };
 }
 
 /**
@@ -96,7 +144,32 @@ export async function rateLimit(
 ): Promise<NextResponse | null> {
     try {
         const identifier = getIdentifier(request);
-        const ratelimit = getRateLimiter('default', config);
+        const limiterKey = `${config.limit}:${config.window}`;
+
+        if (!redis) {
+            const { success, limit, remaining, reset } = limitInMemory(identifier, config);
+            const headers = new Headers();
+            headers.set('X-RateLimit-Limit', limit.toString());
+            headers.set('X-RateLimit-Remaining', remaining.toString());
+            headers.set('X-RateLimit-Reset', new Date(reset).toISOString());
+
+            if (!success) {
+                return NextResponse.json(
+                    {
+                        error: 'Too many requests. Please try again later.',
+                        retryAfter: Math.ceil((reset - Date.now()) / 1000),
+                    },
+                    {
+                        status: 429,
+                        headers,
+                    }
+                );
+            }
+
+            return null;
+        }
+
+        const ratelimit = getRateLimiter(limiterKey, config);
 
         const { success, limit, remaining, reset } = await ratelimit.limit(identifier);
 
