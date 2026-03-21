@@ -20,7 +20,6 @@ export default function ChapterPage() {
     const [loading, setLoading] = useState(true);
     const [fontSize, setFontSize] = useState(16);
     const [showVerseNumbers, setShowVerseNumbers] = useState(true);
-    const [readingMode, setReadingMode] = useState<'light' | 'sepia' | 'dark'>('light');
     const [bookmarks, setBookmarks] = useState<Map<string, string>>(new Map());
     const [bookmarking, setBookmarking] = useState<string | null>(null);
     const [actionMessage, setActionMessage] = useState('');
@@ -265,21 +264,9 @@ export default function ChapterPage() {
     const previousTarget = parseChapterTarget(chapter?.previous?.id);
     const nextTarget = parseChapterTarget(chapter?.next?.id);
 
-    const modeStyles = {
-        light: 'bg-white text-gray-900',
-        sepia: 'bg-amber-50 text-amber-900',
-        dark: 'bg-gray-900 text-gray-100',
-    };
-
     return (
-        <div className={`min-h-screen ${modeStyles[readingMode]}`}>
-            <div
-                className={`sticky top-0 z-10 border-b ${
-                    readingMode === 'dark'
-                        ? 'bg-gray-800 border-gray-700'
-                        : 'bg-white/95 backdrop-blur-sm border-gray-200'
-                }`}
-            >
+        <div className="min-h-screen bg-cream-50 text-navy-950">
+            <div className="sticky top-0 z-10 border-b bg-white/95 backdrop-blur-sm border-gray-200">
                 <div className="max-w-4xl mx-auto px-4 py-4">
                     <div className="flex items-center justify-between mb-4">
                         <Link
@@ -291,21 +278,13 @@ export default function ChapterPage() {
                         <div className="flex gap-2">
                             <button
                                 onClick={() => setFontSize(Math.max(12, fontSize - 2))}
-                                className={`px-3 py-1 rounded ${
-                                    readingMode === 'dark'
-                                        ? 'bg-gray-700 hover:bg-gray-600'
-                                        : 'bg-gray-100 hover:bg-gray-200'
-                                }`}
+                                className="px-3 py-1 rounded bg-gray-100 hover:bg-gray-200"
                             >
                                 A-
                             </button>
                             <button
                                 onClick={() => setFontSize(Math.min(24, fontSize + 2))}
-                                className={`px-3 py-1 rounded ${
-                                    readingMode === 'dark'
-                                        ? 'bg-gray-700 hover:bg-gray-600'
-                                        : 'bg-gray-100 hover:bg-gray-200'
-                                }`}
+                                className="px-3 py-1 rounded bg-gray-100 hover:bg-gray-200"
                             >
                                 A+
                             </button>
@@ -333,11 +312,7 @@ export default function ChapterPage() {
                                 >
                                     {book.name} {chapterNum}
                                 </h1>
-                                <p
-                                    className={`text-sm ${
-                                        readingMode === 'dark' ? 'text-gray-400' : 'text-gray-600'
-                                    }`}
-                                >
+                                <p className="text-sm text-gray-600">
                                     {version} Translation
                                 </p>
                             </div>
@@ -357,50 +332,10 @@ export default function ChapterPage() {
                     )}
 
                     <div className="flex flex-wrap gap-4 mt-4 pt-4 border-t border-gray-200">
-                        <div className="flex gap-2">
-                            <button
-                                onClick={() => setReadingMode('light')}
-                                className={`px-3 py-1 rounded ${
-                                    readingMode === 'light'
-                                        ? 'bg-white border-2 border-orange-600'
-                                        : 'bg-gray-100'
-                                }`}
-                                title="Light Mode"
-                            >
-                                Light
-                            </button>
-                            <button
-                                onClick={() => setReadingMode('sepia')}
-                                className={`px-3 py-1 rounded ${
-                                    readingMode === 'sepia'
-                                        ? 'bg-amber-50 border-2 border-orange-600'
-                                        : 'bg-gray-100'
-                                }`}
-                                title="Sepia Mode"
-                            >
-                                Sepia
-                            </button>
-                            <button
-                                onClick={() => setReadingMode('dark')}
-                                className={`px-3 py-1 rounded ${
-                                    readingMode === 'dark'
-                                        ? 'bg-gray-900 text-white border-2 border-orange-600'
-                                        : 'bg-gray-100'
-                                }`}
-                                title="Dark Mode"
-                            >
-                                Dark
-                            </button>
-                        </div>
-
                         <button
                             onClick={() => setShowVerseNumbers(!showVerseNumbers)}
                             className={`px-4 py-1 rounded ${
-                                showVerseNumbers
-                                    ? 'bg-orange-600 text-white'
-                                    : readingMode === 'dark'
-                                        ? 'bg-gray-700'
-                                        : 'bg-gray-100'
+                                showVerseNumbers ? 'bg-orange-600 text-white' : 'bg-gray-100'
                             }`}
                         >
                             {showVerseNumbers ? 'Hide' : 'Show'} Verse Numbers
