@@ -1,61 +1,120 @@
-/**
- * Sync Schema to Turso
- * 
- * This script syncs your local SQLite schema to Turso.
- * Run with: node scripts/sync-to-turso.js
- */
+require('dotenv/config');
 
-const { execSync } = require('child_process');
 const fs = require('fs');
+const { createClient } = require('@libsql/client');
 
-console.log('🚀 Syncing schema to Turso...\n');
+const INVALID_ENV_LITERALS = new Set(['', 'undefined', 'null']);
+const localDatabasePath = './prisma/dev.db';
 
-// Check if Turso CLI is installed
-try {
-    execSync('turso --version', { stdio: 'ignore' });
-} catch (error) {
-    console.error('❌ Turso CLI not found. Please install it first:');
-    console.error('   PowerShell: irm get.tur.so/install.ps1 | iex');
-    process.exit(1);
+function normalizeEnvValue(value) {
+    if (typeof value !== 'string') {
+        return undefined;
+    }
+
+    const trimmedValue = value.trim();
+    if (!trimmedValue) {
+        return undefined;
+    }
+
+    return INVALID_ENV_LITERALS.has(trimmedValue.toLowerCase()) ? undefined : trimmedValue;
 }
 
-// Check if dev.db exists
-if (!fs.existsSync('./dev.db')) {
-    console.error('❌ Local database (dev.db) not found.');
-    console.error('   Run: npx prisma db push');
-    process.exit(1);
+function toLocalFileUrl(filePath) {
+    return `file:${filePath.replace(/\\/g, '/')}`;
 }
 
-try {
-    // Get the SQL schema from local database
-    console.log('📦 Extracting schema from local database...');
-    const schema = execSync('sqlite3 dev.db .schema', { encoding: 'utf-8' });
-
-    // Save to temp file
-    fs.writeFileSync('./temp-schema.sql', schema);
-    console.log('✅ Schema extracted\n');
-
-    // Apply to Turso
-    console.log('☁️  Applying schema to Turso...');
-    console.log('   Database: reawakening\n');
-
-    // Execute the schema on Turso
-    execSync('turso db shell reawakening < temp-schema.sql', {
-        stdio: 'inherit',
-        shell: 'powershell.exe'
-    });
-
-    // Clean up
-    fs.unlinkSync('./temp-schema.sql');
-
-    console.log('\n✅ Schema synced to Turso successfully!');
-    console.log('\n📊 Verify with: turso db shell reawakening');
-    console.log('   Then run: .tables');
-
-} catch (error) {
-    console.error('\n❌ Error syncing to Turso:', error.message);
-    console.error('\nTry manually:');
-    console.error('1. sqlite3 dev.db .schema > schema.sql');
-    console.error('2. turso db shell reawakening < schema.sql');
-    process.exit(1);
+function makeStatementIdempotent(sql) {
+    return sql
+        .replace(/^CREATE TABLE /i, 'CREATE TABLE IF NOT EXISTS ')
+        .replace(/^CREATE INDEX /i, 'CREATE INDEX IF NOT EXISTS ')
+        .replace(/^CREATE UNIQUE INDEX /i, 'CREATE UNIQUE INDEX IF NOT EXISTS ')
+        .replace(/^CREATE TRIGGER /i, 'CREATE TRIGGER IF NOT EXISTS ');
 }
+
+async function main() {
+    const databaseUrl =
+        normalizeEnvValue(process.env.TURSO_DATABASE_URL) ||
+        normalizeEnvValue(process.env.REMOTE_DATABASE_URL) ||
+        normalizeEnvValue(process.env.DATABASE_URL);
+    const databaseAuthToken = normalizeEnvValue(process.env.DATABASE_AUTH_TOKEN);
+
+    console.log('Syncing schema to Turso/libSQL...\n');
+
+    if (!fs.existsSync(localDatabasePath)) {
+        throw new Error(`Local database not found at ${localDatabasePath}. Run: npx prisma db push`);
+    }
+
+    if (!databaseUrl) {
+        throw new Error('Set TURSO_DATABASE_URL or REMOTE_DATABASE_URL to your remote libSQL/Turso database URL.');
+    }
+
+    if (databaseUrl.startsWith('file:')) {
+        throw new Error(
+            'The selected database URL points to a local SQLite file. Set TURSO_DATABASE_URL or REMOTE_DATABASE_URL to your remote libSQL/Turso URL before running this script.'
+        );
+    }
+
+    if (!databaseAuthToken) {
+        throw new Error('DATABASE_AUTH_TOKEN is missing.');
+    }
+
+    const localClient = createClient({ url: toLocalFileUrl(localDatabasePath) });
+    const remoteClient = createClient({ url: databaseUrl, authToken: databaseAuthToken });
+
+    try {
+        console.log(`Reading schema from ${localDatabasePath}...`);
+        const localSchema = await localClient.execute(`
+            SELECT type, name, sql
+            FROM sqlite_master
+            WHERE sql IS NOT NULL
+              AND type IN ('table', 'index', 'trigger')
+              AND name NOT LIKE 'sqlite_%'
+            ORDER BY
+              CASE type
+                WHEN 'table' THEN 1
+                WHEN 'index' THEN 2
+                WHEN 'trigger' THEN 3
+                ELSE 4
+              END,
+              rowid
+        `);
+
+        const statements = localSchema.rows
+            .map((row) => String(row.sql || '').trim())
+            .filter(Boolean)
+            .map(makeStatementIdempotent);
+
+        if (statements.length === 0) {
+            throw new Error('No schema statements were found in the local SQLite database.');
+        }
+
+        console.log(`Applying ${statements.length} schema statements to remote database...`);
+
+        for (const statement of statements) {
+            await remoteClient.execute(statement);
+        }
+
+        const remoteTables = await remoteClient.execute(`
+            SELECT name
+            FROM sqlite_master
+            WHERE type = 'table'
+              AND name NOT LIKE 'sqlite_%'
+            ORDER BY name
+        `);
+
+        console.log('Schema synced successfully.');
+        console.log('Remote tables:');
+        for (const row of remoteTables.rows) {
+            console.log(`- ${row.name}`);
+        }
+    } finally {
+        await localClient.close();
+        await remoteClient.close();
+    }
+}
+
+main().catch((error) => {
+    console.error('\nSchema sync failed:');
+    console.error(error instanceof Error ? error.message : error);
+    process.exitCode = 1;
+});
