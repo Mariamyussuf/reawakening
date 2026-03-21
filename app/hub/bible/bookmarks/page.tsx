@@ -30,6 +30,18 @@ export default function BookmarksPage() {
         fetchBookmarks();
     }, []);
 
+    const extractBookmarks = (payload: any): Bookmark[] => {
+        if (Array.isArray(payload?.bookmarks)) {
+            return payload.bookmarks;
+        }
+
+        if (Array.isArray(payload?.data?.bookmarks)) {
+            return payload.data.bookmarks;
+        }
+
+        return [];
+    };
+
     const fetchBookmarks = async () => {
         try {
             setLoading(true);
@@ -37,7 +49,7 @@ export default function BookmarksPage() {
             const response = await fetch('/api/bible/bookmarks');
             if (!response.ok) throw new Error('Failed to fetch bookmarks');
             const data = await response.json();
-            setBookmarks(data.bookmarks || []);
+            setBookmarks(extractBookmarks(data));
         } catch (err: any) {
             setError(err.message || 'Failed to load bookmarks');
             console.error('Error fetching bookmarks:', err);

@@ -28,13 +28,38 @@ export default function ChapterPage() {
         loadBookmarks();
     }, [bookId, chapterNum, version]);
 
+    const extractBookmarks = (payload: any) => {
+        if (Array.isArray(payload?.bookmarks)) {
+            return payload.bookmarks;
+        }
+
+        if (Array.isArray(payload?.data?.bookmarks)) {
+            return payload.data.bookmarks;
+        }
+
+        return [];
+    };
+
+    const extractBookmark = (payload: any) => {
+        if (payload?.bookmark) {
+            return payload.bookmark;
+        }
+
+        if (payload?.data) {
+            return payload.data;
+        }
+
+        return null;
+    };
+
     const loadBookmarks = async () => {
         try {
             const response = await fetch(`/api/bible/bookmarks?bookId=${bookId}&chapter=${chapterNum}&version=${version}`);
             if (response.ok) {
                 const data = await response.json();
+                const bookmarkList = extractBookmarks(data);
                 const bookmarkMap = new Map<string, string>();
-                data.bookmarks
+                bookmarkList
                     .filter((b: any) => b.verse)
                     .forEach((b: any) => {
                         bookmarkMap.set(`${b.chapter}:${b.verse}`, b.id);
@@ -95,7 +120,10 @@ export default function ChapterPage() {
 
                 if (response.ok) {
                     const data = await response.json();
-                    setBookmarks((prev) => new Map([...prev, [verseKey, data.bookmark.id]]));
+                    const bookmark = extractBookmark(data);
+                    if (bookmark?.id) {
+                        setBookmarks((prev) => new Map([...prev, [verseKey, bookmark.id]]));
+                    }
                 } else {
                     const data = await response.json();
                     if (data.error && !data.error.includes('already exists')) {
