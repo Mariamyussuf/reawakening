@@ -6,24 +6,60 @@ import { z } from 'zod';
  * Provides clear error messages if variables are missing or invalid
  */
 
+function sanitizeEnvValue(value: unknown): string | undefined {
+    if (typeof value !== 'string') {
+        return undefined;
+    }
+
+    const trimmedValue = value.trim();
+
+    if (!trimmedValue) {
+        return undefined;
+    }
+
+    const normalizedValue = trimmedValue.toLowerCase();
+    return normalizedValue === 'undefined' || normalizedValue === 'null' ? undefined : trimmedValue;
+}
+
+const requiredEnvString = (name: string) =>
+    z.preprocess(
+        sanitizeEnvValue,
+        z.string().min(1, `${name} is required`)
+    );
+
+const optionalEnvString = () =>
+    z.preprocess(
+        sanitizeEnvValue,
+        z.string().optional()
+    );
+
+const optionalUrlString = (name: string) =>
+    z.preprocess(
+        sanitizeEnvValue,
+        z.string().url(`${name} must be a valid URL`).optional()
+    );
+
 // Schema for required environment variables
 const envSchema = z.object({
     // Database
-    DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
+    DATABASE_URL: requiredEnvString('DATABASE_URL'),
 
     // NextAuth
-    NEXTAUTH_SECRET: z.string().min(32, 'NEXTAUTH_SECRET must be at least 32 characters'),
-    NEXTAUTH_URL: z.string().url('NEXTAUTH_URL must be a valid URL').optional(),
+    NEXTAUTH_SECRET: z.preprocess(
+        sanitizeEnvValue,
+        z.string().min(32, 'NEXTAUTH_SECRET must be at least 32 characters')
+    ),
+    NEXTAUTH_URL: optionalUrlString('NEXTAUTH_URL'),
 
     // Optional: Upstash Redis (for rate limiting)
-    UPSTASH_REDIS_REST_URL: z.string().url().optional(),
-    UPSTASH_REDIS_REST_TOKEN: z.string().optional(),
+    UPSTASH_REDIS_REST_URL: optionalUrlString('UPSTASH_REDIS_REST_URL'),
+    UPSTASH_REDIS_REST_TOKEN: optionalEnvString(),
 
     // Optional: Bible API
-    BIBLE_API_KEY: z.string().optional(),
+    BIBLE_API_KEY: optionalEnvString(),
 
     // Optional: Test mode (development only)
-    NEXT_PUBLIC_TEST_MODE: z.string().optional(),
+    NEXT_PUBLIC_TEST_MODE: optionalEnvString(),
 
     // Node environment
     NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),

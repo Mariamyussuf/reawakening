@@ -5,6 +5,8 @@ import { ApiResponse } from '@/lib/api/response';
 import { log } from '@/lib/logger';
 import prisma from '@/lib/prisma';
 
+export const dynamic = 'force-dynamic';
+
 // GET /api/admin/users - Get all users
 export async function GET(request: NextRequest) {
     // Apply rate limiting

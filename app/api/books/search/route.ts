@@ -4,6 +4,8 @@ import { ApiResponse } from '@/lib/api/response';
 import { log } from '@/lib/logger';
 import prisma from '@/lib/prisma';
 
+export const dynamic = 'force-dynamic';
+
 // GET /api/books/search - Search books
 export async function GET(request: NextRequest) {
     // Apply rate limiting (stricter for search)

@@ -7,16 +7,57 @@ declare global {
     var prisma: PrismaClient | undefined;
 }
 
-// Determine which database to use
-const useTurso = process.env.DATABASE_URL?.startsWith('libsql://');
+const INVALID_ENV_LITERALS = new Set(['', 'undefined', 'null']);
+
+function normalizeEnvValue(value: string | undefined): string | undefined {
+    const trimmedValue = value?.trim();
+
+    if (!trimmedValue) {
+        return undefined;
+    }
+
+    return INVALID_ENV_LITERALS.has(trimmedValue.toLowerCase()) ? undefined : trimmedValue;
+}
+
+function isRemoteLibsqlUrl(value: string | undefined): value is string {
+    return Boolean(value && /^(libsql|https?):\/\//i.test(value));
+}
+
+function assertValidRemoteDatabaseUrl(value: string): void {
+    try {
+        new URL(value);
+    } catch {
+        throw new Error(
+            'DATABASE_URL must be a valid libSQL/Turso connection string when using a remote database.'
+        );
+    }
+}
+
+const databaseUrl = normalizeEnvValue(process.env.DATABASE_URL);
+const databaseAuthToken = normalizeEnvValue(process.env.DATABASE_AUTH_TOKEN);
+const useRemoteLibsql = isRemoteLibsqlUrl(databaseUrl);
+
+if (useRemoteLibsql && !databaseAuthToken) {
+    throw new Error(
+        'DATABASE_AUTH_TOKEN is required when DATABASE_URL points to a remote libSQL/Turso database.'
+    );
+}
+
+if (process.env.NODE_ENV === 'production' && !databaseUrl) {
+    throw new Error(
+        'DATABASE_URL is missing in production. Set it to your Turso/libSQL database URL in the deployment environment.'
+    );
+}
 
 let prisma: PrismaClient;
 
-if (useTurso) {
+if (useRemoteLibsql) {
     // Use Turso (production/cloud)
+    assertValidRemoteDatabaseUrl(databaseUrl);
+
     const libsql = createClient({
-        url: process.env.DATABASE_URL!,
-        authToken: process.env.DATABASE_AUTH_TOKEN,
+        url: databaseUrl,
+        authToken: databaseAuthToken,
     });
 
     const adapter = new PrismaLibSQL(libsql as any);

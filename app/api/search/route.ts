@@ -8,6 +8,8 @@ import prisma from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
+
 // GET /api/search - Enhanced full-text search across all content types
 export async function GET(request: NextRequest) {
     // Apply rate limiting (stricter for search)

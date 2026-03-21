@@ -5,6 +5,8 @@ import { ApiResponse } from '@/lib/api/response';
 import { log } from '@/lib/logger';
 import prisma from '@/lib/prisma';
 
+export const dynamic = 'force-dynamic';
+
 // GET /api/prayers/community - Get community prayers (excluding user's own)
 export async function GET(request: NextRequest) {
     // Apply rate limiting
