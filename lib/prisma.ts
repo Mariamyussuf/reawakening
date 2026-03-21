@@ -1,6 +1,5 @@
 import { PrismaClient } from '@prisma/client';
 import { PrismaLibSQL } from '@prisma/adapter-libsql';
-import { createClient } from '@libsql/client';
 
 declare global {
     // eslint-disable-next-line no-var
@@ -55,12 +54,10 @@ if (useRemoteLibsql) {
     // Use Turso (production/cloud)
     assertValidRemoteDatabaseUrl(databaseUrl);
 
-    const libsql = createClient({
+    const adapter = new PrismaLibSQL({
         url: databaseUrl,
         authToken: databaseAuthToken,
     });
-
-    const adapter = new PrismaLibSQL(libsql as any);
 
     prisma = global.prisma || new PrismaClient({
         adapter: adapter as any,
