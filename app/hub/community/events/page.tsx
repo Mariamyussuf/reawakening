@@ -51,15 +51,15 @@ export default function CommunityEventsPage() {
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50 to-amber-50">
             <header className="bg-white/90 backdrop-blur-md shadow-sm border-b border-slate-200">
-                <div className="container-custom py-4 flex items-center justify-between gap-4">
+                <div className="container-custom py-4 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <Link href="/hub/community" className="flex items-center space-x-2 text-slate-600 hover:text-slate-800">
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                         </svg>
                         <span className="font-medium">Back to Community</span>
                     </Link>
-                    <h1 className="text-2xl font-bold text-slate-800">Community Events</h1>
-                    <div className="w-28" />
+                    <h1 className="text-xl sm:text-2xl font-bold text-slate-800">Community Events</h1>
+                    <div className="hidden sm:block w-28" />
                 </div>
             </header>
 

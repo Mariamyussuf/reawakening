@@ -222,15 +222,15 @@ export default function PrayerPage() {
             {/* Header */}
             <header className="bg-white/90 backdrop-blur-md shadow-sm border-b border-slate-200">
                 <div className="container-custom py-4">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <Link href="/hub" className="flex items-center space-x-2 text-slate-600 hover:text-slate-800">
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                             </svg>
                             <span className="font-medium">Back to Hub</span>
                         </Link>
-                        <h1 className="text-2xl font-bold text-slate-800">Prayer Center</h1>
-                        <div className="w-20"></div>
+                        <h1 className="text-xl sm:text-2xl font-bold text-slate-800">Prayer Center</h1>
+                        <div className="hidden sm:block w-20"></div>
                     </div>
                 </div>
             </header>
@@ -305,7 +305,7 @@ export default function PrayerPage() {
                                     />
                                     <p className="text-xs text-slate-500 mt-1">{newRequest.length}/1000 characters</p>
                                 </div>
-                                <div className="flex items-center gap-3">
+                                <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
                                     <button
                                         type="submit"
                                         disabled={submitting}
@@ -329,7 +329,7 @@ export default function PrayerPage() {
                         {/* Tabs */}
                         <div className="card">
                             <div className="border-b border-slate-200 mb-6">
-                                <div className="flex gap-4">
+                                <div className="flex flex-wrap gap-4">
                                     <button
                                         onClick={() => setActiveTab("my-prayers")}
                                         className={`px-4 py-3 font-medium transition-all duration-200 border-b-2 ${activeTab === "my-prayers"

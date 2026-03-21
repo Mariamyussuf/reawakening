@@ -145,8 +145,8 @@ export default function MemberHub() {
 
     return (
         <div className="min-h-screen bg-cream font-body">
-            <div className="max-w-5xl mx-auto px-6 py-8">
-                <div className="flex items-center justify-between mb-8">
+            <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8">
                     <div>
                         <p className="text-xs text-deep/50 tracking-wide uppercase mb-1">Welcome back</p>
                         <h1 className="font-display text-2xl font-medium text-deep">{userData.name}</h1>
@@ -188,7 +188,7 @@ export default function MemberHub() {
                             </div>
                             <div className="space-y-3">
                                 {upcomingEvents.map((event) => (
-                                    <div key={event.id} className="flex items-center justify-between p-4 bg-cream rounded-lg border border-mid/10">
+                                    <div key={event.id} className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between p-4 bg-cream rounded-lg border border-mid/10">
                                         <div>
                                             <h3 className="font-display text-deep">{event.title}</h3>
                                             <p className="text-sm text-deep/50">

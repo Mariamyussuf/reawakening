@@ -63,15 +63,15 @@ export default function BooksLibraryPage() {
             {/* Header */}
             <header className="bg-white/90 backdrop-blur-md shadow-sm border-b border-slate-200">
                 <div className="container-custom py-4">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <Link href="/hub" className="flex items-center space-x-2 text-slate-600 hover:text-slate-800">
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                             </svg>
                             <span className="font-medium">Back to Hub</span>
                         </Link>
-                        <h1 className="text-2xl font-bold text-slate-800">Books Library</h1>
-                        <div className="w-20"></div>
+                        <h1 className="text-xl sm:text-2xl font-bold text-slate-800">Books Library</h1>
+                        <div className="hidden sm:block w-20"></div>
                     </div>
                 </div>
             </header>
@@ -79,7 +79,7 @@ export default function BooksLibraryPage() {
             <main className="container-custom py-8">
                 {/* Search Bar */}
                 <div className="card mb-8">
-                    <div className="flex gap-3">
+                    <div className="flex flex-col sm:flex-row gap-3">
                         <div className="flex-1 relative">
                             <input
                                 type="text"
@@ -127,7 +127,7 @@ export default function BooksLibraryPage() {
                                 <h3 className="text-3xl font-bold mb-2">{featuredBooks[0].title}</h3>
                                 <p className="text-orange-100 text-lg mb-4">by {featuredBooks[0].author}</p>
                                 <p className="text-white/90 mb-6 line-clamp-3">{featuredBooks[0].description}</p>
-                                <div className="flex gap-3">
+                                <div className="flex flex-col sm:flex-row gap-3">
                                     <Link
                                         href={`/hub/books/${featuredBooks[0].id}`}
                                         className="px-6 py-3 bg-white text-orange-600 rounded-lg font-semibold hover:bg-orange-50 transition-colors"
@@ -170,7 +170,7 @@ export default function BooksLibraryPage() {
                 {/* Popular Books */}
                 {popularBooks.length > 0 && (
                     <div className="mb-8">
-                        <div className="flex items-center justify-between mb-4">
+                        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-4">
                             <h2 className="text-2xl font-bold text-slate-800">Popular Books</h2>
                             <Link href="/hub/books/browse?sort=popular" className="text-orange-600 hover:text-orange-700 font-semibold text-sm">
                                 View All

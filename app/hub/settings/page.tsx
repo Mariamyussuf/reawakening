@@ -190,15 +190,15 @@ export default function SettingsPage() {
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50 to-amber-50">
             <header className="bg-white/90 backdrop-blur-md shadow-sm border-b border-slate-200">
-                <div className="container-custom py-4 flex items-center justify-between">
+                <div className="container-custom py-4 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <Link href="/hub" className="flex items-center space-x-2 text-slate-600 hover:text-slate-800">
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                         </svg>
                         <span className="font-medium">Back to Hub</span>
                     </Link>
-                    <h1 className="text-2xl font-bold text-slate-800">Settings</h1>
-                    <div className="w-20" />
+                    <h1 className="text-xl sm:text-2xl font-bold text-slate-800">Settings</h1>
+                    <div className="hidden sm:block w-20" />
                 </div>
             </header>
 
@@ -229,7 +229,7 @@ export default function SettingsPage() {
                     <h2 className="text-2xl font-bold text-slate-800 mb-6">Notification Preferences</h2>
                     <div className="space-y-4">
                         {Object.entries(notifications).map(([key, value]) => (
-                            <button key={key} type="button" onClick={() => toggleNotification(key as keyof typeof defaultNotifications)} className="w-full flex items-center justify-between p-4 bg-slate-50 rounded-lg text-left">
+                            <button key={key} type="button" onClick={() => toggleNotification(key as keyof typeof defaultNotifications)} className="w-full flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between p-4 bg-slate-50 rounded-lg text-left">
                                 <div>
                                     <p className="font-medium text-slate-800">{key}</p>
                                 </div>
@@ -243,7 +243,7 @@ export default function SettingsPage() {
                     <h2 className="text-2xl font-bold text-slate-800 mb-6">Privacy Settings</h2>
                     <div className="space-y-4">
                         {Object.entries(privacy).map(([key, value]) => (
-                            <button key={key} type="button" onClick={() => togglePrivacy(key as keyof typeof defaultPrivacy)} className="w-full flex items-center justify-between p-4 bg-slate-50 rounded-lg text-left">
+                            <button key={key} type="button" onClick={() => togglePrivacy(key as keyof typeof defaultPrivacy)} className="w-full flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between p-4 bg-slate-50 rounded-lg text-left">
                                 <div>
                                     <p className="font-medium text-slate-800">{key}</p>
                                 </div>

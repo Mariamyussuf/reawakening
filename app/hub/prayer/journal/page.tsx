@@ -235,15 +235,15 @@ export default function PrayerJournalPage() {
             {/* Header */}
             <header className="bg-white/90 backdrop-blur-md shadow-sm border-b border-slate-200">
                 <div className="container-custom py-4">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <Link href="/hub/prayer" className="flex items-center space-x-2 text-slate-600 hover:text-slate-800">
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                             </svg>
                             <span className="font-medium">Back to Prayer Center</span>
                         </Link>
-                        <h1 className="text-2xl font-bold text-slate-800">Prayer Journal</h1>
-                        <div className="w-20"></div>
+                        <h1 className="text-xl sm:text-2xl font-bold text-slate-800">Prayer Journal</h1>
+                        <div className="hidden sm:block w-20"></div>
                     </div>
                 </div>
             </header>
@@ -311,7 +311,7 @@ export default function PrayerJournalPage() {
                                     <label className="block text-sm font-medium text-slate-700 mb-2">
                                         Category
                                     </label>
-                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
                                         {categories.map((cat) => (
                                             <button
                                                 key={cat.id}
@@ -344,7 +344,7 @@ export default function PrayerJournalPage() {
                                     <p className="text-xs text-slate-500 mt-1">{newEntry.length}/5000 characters</p>
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
                                         <label className="block text-sm font-medium text-slate-700 mb-2">
                                             Mood (Optional)
@@ -401,7 +401,7 @@ export default function PrayerJournalPage() {
 
                         {/* Journal Entries */}
                         <div className="card">
-                            <div className="flex items-center justify-between mb-6">
+                            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
                                 <h2 className="text-2xl font-bold text-slate-800">Recent Entries</h2>
                                 <select
                                     value={filterCategory}
