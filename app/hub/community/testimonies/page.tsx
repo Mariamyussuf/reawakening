@@ -1,19 +1,33 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { readStoredItems, writeStoredItems } from "@/lib/community-storage";
 
-const testimonies = [
+const STORAGE_KEY = "community-testimonies";
+
+interface Testimony {
+    id: string;
+    name: string;
+    title: string;
+    story: string;
+}
+
+const defaultTestimonies: Testimony[] = [
     {
+        id: "ada",
         name: "Ada",
         title: "I found consistency in prayer again",
         story: "Reawakening helped me move from scattered devotion to a steady prayer life. The daily rhythm and Scripture focus gave me structure and joy again.",
     },
     {
+        id: "daniel",
         name: "Daniel",
         title: "Bible study stopped feeling overwhelming",
         story: "I used to avoid long Bible reading sessions because I did not know where to start. The reading tools and community encouragement made it feel possible.",
     },
     {
+        id: "esther",
         name: "Esther",
         title: "I became bolder about sharing my faith",
         story: "Through the devotionals and prayer spaces, I grew in confidence and started speaking openly about what God has been doing in my life.",
@@ -21,6 +35,43 @@ const testimonies = [
 ];
 
 export default function CommunityTestimoniesPage() {
+    const [testimonies, setTestimonies] = useState<Testimony[]>(defaultTestimonies);
+    const [name, setName] = useState("");
+    const [title, setTitle] = useState("");
+    const [story, setStory] = useState("");
+    const [status, setStatus] = useState("");
+
+    useEffect(() => {
+        const saved = readStoredItems<Testimony>(STORAGE_KEY);
+        if (saved.length > 0) {
+            setTestimonies([...saved, ...defaultTestimonies]);
+        }
+    }, []);
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!name.trim() || !title.trim() || !story.trim()) {
+            setStatus("Please fill in your name, title, and testimony.");
+            return;
+        }
+
+        const newTestimony: Testimony = {
+            id: `custom-${Date.now()}`,
+            name: name.trim(),
+            title: title.trim(),
+            story: story.trim(),
+        };
+
+        const customOnly = testimonies.filter((item) => item.id.startsWith("custom-"));
+        const nextCustom = [newTestimony, ...customOnly];
+        writeStoredItems(STORAGE_KEY, nextCustom);
+        setTestimonies([newTestimony, ...testimonies]);
+        setName("");
+        setTitle("");
+        setStory("");
+        setStatus("Testimony saved on this device.");
+    };
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50 to-amber-50">
             <header className="bg-white/90 backdrop-blur-md shadow-sm border-b border-slate-200">
@@ -37,16 +88,57 @@ export default function CommunityTestimoniesPage() {
             </header>
 
             <main className="container-custom py-8 space-y-6">
+                {status && (
+                    <div className="p-4 bg-green-50 border border-green-200 rounded-lg text-green-700">
+                        {status}
+                    </div>
+                )}
+
                 <div className="card bg-gradient-to-r from-orange-600 to-amber-600 text-white">
                     <h2 className="text-3xl font-bold mb-3">Stories of growth, grace, and renewed fire</h2>
                     <p className="text-orange-100">
-                        These testimonies reflect the kind of spiritual fruit we want this community to keep nurturing.
+                        Read what God is doing in the community and share your own testimony below.
                     </p>
+                </div>
+
+                <div className="card">
+                    <h3 className="text-2xl font-bold text-slate-800 mb-4">Share Your Testimony</h3>
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <input
+                                type="text"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                placeholder="Your name"
+                                className="w-full px-4 py-3 border border-slate-300 rounded-lg"
+                            />
+                            <input
+                                type="text"
+                                value={title}
+                                onChange={(e) => setTitle(e.target.value)}
+                                placeholder="Short title for your testimony"
+                                className="w-full px-4 py-3 border border-slate-300 rounded-lg"
+                            />
+                        </div>
+                        <textarea
+                            rows={5}
+                            value={story}
+                            onChange={(e) => setStory(e.target.value)}
+                            placeholder="What has God been teaching or doing in your life?"
+                            className="w-full px-4 py-3 border border-slate-300 rounded-lg"
+                        />
+                        <button
+                            type="submit"
+                            className="px-5 py-3 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700 transition-colors"
+                        >
+                            Save Testimony
+                        </button>
+                    </form>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {testimonies.map((testimony) => (
-                        <div key={testimony.title} className="card">
+                        <div key={testimony.id} className="card">
                             <p className="text-sm font-semibold text-orange-600 mb-3">{testimony.name}</p>
                             <h3 className="text-xl font-bold text-slate-800 mb-3">{testimony.title}</h3>
                             <p className="text-slate-600 leading-relaxed">{testimony.story}</p>
