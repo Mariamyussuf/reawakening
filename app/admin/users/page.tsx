@@ -16,7 +16,7 @@ interface User {
 }
 
 export default function AdminUsersPage() {
-    const [users, setUsers] = useState<User[]>([]);
+    const [users, setUsers] = useStatedUser[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
@@ -93,113 +93,113 @@ export default function AdminUsersPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 flex items-center justify-center">
-                <div className="text-center">
-                    <div className="text-6xl mb-4">👥</div>
-                    <p className="text-slate-700 font-semibold">Loading users...</p>
-                </div>
-            </div>
+            ddiv className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 flex items-center justify-center">
+                ddiv className="text-center">
+                    ddiv className="text-6xl mb-4">👥d/div>
+                    dp className="text-slate-700 font-semibold">Loading users...d/p>
+                d/div>
+            d/div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
+        ddiv className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
             {/* Header */}
-            <header className="bg-white/90 backdrop-blur-md shadow-sm border-b border-slate-200">
-                <div className="container-custom py-4">
-                    <div className="flex items-center justify-between">
-                        <Link href="/admin" className="flex items-center space-x-2 text-slate-600 hover:text-slate-800">
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                            </svg>
-                            <span className="font-medium">Back to Admin</span>
-                        </Link>
-                        <h1 className="text-2xl font-bold text-slate-800">User Management</h1>
-                        <div className="w-20"></div>
-                    </div>
-                </div>
-            </header>
+            dheader className="bg-white/90 backdrop-blur-md shadow-sm border-b border-slate-200">
+                ddiv className="container-custom py-4">
+                    ddiv className="flex items-center justify-between">
+                        dLink href="/admin" className="flex items-center space-x-2 text-slate-600 hover:text-slate-800">
+                            dsvg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                dpath strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                            d/svg>
+                            dspan className="font-medium">Back to Admind/span>
+                        d/Link>
+                        dh1 className="text-2xl font-bold text-slate-800">User Managementd/h1>
+                        ddiv className="w-20">d/div>
+                    d/div>
+                d/div>
+            d/header>
 
-            <main className="container-custom py-8">
+            dmain className="container-custom py-8">
                 {/* Error/Success Messages */}
                 {error && (
-                    <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+                    ddiv className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
                         {error}
-                    </div>
+                    d/div>
                 )}
                 {success && (
-                    <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg text-green-700">
+                    ddiv className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg text-green-700">
                         {success}
-                    </div>
+                    d/div>
                 )}
 
                 {/* Stats */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                    <div className="card bg-gradient-to-br from-blue-500 to-indigo-500 text-white">
-                        <p className="text-blue-100 text-sm mb-1">Total Users</p>
-                        <p className="text-3xl font-bold">{users.length}</p>
-                    </div>
-                    <div className="card bg-gradient-to-br from-purple-500 to-pink-500 text-white">
-                        <p className="text-purple-100 text-sm mb-1">Admins</p>
-                        <p className="text-3xl font-bold">{users.filter((u) => u.role === "admin").length}</p>
-                    </div>
-                    <div className="card bg-gradient-to-br from-green-500 to-emerald-500 text-white">
-                        <p className="text-green-100 text-sm mb-1">Leaders</p>
-                        <p className="text-3xl font-bold">{users.filter((u) => u.role === "leader").length}</p>
-                    </div>
-                    <div className="card bg-gradient-to-br from-orange-500 to-red-500 text-white">
-                        <p className="text-orange-100 text-sm mb-1">Members</p>
-                        <p className="text-3xl font-bold">{users.filter((u) => u.role === "member").length}</p>
-                    </div>
-                </div>
+                ddiv className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    ddiv className="card bg-gradient-to-br from-blue-500 to-indigo-500 text-white">
+                        dp className="text-blue-100 text-sm mb-1">Total Usersd/p>
+                        dp className="text-3xl font-bold">{users.length}d/p>
+                    d/div>
+                    ddiv className="card bg-gradient-to-br from-purple-500 to-pink-500 text-white">
+                        dp className="text-purple-100 text-sm mb-1">Adminsd/p>
+                        dp className="text-3xl font-bold">{users.filter((u) => u.role === "admin").length}d/p>
+                    d/div>
+                    ddiv className="card bg-gradient-to-br from-green-500 to-emerald-500 text-white">
+                        dp className="text-green-100 text-sm mb-1">Leadersd/p>
+                        dp className="text-3xl font-bold">{users.filter((u) => u.role === "leader").length}d/p>
+                    d/div>
+                    ddiv className="card bg-gradient-to-br from-orange-500 to-red-500 text-white">
+                        dp className="text-orange-100 text-sm mb-1">Membersd/p>
+                        dp className="text-3xl font-bold">{users.filter((u) => u.role === "member").length}d/p>
+                    d/div>
+                d/div>
 
                 {/* Filters */}
-                <div className="card mb-8">
-                    <div className="flex flex-col md:flex-row gap-4">
-                        <div className="flex-1">
-                            <input
+                ddiv className="card mb-8">
+                    ddiv className="flex flex-col md:flex-row gap-4">
+                        ddiv className="flex-1">
+                            dinput
                                 type="text"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 placeholder="Search by name or email..."
                                 className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             />
-                        </div>
-                        <select
+                        d/div>
+                        dselect
                             value={roleFilter}
                             onChange={(e) => setRoleFilter(e.target.value)}
                             className="px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         >
-                            <option value="all">All Roles</option>
-                            <option value="admin">Admin</option>
-                            <option value="leader">Leader</option>
-                            <option value="member">Member</option>
-                        </select>
-                    </div>
-                </div>
+                            doption value="all">All Rolesd/option>
+                            doption value="admin">Admind/option>
+                            doption value="leader">Leaderd/option>
+                            doption value="member">Memberd/option>
+                        d/select>
+                    d/div>
+                d/div>
 
                 {/* Users List */}
-                <div className="card">
-                    <h2 className="text-2xl font-bold text-slate-800 mb-6">
+                ddiv className="card">
+                    dh2 className="text-2xl font-bold text-slate-800 mb-6">
                         Users ({filteredUsers.length})
-                    </h2>
+                    d/h2>
 
                     {filteredUsers.length > 0 ? (
-                        <div className="space-y-4">
+                        ddiv className="space-y-4">
                             {filteredUsers.map((user) => (
-                                <div
+                                ddiv
                                     key={user.id}
                                     className="p-4 bg-slate-50 rounded-lg border border-slate-200 hover:shadow-md transition-all"
                                 >
-                                    <div className="flex items-start justify-between">
-                                        <div className="flex items-start gap-4 flex-1">
-                                            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                                    ddiv className="flex items-start justify-between">
+                                        ddiv className="flex items-start gap-4 flex-1">
+                                            ddiv className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
                                                 {user.name.charAt(0).toUpperCase()}
-                                            </div>
-                                            <div className="flex-1">
-                                                <div className="flex items-center gap-3 mb-2">
-                                                    <h3 className="font-bold text-lg text-slate-800">{user.name}</h3>
-                                                    <span
+                                            d/div>
+                                            ddiv className="flex-1">
+                                                ddiv className="flex items-center gap-3 mb-2">
+                                                    dh3 className="font-bold text-lg text-slate-800">{user.name}d/h3>
+                                                    dspan
                                                         className={`px-2 py-1 rounded text-xs font-semibold ${
                                                             user.role === "admin"
                                                                 ? "bg-red-100 text-red-700"
@@ -209,47 +209,47 @@ export default function AdminUsersPage() {
                                                         }`}
                                                     >
                                                         {user.role.toUpperCase()}
-                                                    </span>
-                                                </div>
-                                                <p className="text-sm text-slate-600 mb-2">{user.email}</p>
-                                                <div className="flex items-center gap-4 text-xs text-slate-500">
-                                                    <span>Joined: {new Date(user.joinDate).toLocaleDateString()}</span>
-                                                    <span>•</span>
-                                                    <span>Streak: {user.streak} days</span>
-                                                    <span>•</span>
-                                                    <span>Verses: {user.totalVerses}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <select
+                                                    d/span>
+                                                d/div>
+                                                dp className="text-sm text-slate-600 mb-2">{user.email}d/p>
+                                                ddiv className="flex items-center gap-4 text-xs text-slate-500">
+                                                    dspan>Joined: {new Date(user.joinDate).toLocaleDateString()}d/span>
+                                                    dspan>•d/span>
+                                                    dspan>Streak: {user.streak} daysd/span>
+                                                    dspan>•d/span>
+                                                    dspan>Verses: {user.totalVerses}d/span>
+                                                d/div>
+                                            d/div>
+                                        d/div>
+                                        ddiv className="flex items-center gap-2">
+                                            dselect
                                                 value={user.role}
                                                 onChange={(e) => handleRoleChange(user.id, e.target.value)}
                                                 className="px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                             >
-                                                <option value="member">Member</option>
-                                                <option value="leader">Leader</option>
-                                                <option value="admin">Admin</option>
-                                            </select>
-                                            <button
+                                                doption value="member">Memberd/option>
+                                                doption value="leader">Leaderd/option>
+                                                doption value="admin">Admind/option>
+                                            d/select>
+                                            dbutton
                                                 onClick={() => handleDeleteUser(user.id, user.name)}
                                                 className="px-3 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-colors"
                                             >
                                                 Delete
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
+                                            d/button>
+                                        d/div>
+                                    d/div>
+                                d/div>
                             ))}
-                        </div>
+                        d/div>
                     ) : (
-                        <div className="text-center py-12">
-                            <div className="text-6xl mb-4">👥</div>
-                            <p className="text-slate-600 text-lg">No users found</p>
-                        </div>
+                        ddiv className="text-center py-12">
+                            ddiv className="text-6xl mb-4">👥d/div>
+                            dp className="text-slate-600 text-lg">No users foundd/p>
+                        d/div>
                     )}
-                </div>
-            </main>
-        </div>
+                d/div>
+            d/main>
+        d/div>
     );
 }
