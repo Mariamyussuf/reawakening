@@ -136,12 +136,12 @@ export default function CommunityPage() {
                         <p className="text-orange-100 text-sm mb-1">Active Members</p>
                         <p className="text-3xl font-bold">{stats.activeMembers}</p>
                     </div>
-                    <div className="card bg-gradient-to-br from-purple-500 to-pink-500 text-white">
-                        <p className="text-purple-100 text-sm mb-1">Community Prayers</p>
+                    <div className="card bg-gradient-to-br from-orange-500 to-amber-500 text-white">
+                        <p className="text-orange-100 text-sm mb-1">Community Prayers</p>
                         <p className="text-3xl font-bold">{stats.prayerRequests}</p>
                     </div>
-                    <div className="card bg-gradient-to-br from-blue-500 to-indigo-500 text-white">
-                        <p className="text-blue-100 text-sm mb-1">Community Paths</p>
+                    <div className="card bg-gradient-to-br from-orange-500 to-amber-500 text-white">
+                        <p className="text-orange-100 text-sm mb-1">Community Paths</p>
                         <p className="text-3xl font-bold">{stats.nextSteps}</p>
                     </div>
                 </div>
