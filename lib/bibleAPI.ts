@@ -1,18 +1,12 @@
-// Bible API Service
-// Handles all Bible API interactions
+// Bible API client service
+// Client components should use this file instead of calling external APIs directly.
 
-import { env } from '@/lib/env';
-
-const BIBLE_API_BASE = 'https://api.scripture.api.bible/v1';
-const API_KEY = env.BIBLE_API_KEY || '';
-
-// Bible translation IDs from API.Bible
 export const BIBLE_VERSIONS = {
-    KJV: 'de4e12af7f28f599-02', // King James Version
-    NIV: '592420522e16049f-01', // New International Version
-    ESV: '65eec8e0b60e656b-01', // English Standard Version
-    NLT: '06125adad2d5898a-01', // New Living Translation
-    MSG: '9879dbb7cfe39e4d-04', // The Message
+    KJV: 'de4e12af7f28f599-02',
+    NIV: '592420522e16049f-01',
+    ESV: '65eec8e0b60e656b-01',
+    NLT: '06125adad2d5898a-01',
+    MSG: '9879dbb7cfe39e4d-04',
 } as const;
 
 export type BibleVersion = keyof typeof BIBLE_VERSIONS;
@@ -47,148 +41,72 @@ export interface Chapter {
 }
 
 class BibleAPIService {
-    private apiKey: string;
-
-    constructor() {
-        this.apiKey = API_KEY;
-    }
-
-    private async fetchAPI(endpoint: string, version: BibleVersion = 'KJV') {
-        const versionId = BIBLE_VERSIONS[version];
-        const url = `${BIBLE_API_BASE}/bibles/${versionId}${endpoint}`;
-
+    private async fetchJSON<T>(url: string): Promise<T> {
         const response = await fetch(url, {
-            headers: {
-                'api-key': this.apiKey,
-            },
+            cache: 'no-store',
         });
 
         if (!response.ok) {
-            throw new Error(`Bible API error: ${response.statusText}`);
+            const errorBody = await response.text();
+            throw new Error(errorBody || `Bible API request failed with status ${response.status}`);
         }
 
-        return response.json();
+        return response.json() as Promise<T>;
     }
 
-    // Get all books in the Bible
     async getBooks(version: BibleVersion = 'KJV'): Promise<Book[]> {
         try {
-            const data = await this.fetchAPI('/books', version);
-            return data.data.map((book: any) => ({
-                id: book.id,
-                name: book.name,
-                abbreviation: book.abbreviation,
-                chapters: book.chapters?.length || 0,
-            }));
+            const data = await this.fetchJSON<{ books: Book[] }>(`/api/bible/books?version=${version}`);
+            return data.books;
         } catch (error) {
             console.error('Error fetching books:', error);
             return this.getFallbackBooks();
         }
     }
 
-    // Get a specific chapter
     async getChapter(
         bookId: string,
         chapterNumber: number,
         version: BibleVersion = 'KJV'
     ): Promise<Chapter> {
-        try {
-            const chapterId = `${bookId}.${chapterNumber}`;
-            const data = await this.fetchAPI(`/chapters/${chapterId}`, version);
+        const params = new URLSearchParams({
+            version,
+        });
 
-            return {
-                id: data.data.id,
-                reference: data.data.reference,
-                content: data.data.content,
-                verses: this.parseVerses(data.data.content),
-                next: data.data.next,
-                previous: data.data.previous,
-            };
-        } catch (error) {
-            console.error('Error fetching chapter:', error);
-            throw error;
-        }
+        return this.fetchJSON<Chapter>(
+            `/api/bible/chapters/${encodeURIComponent(bookId)}/${chapterNumber}?${params.toString()}`
+        );
     }
 
-    // Search the Bible
     async search(query: string, version: BibleVersion = 'KJV', limit: number = 10) {
         try {
-            const data = await this.fetchAPI(
-                `/search?query=${encodeURIComponent(query)}&limit=${limit}`,
-                version
-            );
-            return data.data.verses || [];
+            const params = new URLSearchParams({
+                q: query,
+                version,
+                limit: String(limit),
+            });
+            const data = await this.fetchJSON<{ results: any[] }>(`/api/bible/search?${params.toString()}`);
+            return data.results;
         } catch (error) {
             console.error('Error searching Bible:', error);
             return [];
         }
     }
 
-    // Get verse of the day (using a simple algorithm)
     async getVerseOfTheDay(version: BibleVersion = 'KJV'): Promise<Verse | null> {
-        // Popular verses for VOTD rotation
-        const popularVerses = [
-            'JHN.3.16', // John 3:16
-            'PSA.23.1', // Psalm 23:1
-            'PRO.3.5-6', // Proverbs 3:5-6
-            'ROM.8.28', // Romans 8:28
-            'PHP.4.13', // Philippians 4:13
-            'JER.29.11', // Jeremiah 29:11
-            'ISA.40.31', // Isaiah 40:31
-            'MAT.28.20', // Matthew 28:20
-            'PSA.46.1', // Psalm 46:1
-            '1CO.13.4-7', // 1 Corinthians 13:4-7
-        ];
-
-        // Use day of year to rotate through verses
-        const dayOfYear = Math.floor(
-            (Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000
-        );
-        const verseIndex = dayOfYear % popularVerses.length;
-        const verseId = popularVerses[verseIndex];
-
         try {
-            const data = await this.fetchAPI(`/verses/${verseId}`, version);
-            return {
-                id: data.data.id,
-                reference: data.data.reference,
-                text: this.stripHTML(data.data.content),
-                verseNumber: 1,
-            };
+            const data = await this.fetchJSON<{ verse: Verse | null }>(
+                `/api/bible/verse-of-the-day?version=${version}`
+            );
+            return data.verse;
         } catch (error) {
             console.error('Error fetching verse of the day:', error);
             return null;
         }
     }
 
-    // Helper: Parse verses from HTML content
-    private parseVerses(htmlContent: string): Verse[] {
-        // This is a simplified parser - in production, use a proper HTML parser
-        const verses: Verse[] = [];
-        const verseRegex = /<span[^>]*class="v"[^>]*>(\d+)<\/span>([^<]*)/g;
-        let match;
-
-        while ((match = verseRegex.exec(htmlContent)) !== null) {
-            verses.push({
-                id: `verse-${match[1]}`,
-                reference: `Verse ${match[1]}`,
-                text: match[2].trim(),
-                verseNumber: parseInt(match[1]),
-            });
-        }
-
-        return verses;
-    }
-
-    // Helper: Strip HTML tags
-    private stripHTML(html: string): string {
-        return html.replace(/<[^>]*>/g, '').trim();
-    }
-
-    // Fallback books list (in case API fails)
     private getFallbackBooks(): Book[] {
         return [
-            // Old Testament
             { id: 'GEN', name: 'Genesis', abbreviation: 'Gen', chapters: 50 },
             { id: 'EXO', name: 'Exodus', abbreviation: 'Exo', chapters: 40 },
             { id: 'LEV', name: 'Leviticus', abbreviation: 'Lev', chapters: 27 },
@@ -205,7 +123,6 @@ class BibleAPIService {
             { id: 'PRO', name: 'Proverbs', abbreviation: 'Pro', chapters: 31 },
             { id: 'ISA', name: 'Isaiah', abbreviation: 'Isa', chapters: 66 },
             { id: 'JER', name: 'Jeremiah', abbreviation: 'Jer', chapters: 52 },
-            // New Testament
             { id: 'MAT', name: 'Matthew', abbreviation: 'Mat', chapters: 28 },
             { id: 'MRK', name: 'Mark', abbreviation: 'Mrk', chapters: 16 },
             { id: 'LUK', name: 'Luke', abbreviation: 'Luk', chapters: 24 },
