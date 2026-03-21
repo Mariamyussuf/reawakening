@@ -41,6 +41,26 @@ export default function PrayerPage() {
         fetchPrayers();
     }, [activeTab]);
 
+    const extractPrayers = (payload: any): Prayer[] => {
+        if (Array.isArray(payload?.prayers)) {
+            return payload.prayers;
+        }
+
+        if (Array.isArray(payload?.data?.prayers)) {
+            return payload.data.prayers;
+        }
+
+        return [];
+    };
+
+    const extractActionData = (payload: any) => {
+        if (payload?.data) {
+            return payload.data;
+        }
+
+        return payload;
+    };
+
     const fetchPrayers = async () => {
         try {
             setLoading(true);
@@ -50,12 +70,12 @@ export default function PrayerPage() {
                 const response = await fetch("/api/prayers");
                 if (!response.ok) throw new Error("Failed to fetch prayers");
                 const data = await response.json();
-                setMyPrayers(data.prayers || []);
+                setMyPrayers(extractPrayers(data));
             } else {
                 const response = await fetch("/api/prayers/community");
                 if (!response.ok) throw new Error("Failed to fetch community prayers");
                 const data = await response.json();
-                setPrayingFor(data.prayers || []);
+                setPrayingFor(extractPrayers(data) as CommunityPrayer[]);
             }
         } catch (err: any) {
             setError(err.message || "Failed to load prayers");
@@ -147,13 +167,18 @@ export default function PrayerPage() {
             if (!response.ok) throw new Error("Failed to update prayer count");
 
             const data = await response.json();
+            const actionData = extractActionData(data);
 
             // Update local state
             if (activeTab === "praying-for") {
                 setPrayingFor((prev) =>
                     prev.map((p) =>
                         p.id === id
-                            ? { ...p, prayerCount: data.prayerCount, hasPrayed: data.hasPrayed }
+                            ? {
+                                ...p,
+                                prayerCount: actionData.prayerCount ?? p.prayerCount,
+                                hasPrayed: actionData.hasPrayed ?? p.hasPrayed,
+                            }
                             : p
                     )
                 );
