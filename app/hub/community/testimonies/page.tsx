@@ -73,7 +73,7 @@ export default function CommunityTestimoniesPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50 to-amber-50">
+        <div className="page-shell">
             <header className="bg-white/90 backdrop-blur-md shadow-sm border-b border-slate-200">
                 <div className="container-custom py-4 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <Link href="/hub/community" className="flex items-center space-x-2 text-slate-600 hover:text-slate-800">
@@ -94,9 +94,9 @@ export default function CommunityTestimoniesPage() {
                     </div>
                 )}
 
-                <div className="card bg-gradient-to-r from-orange-600 to-amber-600 text-white">
+                <div className="card-accent-soft">
                     <h2 className="text-3xl font-bold mb-3">Stories of growth, grace, and renewed fire</h2>
-                    <p className="text-orange-100">
+                    <p className="text-slate-700">
                         Read what God is doing in the community and share your own testimony below.
                     </p>
                 </div>
@@ -110,14 +110,14 @@ export default function CommunityTestimoniesPage() {
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
                                 placeholder="Your name"
-                                className="w-full px-4 py-3 border border-slate-300 rounded-lg"
+                                className="input-soft"
                             />
                             <input
                                 type="text"
                                 value={title}
                                 onChange={(e) => setTitle(e.target.value)}
                                 placeholder="Short title for your testimony"
-                                className="w-full px-4 py-3 border border-slate-300 rounded-lg"
+                                className="input-soft"
                             />
                         </div>
                         <textarea
@@ -125,11 +125,11 @@ export default function CommunityTestimoniesPage() {
                             value={story}
                             onChange={(e) => setStory(e.target.value)}
                             placeholder="What has God been teaching or doing in your life?"
-                            className="w-full px-4 py-3 border border-slate-300 rounded-lg"
+                            className="input-soft"
                         />
                         <button
                             type="submit"
-                            className="px-5 py-3 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700 transition-colors"
+                            className="btn-soft-primary"
                         >
                             Save Testimony
                         </button>
@@ -138,8 +138,8 @@ export default function CommunityTestimoniesPage() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {testimonies.map((testimony) => (
-                        <div key={testimony.id} className="card">
-                            <p className="text-sm font-semibold text-orange-600 mb-3">{testimony.name}</p>
+                        <div key={testimony.id} className="card-soft">
+                            <p className="text-sm font-semibold text-gold-dark mb-3">{testimony.name}</p>
                             <h3 className="text-xl font-bold text-slate-800 mb-3">{testimony.title}</h3>
                             <p className="text-slate-600 leading-relaxed">{testimony.story}</p>
                         </div>

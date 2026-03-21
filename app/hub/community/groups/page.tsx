@@ -56,7 +56,7 @@ export default function CommunityGroupsPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50 to-amber-50">
+        <div className="page-shell">
             <header className="bg-white/90 backdrop-blur-md shadow-sm border-b border-slate-200">
                 <div className="container-custom py-4 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <Link href="/hub/community" className="flex items-center space-x-2 text-slate-600 hover:text-slate-800">
@@ -77,7 +77,7 @@ export default function CommunityGroupsPage() {
                     </div>
                 )}
 
-                <div className="card bg-white/80">
+                <div className="card-soft">
                     <h2 className="text-3xl font-bold text-slate-900 mb-2">Find a circle that keeps you consistent</h2>
                     <p className="text-slate-600">
                         Request a place in a smaller group for prayer, Bible study, and honest accountability.
@@ -89,8 +89,8 @@ export default function CommunityGroupsPage() {
                         const requested = requestedGroups.includes(group.id);
 
                         return (
-                            <div key={group.id} className="card">
-                                <p className="text-xs font-semibold uppercase tracking-widest text-orange-600 mb-3">
+                            <div key={group.id} className="card-soft">
+                                <p className="eyebrow-soft mb-3">
                                     Open Group
                                 </p>
                                 <h3 className="text-xl font-bold text-slate-800 mb-2">{group.name}</h3>
@@ -103,7 +103,7 @@ export default function CommunityGroupsPage() {
                                     className={`w-full px-4 py-2 rounded-lg font-medium transition-colors ${
                                         requested
                                             ? "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                                            : "bg-orange-600 text-white hover:bg-orange-700"
+                                            : "bg-deep text-warm-white hover:bg-deep-2"
                                     }`}
                                 >
                                     {requested ? "Requested" : "Request to Join"}

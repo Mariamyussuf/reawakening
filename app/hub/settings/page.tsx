@@ -171,16 +171,16 @@ export default function SettingsPage() {
     };
 
     const renderToggle = (active: boolean) => (
-        <span className={`inline-flex h-6 w-11 items-center rounded-full ${active ? "bg-orange-600" : "bg-slate-300"}`}>
+        <span className={`inline-flex h-6 w-11 items-center rounded-full ${active ? "bg-deep" : "bg-slate-300"}`}>
             <span className={`inline-block h-4 w-4 rounded-full bg-white transition-transform ${active ? "translate-x-6" : "translate-x-1"}`} />
         </span>
     );
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50 to-amber-50 flex items-center justify-center">
+            <div className="page-shell flex items-center justify-center">
                 <div className="text-center">
-                    <div className="text-5xl font-bold text-orange-600 mb-4">Settings</div>
+                    <div className="text-5xl font-bold text-gold-dark mb-4">Settings</div>
                     <p className="text-slate-700 font-semibold">Loading settings...</p>
                 </div>
             </div>
@@ -188,7 +188,7 @@ export default function SettingsPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50 to-amber-50">
+        <div className="page-shell">
             <header className="bg-white/90 backdrop-blur-md shadow-sm border-b border-slate-200">
                 <div className="container-custom py-4 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <Link href="/hub" className="flex items-center space-x-2 text-slate-600 hover:text-slate-800">
@@ -210,15 +210,15 @@ export default function SettingsPage() {
                     <h2 className="text-2xl font-bold text-slate-800 mb-6">Profile Settings</h2>
                     <form onSubmit={saveProfile} className="space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <input className="w-full px-4 py-2 border border-slate-300 rounded-lg" value={profileForm.name} onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })} placeholder="Full Name" required />
-                            <input className="w-full px-4 py-2 border border-slate-300 rounded-lg bg-slate-100 text-slate-500" value={profileForm.email} disabled placeholder="Email Address" />
-                            <input className="w-full px-4 py-2 border border-slate-300 rounded-lg" value={profileForm.phone} onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })} placeholder="Phone Number" />
-                            <input className="w-full px-4 py-2 border border-slate-300 rounded-lg" value={profileForm.campus} onChange={(e) => setProfileForm({ ...profileForm, campus: e.target.value })} placeholder="Campus or Location" />
+                            <input className="input-soft py-2" value={profileForm.name} onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })} placeholder="Full Name" required />
+                            <input className="input-soft py-2 bg-slate-100 text-slate-500" value={profileForm.email} disabled placeholder="Email Address" />
+                            <input className="input-soft py-2" value={profileForm.phone} onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })} placeholder="Phone Number" />
+                            <input className="input-soft py-2" value={profileForm.campus} onChange={(e) => setProfileForm({ ...profileForm, campus: e.target.value })} placeholder="Campus or Location" />
                         </div>
-                        <textarea className="w-full px-4 py-2 border border-slate-300 rounded-lg" rows={4} maxLength={500} value={profileForm.bio} onChange={(e) => setProfileForm({ ...profileForm, bio: e.target.value })} placeholder="Tell us about yourself..." />
+                        <textarea className="input-soft py-2" rows={4} maxLength={500} value={profileForm.bio} onChange={(e) => setProfileForm({ ...profileForm, bio: e.target.value })} placeholder="Tell us about yourself..." />
                         <div className="text-xs text-slate-500">{profileForm.bio.length}/500 characters</div>
                         <div className="flex justify-end">
-                            <button type="submit" disabled={saving} className="px-6 py-2 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700 disabled:opacity-50">
+                            <button type="submit" disabled={saving} className="btn-soft-primary">
                                 {saving ? "Saving..." : "Save Changes"}
                             </button>
                         </div>
@@ -274,12 +274,12 @@ export default function SettingsPage() {
                         <div className="bg-white rounded-lg max-w-md w-full p-6">
                             <h3 className="text-2xl font-bold text-slate-800 mb-4">Change Password</h3>
                             <form onSubmit={savePassword} className="space-y-4">
-                                <input type="password" className="w-full px-4 py-2 border border-slate-300 rounded-lg" value={passwordForm.currentPassword} onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })} placeholder="Current Password" required />
-                                <input type="password" className="w-full px-4 py-2 border border-slate-300 rounded-lg" value={passwordForm.newPassword} onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })} placeholder="New Password" required minLength={6} />
-                                <input type="password" className="w-full px-4 py-2 border border-slate-300 rounded-lg" value={passwordForm.confirmPassword} onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })} placeholder="Confirm New Password" required minLength={6} />
+                                <input type="password" className="input-soft py-2" value={passwordForm.currentPassword} onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })} placeholder="Current Password" required />
+                                <input type="password" className="input-soft py-2" value={passwordForm.newPassword} onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })} placeholder="New Password" required minLength={6} />
+                                <input type="password" className="input-soft py-2" value={passwordForm.confirmPassword} onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })} placeholder="Confirm New Password" required minLength={6} />
                                 <div className="flex gap-3 justify-end">
                                     <button type="button" onClick={() => setShowPasswordModal(false)} className="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg">Cancel</button>
-                                    <button type="submit" disabled={saving} className="px-4 py-2 bg-orange-600 text-white rounded-lg disabled:opacity-50">{saving ? "Changing..." : "Change Password"}</button>
+                                    <button type="submit" disabled={saving} className="btn-soft-primary px-4 py-2">{saving ? "Changing..." : "Change Password"}</button>
                                 </div>
                             </form>
                         </div>

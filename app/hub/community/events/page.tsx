@@ -49,7 +49,7 @@ export default function CommunityEventsPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50 to-amber-50">
+        <div className="page-shell">
             <header className="bg-white/90 backdrop-blur-md shadow-sm border-b border-slate-200">
                 <div className="container-custom py-4 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <Link href="/hub/community" className="flex items-center space-x-2 text-slate-600 hover:text-slate-800">
@@ -74,9 +74,9 @@ export default function CommunityEventsPage() {
                     const saved = savedEvents.includes(event.id);
 
                     return (
-                        <div key={event.id} className="card flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+                        <div key={event.id} className="card-soft flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                             <div>
-                                <p className="text-xs font-semibold uppercase tracking-widest text-orange-600 mb-2">Upcoming Event</p>
+                                <p className="eyebrow-soft mb-2">Upcoming Event</p>
                                 <h2 className="text-2xl font-bold text-slate-800 mb-2">{event.title}</h2>
                                 <p className="text-slate-500 mb-1">{event.date}</p>
                                 <p className="text-sm text-slate-500 mb-3">{event.location}</p>
@@ -85,7 +85,7 @@ export default function CommunityEventsPage() {
                             <button
                                 onClick={() => toggleRsvp(event.id)}
                                 className={`px-5 py-3 rounded-lg font-medium transition-colors ${
-                                    saved ? "bg-slate-100 text-slate-700 hover:bg-slate-200" : "bg-orange-600 text-white hover:bg-orange-700"
+                                    saved ? "bg-slate-100 text-slate-700 hover:bg-slate-200" : "bg-deep text-warm-white hover:bg-deep-2"
                                 }`}
                             >
                                 {saved ? "Spot Saved" : "Save Spot"}

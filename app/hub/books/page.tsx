@@ -49,9 +49,9 @@ export default function BooksLibraryPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50 to-amber-50 flex items-center justify-center">
+            <div className="page-shell flex items-center justify-center">
                 <div className="text-center">
-                    <div className="text-5xl font-bold text-orange-600 mb-4">Books</div>
+                    <div className="text-5xl font-bold text-gold-dark mb-4">Books</div>
                     <p className="text-slate-700 font-semibold">Loading library...</p>
                 </div>
             </div>
@@ -59,7 +59,7 @@ export default function BooksLibraryPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50 to-amber-50">
+        <div className="page-shell">
             {/* Header */}
             <header className="bg-white/90 backdrop-blur-md shadow-sm border-b border-slate-200">
                 <div className="container-custom py-4">
@@ -87,7 +87,7 @@ export default function BooksLibraryPage() {
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 onKeyPress={(e) => e.key === "Enter" && handleSearch()}
                                 placeholder="Search books by title, author, or topic..."
-                                className="w-full px-4 py-3 pl-12 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                className="input-soft pl-12"
                             />
                             <svg className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -95,7 +95,7 @@ export default function BooksLibraryPage() {
                         </div>
                         <button
                             onClick={handleSearch}
-                            className="px-6 py-3 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700 transition-colors"
+                            className="btn-soft-primary"
                         >
                             Search
                         </button>
@@ -104,9 +104,9 @@ export default function BooksLibraryPage() {
 
                 {/* Featured Book */}
                 {featuredBooks.length > 0 && (
-                    <div className="card bg-gradient-to-r from-orange-600 to-amber-600 text-white mb-8">
+                    <div className="card-accent-soft mb-8">
                         <div className="flex items-center gap-2 mb-4">
-                            <span className="text-sm font-semibold uppercase tracking-wide">Featured</span>
+                            <span className="eyebrow-soft mb-0">Featured</span>
                             <h2 className="text-2xl font-bold">Featured Book</h2>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -125,18 +125,18 @@ export default function BooksLibraryPage() {
                             </div>
                             <div className="md:col-span-2 flex flex-col justify-center">
                                 <h3 className="text-3xl font-bold mb-2">{featuredBooks[0].title}</h3>
-                                <p className="text-orange-100 text-lg mb-4">by {featuredBooks[0].author}</p>
-                                <p className="text-white/90 mb-6 line-clamp-3">{featuredBooks[0].description}</p>
+                                <p className="text-gold-dark text-lg mb-4">by {featuredBooks[0].author}</p>
+                                <p className="text-slate-700 mb-6 line-clamp-3">{featuredBooks[0].description}</p>
                                 <div className="flex flex-col sm:flex-row gap-3">
                                     <Link
                                         href={`/hub/books/${featuredBooks[0].id}`}
-                                        className="px-6 py-3 bg-white text-orange-600 rounded-lg font-semibold hover:bg-orange-50 transition-colors"
+                                        className="btn-soft-primary"
                                     >
                                         View Details
                                     </Link>
                                     <Link
                                         href={`/hub/books/${featuredBooks[0].id}/read`}
-                                        className="px-6 py-3 bg-white/20 backdrop-blur-sm text-white rounded-lg font-semibold hover:bg-white/30 transition-colors"
+                                        className="btn-soft-secondary"
                                     >
                                         Start Reading
                                     </Link>
@@ -159,7 +159,7 @@ export default function BooksLibraryPage() {
                                 <div className="text-4xl mb-2 group-hover:scale-110 transition-transform">
                                     {getCategoryIcon(category)}
                                 </div>
-                                <p className="text-sm font-semibold text-slate-700 group-hover:text-orange-600 transition-colors">
+                                <p className="text-sm font-semibold text-slate-700 group-hover:text-gold-dark transition-colors">
                                     {category}
                                 </p>
                             </Link>
@@ -172,7 +172,7 @@ export default function BooksLibraryPage() {
                     <div className="mb-8">
                         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-4">
                             <h2 className="text-2xl font-bold text-slate-800">Popular Books</h2>
-                            <Link href="/hub/books/browse?sort=popular" className="text-orange-600 hover:text-orange-700 font-semibold text-sm">
+                            <Link href="/hub/books/browse?sort=popular" className="text-gold-dark hover:text-gold font-semibold text-sm">
                                 View All
                             </Link>
                         </div>
@@ -197,7 +197,7 @@ export default function BooksLibraryPage() {
                         </div>
                     ) : (
                         <div className="card text-center py-12">
-                            <div className="text-5xl font-bold text-orange-600 mb-4">Books</div>
+                            <div className="text-5xl font-bold text-gold-dark mb-4">Books</div>
                             <p className="text-slate-600 text-lg">No books found</p>
                             <p className="text-slate-500 text-sm mt-2">Try a different search term</p>
                         </div>

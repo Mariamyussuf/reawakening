@@ -108,7 +108,7 @@ export default function CommunityPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50 to-amber-50">
+        <div className="page-shell">
             <header className="bg-white/90 backdrop-blur-md shadow-sm border-b border-slate-200">
                 <div className="container-custom py-4">
                     <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -132,17 +132,17 @@ export default function CommunityPage() {
                 )}
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div className="card bg-gradient-to-br from-orange-500 to-amber-500 text-white">
-                        <p className="text-orange-100 text-sm mb-1">Active Members</p>
-                        <p className="text-3xl font-bold">{stats.activeMembers}</p>
+                    <div className="stat-card-soft">
+                        <p className="eyebrow-soft mb-2">Active Members</p>
+                        <p className="text-3xl font-bold text-deep">{stats.activeMembers}</p>
                     </div>
-                    <div className="card bg-gradient-to-br from-orange-500 to-amber-500 text-white">
-                        <p className="text-orange-100 text-sm mb-1">Community Prayers</p>
-                        <p className="text-3xl font-bold">{stats.prayerRequests}</p>
+                    <div className="stat-card-soft">
+                        <p className="eyebrow-soft mb-2">Community Prayers</p>
+                        <p className="text-3xl font-bold text-deep">{stats.prayerRequests}</p>
                     </div>
-                    <div className="card bg-gradient-to-br from-orange-500 to-amber-500 text-white">
-                        <p className="text-orange-100 text-sm mb-1">Community Paths</p>
-                        <p className="text-3xl font-bold">{stats.nextSteps}</p>
+                    <div className="stat-card-soft">
+                        <p className="eyebrow-soft mb-2">Community Paths</p>
+                        <p className="text-3xl font-bold text-deep">{stats.nextSteps}</p>
                     </div>
                 </div>
 
@@ -156,7 +156,7 @@ export default function CommunityPage() {
                                 </div>
                                 <Link
                                     href="/hub/prayer"
-                                    className="px-4 py-2 bg-orange-600 text-white rounded-lg text-sm font-medium hover:bg-orange-700 transition-colors"
+                                    className="btn-soft-primary"
                                 >
                                     Add Request
                                 </Link>
@@ -171,9 +171,9 @@ export default function CommunityPage() {
                             ) : (
                                 <div className="space-y-4">
                                     {communityPrayers.slice(0, 6).map((prayer) => (
-                                        <div key={prayer.id} className="p-4 bg-gradient-to-r from-slate-50 to-orange-50 rounded-lg border border-slate-200">
+                                        <div key={prayer.id} className="card-accent-soft p-4">
                                             <div className="flex items-start gap-3">
-                                                <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-amber-500 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
+                                                <div className="w-10 h-10 rounded-full flex items-center justify-center text-deep font-bold flex-shrink-0 bg-gold/20 border border-gold/25">
                                                     {prayer.avatar}
                                                 </div>
                                                 <div className="flex-1">
@@ -188,8 +188,8 @@ export default function CommunityPage() {
                                                             onClick={() => handlePray(prayer.id)}
                                                             className={`text-sm font-medium ${
                                                                 prayer.hasPrayed
-                                                                    ? "text-orange-700 hover:text-orange-800"
-                                                                    : "text-orange-600 hover:text-orange-700"
+                                                                    ? "text-deep hover:text-deep/80"
+                                                                    : "text-gold-dark hover:text-gold"
                                                             }`}
                                                         >
                                                             {prayer.hasPrayed ? "Praying" : "Pray for This"} ({prayer.prayerCount})
@@ -219,14 +219,14 @@ export default function CommunityPage() {
                                     <Link
                                         key={action.href}
                                         href={action.href}
-                                        className="rounded-xl border border-slate-200 bg-white p-5 hover:shadow-md hover:border-orange-300 transition-all"
+                                        className="card-soft p-5 hover:shadow-md hover:border-gold/35 transition-all"
                                     >
-                                        <p className="text-xs font-semibold uppercase tracking-widest text-orange-600 mb-3">
+                                        <p className="eyebrow-soft mb-3">
                                             Community Step
                                         </p>
                                         <h3 className="text-xl font-bold text-slate-800 mb-2">{action.title}</h3>
                                         <p className="text-sm text-slate-600 mb-4">{action.summary}</p>
-                                        <span className="text-sm font-semibold text-orange-600">{action.label}</span>
+                                        <span className="text-sm font-semibold text-gold-dark">{action.label}</span>
                                     </Link>
                                 ))}
                             </div>
@@ -240,7 +240,7 @@ export default function CommunityPage() {
                                 {communityMembers.filter((member) => member.online).map((member) => (
                                     <div key={member.id} className="flex items-center gap-3">
                                         <div className="relative">
-                                            <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-amber-500 rounded-full flex items-center justify-center text-white font-bold">
+                                            <div className="w-10 h-10 rounded-full flex items-center justify-center text-deep font-bold bg-gold/20 border border-gold/25">
                                                 {member.avatar}
                                             </div>
                                             <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full" />
@@ -249,13 +249,13 @@ export default function CommunityPage() {
                                             <p className="text-sm font-semibold text-slate-800 truncate">{member.name}</p>
                                             <p className="text-xs text-slate-500">{member.role}</p>
                                         </div>
-                                        <div className="text-xs text-orange-600 font-medium">{member.streak} day streak</div>
+                                        <div className="text-xs text-gold-dark font-medium">{member.streak} day streak</div>
                                     </div>
                                 ))}
                             </div>
                         </section>
 
-                        <section className="card bg-gradient-to-br from-orange-50 to-amber-50">
+                        <section className="card-accent-soft">
                             <h3 className="text-lg font-bold text-slate-800 mb-4">Next Best Step</h3>
                             <p className="text-sm text-slate-600 mb-4">
                                 If you are just getting started, begin in the prayer center and then join a smaller circle for consistent community.

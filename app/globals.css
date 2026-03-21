@@ -8,6 +8,8 @@
   /* Sage & Stone Palette */
   --gold: #D4923A;
   --gold-light: #ECC07A;
+  --gold-mist: #F2E3C8;
+  --gold-wash: #FBF5EA;
   --deep: #1A2E1A;
   --deep2: #223322;
   --mid: #4A6741;
@@ -63,6 +65,13 @@
     @apply max-w-6xl mx-auto px-4 sm:px-6 lg:px-8;
   }
 
+  .page-shell {
+    min-height: 100vh;
+    background:
+      radial-gradient(circle at top, rgba(212, 146, 58, 0.08), transparent 34%),
+      linear-gradient(180deg, #fdfbf7 0%, #f6f1e8 52%, #fbf8f2 100%);
+  }
+
   /* Buttons */
   .btn {
     @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-medium rounded transition-all duration-300 cursor-pointer tracking-wide;
@@ -82,6 +91,32 @@
     @apply btn text-mid hover:text-deep hover:bg-cream/50;
   }
 
+  .btn-soft-primary {
+    @apply inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-sm font-semibold transition-colors;
+    background-color: var(--deep);
+    color: var(--warm-white);
+  }
+
+  .btn-soft-primary:hover {
+    background-color: var(--deep2);
+  }
+
+  .btn-soft-primary:disabled {
+    @apply opacity-50 cursor-not-allowed;
+  }
+
+  .btn-soft-secondary {
+    @apply inline-flex items-center justify-center rounded-lg border px-5 py-2.5 text-sm font-semibold transition-colors;
+    background-color: rgba(251, 248, 242, 0.96);
+    border-color: rgba(212, 146, 58, 0.22);
+    color: var(--deep);
+  }
+
+  .btn-soft-secondary:hover {
+    background-color: var(--gold-wash);
+    border-color: rgba(212, 146, 58, 0.32);
+  }
+
   /* Cards */
   .card {
     @apply bg-warm-white rounded-lg border border-mid/20 p-4 sm:p-6;
@@ -92,9 +127,34 @@
     @apply card transition-all duration-300 hover:shadow-lift hover:-translate-y-1;
   }
 
+  .card-soft {
+    @apply rounded-xl border p-4 sm:p-6;
+    background: rgba(251, 248, 242, 0.94);
+    border-color: rgba(74, 103, 65, 0.16);
+    box-shadow: 0 8px 30px rgba(26, 46, 26, 0.04);
+  }
+
+  .card-accent-soft {
+    @apply rounded-xl border p-4 sm:p-6;
+    background: linear-gradient(135deg, rgba(242, 227, 200, 0.55), rgba(251, 248, 242, 0.96));
+    border-color: rgba(212, 146, 58, 0.2);
+    box-shadow: 0 8px 30px rgba(26, 46, 26, 0.05);
+  }
+
+  .stat-card-soft {
+    @apply rounded-xl border p-4 sm:p-5;
+    background: linear-gradient(180deg, rgba(251, 248, 242, 0.98), rgba(245, 240, 232, 0.92));
+    border-color: rgba(212, 146, 58, 0.18);
+    box-shadow: 0 8px 24px rgba(26, 46, 26, 0.04);
+  }
+
   /* Section eyebrow */
   .eyebrow {
     @apply text-xs font-medium tracking-[0.15em] uppercase text-gold mb-3;
+  }
+
+  .eyebrow-soft {
+    @apply text-xs font-semibold uppercase tracking-[0.18em] text-gold;
   }
 
   /* Section heading */
@@ -148,6 +208,22 @@
 
   .input::placeholder {
     @apply text-mid/60;
+  }
+
+  .input-soft {
+    @apply w-full rounded-lg border px-4 py-3 text-sm text-deep outline-none transition-colors;
+    background-color: rgba(251, 248, 242, 0.96);
+    border-color: rgba(74, 103, 65, 0.22);
+  }
+
+  .input-soft:focus {
+    @apply ring-2;
+    border-color: rgba(212, 146, 58, 0.48);
+    box-shadow: 0 0 0 4px rgba(212, 146, 58, 0.12);
+  }
+
+  .input-soft::placeholder {
+    color: rgba(74, 103, 65, 0.66);
   }
 
   /* Dividers */

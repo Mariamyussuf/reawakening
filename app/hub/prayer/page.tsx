@@ -218,7 +218,7 @@ export default function PrayerPage() {
     ];
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50 to-amber-50">
+        <div className="page-shell">
             {/* Header */}
             <header className="bg-white/90 backdrop-blur-md shadow-sm border-b border-slate-200">
                 <div className="container-custom py-4">
@@ -287,7 +287,7 @@ export default function PrayerPage() {
                                         value={newTitle}
                                         onChange={(e) => setNewTitle(e.target.value)}
                                         placeholder="Brief title for your prayer request..."
-                                        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent mb-4"
+                                        className="input-soft mb-4"
                                         maxLength={100}
                                     />
                                 </div>
@@ -300,7 +300,7 @@ export default function PrayerPage() {
                                         value={newRequest}
                                         onChange={(e) => setNewRequest(e.target.value)}
                                         placeholder="Share your prayer request with the community..."
-                                        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                        className="input-soft"
                                         maxLength={1000}
                                     />
                                     <p className="text-xs text-slate-500 mt-1">{newRequest.length}/1000 characters</p>
@@ -309,7 +309,7 @@ export default function PrayerPage() {
                                     <button
                                         type="submit"
                                         disabled={submitting}
-                                        className="px-6 py-2 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="btn-soft-primary"
                                     >
                                         {submitting ? "Submitting..." : "Submit Prayer Request"}
                                     </button>
@@ -333,7 +333,7 @@ export default function PrayerPage() {
                                     <button
                                         onClick={() => setActiveTab("my-prayers")}
                                         className={`px-4 py-3 font-medium transition-all duration-200 border-b-2 ${activeTab === "my-prayers"
-                                            ? "border-orange-600 text-orange-600"
+                                            ? "border-gold text-gold-dark"
                                             : "border-transparent text-slate-600 hover:text-slate-800"
                                             }`}
                                     >
@@ -342,7 +342,7 @@ export default function PrayerPage() {
                                     <button
                                         onClick={() => setActiveTab("praying-for")}
                                         className={`px-4 py-3 font-medium transition-all duration-200 border-b-2 ${activeTab === "praying-for"
-                                            ? "border-orange-600 text-orange-600"
+                                            ? "border-gold text-gold-dark"
                                             : "border-transparent text-slate-600 hover:text-slate-800"
                                             }`}
                                     >
@@ -365,7 +365,7 @@ export default function PrayerPage() {
                                             <div
                                                 key={prayer.id}
                                                 className={`p-4 rounded-lg border-2 transition-all duration-300 ${prayer.isAnswered
-                                                    ? "bg-gradient-to-r from-amber-50 to-orange-50 border-amber-200"
+                                                    ? "bg-gradient-to-r from-cream to-gold/10 border-gold/30"
                                                     : "bg-white border-slate-200 hover:shadow-md"
                                                     }`}
                                             >
@@ -374,7 +374,7 @@ export default function PrayerPage() {
                                                         <div className="flex items-center gap-2 mb-2">
                                                             <h3 className="font-bold text-slate-800">{prayer.title}</h3>
                                                             {prayer.isAnswered && (
-                                                                <span className="px-2 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-medium">
+                                                                <span className="px-2 py-1 bg-gold/15 text-gold-dark rounded-full text-xs font-medium">
                                                                     Answered
                                                                 </span>
                                                             )}
@@ -403,7 +403,7 @@ export default function PrayerPage() {
                                                     <div className="flex gap-2">
                                                         <button
                                                             onClick={() => handleMarkAnswered(prayer.id)}
-                                                            className="px-4 py-2 bg-orange-600 text-white rounded-lg text-sm font-medium hover:bg-orange-700 transition-colors"
+                                                            className="btn-soft-primary px-4 py-2 text-sm"
                                                         >
                                                             Mark as Answered
                                                         </button>
@@ -428,7 +428,7 @@ export default function PrayerPage() {
                                         prayingFor.map((prayer) => (
                                             <div key={prayer.id} className="p-4 bg-white border border-slate-200 rounded-lg hover:shadow-md transition-all duration-300">
                                                 <div className="flex items-start gap-3 mb-3">
-                                                    <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
+                                                    <div className="w-10 h-10 rounded-full flex items-center justify-center text-deep font-bold flex-shrink-0 bg-gold/20 border border-gold/25">
                                                         {prayer.avatar}
                                                     </div>
                                                     <div className="flex-1">
@@ -442,8 +442,8 @@ export default function PrayerPage() {
                                                             <button
                                                                 onClick={() => handlePray(prayer.id)}
                                                                 className={`flex items-center gap-2 text-sm font-medium transition-colors ${prayer.hasPrayed
-                                                                    ? "text-orange-600 hover:text-orange-700"
-                                                                    : "text-slate-600 hover:text-orange-600"
+                                                                    ? "text-gold-dark hover:text-gold"
+                                                                    : "text-slate-600 hover:text-gold-dark"
                                                                     }`}
                                                             >
                                                                 <svg
@@ -475,7 +475,7 @@ export default function PrayerPage() {
                             <div className="space-y-3">
                                 {prayerPrompts.map((prompt, index) => (
                                     <div key={index} className="p-4 bg-slate-50 rounded-lg border border-slate-200">
-                                        <p className="text-xs font-semibold text-orange-600 mb-2">{prompt.category}</p>
+                                        <p className="text-xs font-semibold text-gold-dark mb-2">{prompt.category}</p>
                                         <p className="text-sm text-slate-700 italic leading-relaxed">&quot;{prompt.prompt}&quot;</p>
                                     </div>
                                 ))}
