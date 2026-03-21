@@ -263,28 +263,34 @@ export default function ChapterPage() {
 
     const previousTarget = parseChapterTarget(chapter?.previous?.id);
     const nextTarget = parseChapterTarget(chapter?.next?.id);
+    const previousLabel =
+        previousTarget &&
+        (chapter?.previous?.reference || `${book?.name || previousTarget.bookId} ${previousTarget.chapter}`);
+    const nextLabel =
+        nextTarget &&
+        (chapter?.next?.reference || `${book?.name || nextTarget.bookId} ${nextTarget.chapter}`);
 
     return (
         <div className="min-h-screen bg-cream-50 text-navy-950">
             <div className="sticky top-0 z-10 border-b bg-white/95 backdrop-blur-sm border-gray-200">
                 <div className="max-w-4xl mx-auto px-4 py-4">
-                    <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center justify-between gap-3 mb-4">
                         <Link
                             href={`/hub/bible?version=${version}`}
-                            className="text-orange-600 hover:text-orange-700 font-medium"
+                            className="text-gold-dark hover:text-gold font-medium"
                         >
                             {'<-'} Back to Books
                         </Link>
                         <div className="flex gap-2">
                             <button
                                 onClick={() => setFontSize(Math.max(12, fontSize - 2))}
-                                className="px-3 py-1 rounded bg-gray-100 hover:bg-gray-200"
+                                className="px-3 py-2 rounded-lg bg-white border border-gray-200 hover:bg-gray-50 text-sm font-medium"
                             >
                                 A-
                             </button>
                             <button
                                 onClick={() => setFontSize(Math.min(24, fontSize + 2))}
-                                className="px-3 py-1 rounded bg-gray-100 hover:bg-gray-200"
+                                className="px-3 py-2 rounded-lg bg-white border border-gray-200 hover:bg-gray-50 text-sm font-medium"
                             >
                                 A+
                             </button>
@@ -292,50 +298,64 @@ export default function ChapterPage() {
                     </div>
 
                     {book && (
-                        <div className="flex items-center justify-between">
-                            <button
-                                onClick={() => navigateToTarget(previousTarget)}
-                                disabled={!previousTarget}
-                                className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                                    !previousTarget
-                                        ? 'opacity-50 cursor-not-allowed'
-                                        : 'bg-gradient-to-r from-orange-600 to-amber-600 text-white hover:scale-105'
-                                }`}
-                            >
-                                {'<-'} Previous
-                            </button>
-
-                            <div className="text-center">
+                        <div className="space-y-4">
+                            <div className="rounded-2xl border border-gold/20 bg-gradient-to-br from-warm-white to-cream px-4 py-4 text-center shadow-sm">
                                 <h1
                                     className="text-2xl font-bold"
                                     style={{ fontFamily: 'Merriweather, serif' }}
                                 >
                                     {book.name} {chapterNum}
                                 </h1>
-                                <p className="text-sm text-gray-600">
-                                    {version} Translation
+                                <p className="text-sm text-gray-600 mt-1">
+                                    Chapter {chapterNum} • {version} Translation
                                 </p>
                             </div>
 
-                            <button
-                                onClick={() => navigateToTarget(nextTarget)}
-                                disabled={!nextTarget}
-                                className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                                    !nextTarget
-                                        ? 'opacity-50 cursor-not-allowed'
-                                        : 'bg-gradient-to-r from-orange-600 to-amber-600 text-white hover:scale-105'
-                                }`}
-                            >
-                                Next {'->'}
-                            </button>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <button
+                                    onClick={() => navigateToTarget(previousTarget)}
+                                    disabled={!previousTarget}
+                                    className={`rounded-xl border px-4 py-3 text-left transition-colors ${
+                                        !previousTarget
+                                            ? 'cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400'
+                                            : 'border-gold/20 bg-white hover:bg-cream text-deep'
+                                    }`}
+                                >
+                                    <div className="text-xs font-semibold uppercase tracking-[0.18em] text-gold-dark/80">
+                                        Previous Chapter
+                                    </div>
+                                    <div className="mt-1 text-sm font-medium">
+                                        {previousLabel || 'No earlier chapter'}
+                                    </div>
+                                </button>
+
+                                <button
+                                    onClick={() => navigateToTarget(nextTarget)}
+                                    disabled={!nextTarget}
+                                    className={`rounded-xl border px-4 py-3 text-left transition-colors ${
+                                        !nextTarget
+                                            ? 'cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400'
+                                            : 'border-gold/20 bg-white hover:bg-cream text-deep'
+                                    }`}
+                                >
+                                    <div className="text-xs font-semibold uppercase tracking-[0.18em] text-gold-dark/80">
+                                        Next Chapter
+                                    </div>
+                                    <div className="mt-1 text-sm font-medium">
+                                        {nextLabel || 'No later chapter'}
+                                    </div>
+                                </button>
+                            </div>
                         </div>
                     )}
 
                     <div className="flex flex-wrap gap-4 mt-4 pt-4 border-t border-gray-200">
                         <button
                             onClick={() => setShowVerseNumbers(!showVerseNumbers)}
-                            className={`px-4 py-1 rounded ${
-                                showVerseNumbers ? 'bg-orange-600 text-white' : 'bg-gray-100'
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                                showVerseNumbers
+                                    ? 'bg-deep text-warm-white'
+                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                             }`}
                         >
                             {showVerseNumbers ? 'Hide' : 'Show'} Verse Numbers
@@ -422,19 +442,19 @@ export default function ChapterPage() {
                         <button
                             onClick={handleChapterBookmark}
                             disabled={bookmarking === `${chapterNum}:chapter`}
-                            className="px-6 py-3 bg-gradient-to-r from-orange-600 to-amber-600 text-white rounded-lg hover:scale-105 transition-transform shadow-lg disabled:opacity-60 disabled:cursor-not-allowed"
+                            className="px-6 py-3 bg-deep text-warm-white rounded-lg hover:bg-deep-2 transition-colors shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
                         >
                             Bookmark Chapter
                         </button>
                         <button
                             onClick={() => setTemporaryMessage('Chapter notes are coming soon.')}
-                            className="px-6 py-3 bg-gradient-to-r from-orange-600 to-amber-600 text-white rounded-lg hover:scale-105 transition-transform shadow-lg"
+                            className="px-6 py-3 bg-deep text-warm-white rounded-lg hover:bg-deep-2 transition-colors shadow-sm"
                         >
                             Add Note Soon
                         </button>
                         <button
                             onClick={handleShare}
-                            className="px-6 py-3 bg-gradient-to-r from-orange-600 to-amber-600 text-white rounded-lg hover:scale-105 transition-transform shadow-lg"
+                            className="px-6 py-3 bg-deep text-warm-white rounded-lg hover:bg-deep-2 transition-colors shadow-sm"
                         >
                             Share
                         </button>
@@ -443,27 +463,27 @@ export default function ChapterPage() {
 
                 {book && (
                     <div className="mt-12 pt-8 border-t border-gray-200">
-                        <div className="flex justify-between items-center gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <button
                                 onClick={() => navigateToTarget(previousTarget)}
                                 disabled={!previousTarget}
-                                className={`px-6 py-3 rounded-lg font-medium transition-all ${
+                                className={`rounded-xl border px-4 py-3 text-left transition-colors ${
                                     !previousTarget
-                                        ? 'opacity-50 cursor-not-allowed'
-                                        : 'bg-gradient-to-r from-orange-600 to-amber-600 text-white hover:scale-105'
+                                        ? 'cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400'
+                                        : 'border-gold/20 bg-white hover:bg-cream text-deep'
                                 }`}
                             >
-                                {previousTarget
-                                    ? `<- ${
-                                          chapter?.previous?.reference ||
-                                          `${book.name} ${previousTarget.chapter}`
-                                      }`
-                                    : '<- Previous'}
+                                <div className="text-xs font-semibold uppercase tracking-[0.18em] text-gold-dark/80">
+                                    Previous Chapter
+                                </div>
+                                <div className="mt-1 text-sm font-medium">
+                                    {previousLabel || 'No earlier chapter'}
+                                </div>
                             </button>
 
                             <Link
                                 href={`/hub/bible?version=${version}`}
-                                className="px-6 py-3 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-all"
+                                className="rounded-xl border border-gray-200 bg-white px-4 py-3 text-center font-medium text-gray-700 hover:bg-gray-50 transition-colors"
                             >
                                 All Books
                             </Link>
@@ -471,18 +491,18 @@ export default function ChapterPage() {
                             <button
                                 onClick={() => navigateToTarget(nextTarget)}
                                 disabled={!nextTarget}
-                                className={`px-6 py-3 rounded-lg font-medium transition-all ${
+                                className={`rounded-xl border px-4 py-3 text-left transition-colors ${
                                     !nextTarget
-                                        ? 'opacity-50 cursor-not-allowed'
-                                        : 'bg-gradient-to-r from-orange-600 to-amber-600 text-white hover:scale-105'
+                                        ? 'cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400'
+                                        : 'border-gold/20 bg-white hover:bg-cream text-deep'
                                 }`}
                             >
-                                {nextTarget
-                                    ? `${
-                                          chapter?.next?.reference ||
-                                          `${book.name} ${nextTarget.chapter}`
-                                      } ->`
-                                    : 'Next ->'}
+                                <div className="text-xs font-semibold uppercase tracking-[0.18em] text-gold-dark/80">
+                                    Next Chapter
+                                </div>
+                                <div className="mt-1 text-sm font-medium">
+                                    {nextLabel || 'No later chapter'}
+                                </div>
                             </button>
                         </div>
                     </div>
