@@ -1,13 +1,37 @@
 import { Book, BookCategory } from "@/models/Book";
 
 export class BookService {
+    private extractBooks(payload: any): any[] {
+        if (Array.isArray(payload?.books)) {
+            return payload.books;
+        }
+
+        if (Array.isArray(payload?.data?.books)) {
+            return payload.data.books;
+        }
+
+        return [];
+    }
+
+    private extractBook(payload: any): any | null {
+        if (payload?.book) {
+            return payload.book;
+        }
+
+        if (payload?.data?.book) {
+            return payload.data.book;
+        }
+
+        return null;
+    }
+
     // Get all books
     async getAllBooks(): Promise<Book[]> {
         try {
             const response = await fetch('/api/books');
             if (!response.ok) throw new Error('Failed to fetch books');
             const data = await response.json();
-            return data.books.map(this.formatBook);
+            return this.extractBooks(data).map(this.formatBook);
         } catch (error) {
             console.error('Error fetching books:', error);
             return [];
@@ -23,7 +47,8 @@ export class BookService {
                 throw new Error('Failed to fetch book');
             }
             const data = await response.json();
-            return this.formatBook(data.book);
+            const book = this.extractBook(data);
+            return book ? this.formatBook(book) : null;
         } catch (error) {
             console.error('Error fetching book:', error);
             return null;
@@ -36,7 +61,7 @@ export class BookService {
             const response = await fetch(`/api/books?category=${encodeURIComponent(category)}`);
             if (!response.ok) throw new Error('Failed to fetch books by category');
             const data = await response.json();
-            return data.books.map(this.formatBook);
+            return this.extractBooks(data).map(this.formatBook);
         } catch (error) {
             console.error('Error fetching books by category:', error);
             return [];
@@ -49,7 +74,7 @@ export class BookService {
             const response = await fetch('/api/books?featured=true&limit=10');
             if (!response.ok) throw new Error('Failed to fetch featured books');
             const data = await response.json();
-            return data.books.map(this.formatBook);
+            return this.extractBooks(data).map(this.formatBook);
         } catch (error) {
             console.error('Error fetching featured books:', error);
             return [];
@@ -62,7 +87,7 @@ export class BookService {
             const response = await fetch('/api/books?popular=true&sortBy=views&sortOrder=desc&limit=10');
             if (!response.ok) throw new Error('Failed to fetch popular books');
             const data = await response.json();
-            return data.books.map(this.formatBook);
+            return this.extractBooks(data).map(this.formatBook);
         } catch (error) {
             console.error('Error fetching popular books:', error);
             return [];
@@ -75,7 +100,7 @@ export class BookService {
             const response = await fetch('/api/books?newRelease=true&sortBy=createdAt&sortOrder=desc&limit=10');
             if (!response.ok) throw new Error('Failed to fetch new releases');
             const data = await response.json();
-            return data.books.map(this.formatBook);
+            return this.extractBooks(data).map(this.formatBook);
         } catch (error) {
             console.error('Error fetching new releases:', error);
             return [];
@@ -88,7 +113,7 @@ export class BookService {
             const response = await fetch(`/api/books/search?q=${encodeURIComponent(query)}`);
             if (!response.ok) throw new Error('Failed to search books');
             const data = await response.json();
-            return data.books.map(this.formatBook);
+            return this.extractBooks(data).map(this.formatBook);
         } catch (error) {
             console.error('Error searching books:', error);
             return [];
