@@ -51,10 +51,6 @@ const envSchema = z.object({
     ),
     NEXTAUTH_URL: optionalUrlString('NEXTAUTH_URL'),
 
-    // Optional: Upstash Redis (for rate limiting)
-    UPSTASH_REDIS_REST_URL: optionalUrlString('UPSTASH_REDIS_REST_URL'),
-    UPSTASH_REDIS_REST_TOKEN: optionalEnvString(),
-
     // Optional: Bible API
     BIBLE_API_KEY: optionalEnvString(),
 
@@ -88,8 +84,6 @@ export function getEnv(): Env {
             DATABASE_URL: process.env.DATABASE_URL,
             NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
             NEXTAUTH_URL: process.env.NEXTAUTH_URL,
-            UPSTASH_REDIS_REST_URL: process.env.UPSTASH_REDIS_REST_URL,
-            UPSTASH_REDIS_REST_TOKEN: process.env.UPSTASH_REDIS_REST_TOKEN,
             BIBLE_API_KEY: process.env.BIBLE_API_KEY,
             NEXT_PUBLIC_TEST_MODE: process.env.NEXT_PUBLIC_TEST_MODE,
             NODE_ENV: process.env.NODE_ENV || 'development',
@@ -126,12 +120,6 @@ export const env = {
     },
     get NEXTAUTH_URL() {
         return getEnv().NEXTAUTH_URL;
-    },
-    get UPSTASH_REDIS_REST_URL() {
-        return getEnv().UPSTASH_REDIS_REST_URL;
-    },
-    get UPSTASH_REDIS_REST_TOKEN() {
-        return getEnv().UPSTASH_REDIS_REST_TOKEN;
     },
     get BIBLE_API_KEY() {
         return getEnv().BIBLE_API_KEY;
