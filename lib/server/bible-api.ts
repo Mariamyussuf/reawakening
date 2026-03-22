@@ -53,25 +53,83 @@ async function fetchBibleAPI(endpoint: string, version: BibleVersion = 'KJV') {
     return response.json();
 }
 
+const VERSE_MARKER_REGEX =
+    /<(?:span|sup)\b[^>]*class="[^"]*\bv\b[^"]*"[^>]*>(\d+)<\/(?:span|sup)>/gi;
+const FOOTNOTE_REGEXES = [
+    /<sup\b[^>]*class="[^"]*\b(?:f|x)\b[^"]*"[^>]*>[\s\S]*?<\/sup>/gi,
+    /<span\b[^>]*class="[^"]*\b(?:f|x|fr|fq|ft|fv|xo|xt)\b[^"]*"[^>]*>[\s\S]*?<\/span>/gi,
+    /<div\b[^>]*class="[^"]*\b(?:footnotes?|crossrefs?)\b[^"]*"[^>]*>[\s\S]*?<\/div>/gi,
+];
+const HTML_ENTITY_MAP: Record<string, string> = {
+    amp: '&',
+    apos: "'",
+    nbsp: ' ',
+    quot: '"',
+    lt: '<',
+    gt: '>',
+    ldquo: '"',
+    rdquo: '"',
+    lsquo: "'",
+    rsquo: "'",
+    mdash: '-',
+    ndash: '-',
+    hellip: '...',
+};
+
+function decodeHtmlEntities(text: string): string {
+    return text
+        .replace(/&#(\d+);/g, (_, codePoint: string) =>
+            String.fromCodePoint(Number.parseInt(codePoint, 10))
+        )
+        .replace(/&#x([0-9a-f]+);/gi, (_, hexCodePoint: string) =>
+            String.fromCodePoint(Number.parseInt(hexCodePoint, 16))
+        )
+        .replace(/&([a-z]+);/gi, (entity, name: string) => HTML_ENTITY_MAP[name.toLowerCase()] ?? entity);
+}
+
+function removeIgnoredHtml(html: string): string {
+    return FOOTNOTE_REGEXES.reduce(
+        (content, regex) => content.replace(regex, ' '),
+        html
+    );
+}
+
+function stripHTML(html: string): string {
+    return decodeHtmlEntities(
+        removeIgnoredHtml(html)
+            .replace(/<br\s*\/?>/gi, ' ')
+            .replace(/<\/p>/gi, ' ')
+            .replace(/<[^>]*>/g, ' ')
+            .replace(/\s+/g, ' ')
+    ).trim();
+}
+
 function parseVerses(htmlContent: string): Verse[] {
     const verses: Verse[] = [];
-    const verseRegex = /<span[^>]*class="v"[^>]*>(\d+)<\/span>([^<]*)/g;
-    let match: RegExpExecArray | null;
+    const verseMatches = Array.from(htmlContent.matchAll(VERSE_MARKER_REGEX));
 
-    while ((match = verseRegex.exec(htmlContent)) !== null) {
+    for (let index = 0; index < verseMatches.length; index += 1) {
+        const match = verseMatches[index];
+        const nextMatch = verseMatches[index + 1];
+        const verseNumber = Number.parseInt(match[1], 10);
+        const verseStart = (match.index ?? 0) + match[0].length;
+        const verseEnd = nextMatch?.index ?? htmlContent.length;
+        const verseHtml = htmlContent.slice(verseStart, verseEnd);
+        const text = stripHTML(verseHtml);
+
+        if (!text || Number.isNaN(verseNumber)) {
+            continue;
+        }
+
         verses.push({
-            id: `verse-${match[1]}`,
-            reference: `Verse ${match[1]}`,
-            text: match[2].trim(),
-            verseNumber: parseInt(match[1], 10),
+            id: `verse-${verseNumber}`,
+            reference: `Verse ${verseNumber}`,
+            text,
+            verseNumber,
         });
     }
 
     return verses;
-}
-
-function stripHTML(html: string): string {
-    return html.replace(/<[^>]*>/g, '').trim();
 }
 
 export async function getBibleBooks(version: BibleVersion = 'KJV'): Promise<Book[]> {
