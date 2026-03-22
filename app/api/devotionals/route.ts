@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { rateLimiters } from '@/lib/middleware/ratelimit';
 import { ApiResponse } from '@/lib/api/response';
+import { isMissingDevotionalsTableError, serializeDevotional } from '@/lib/devotionals';
 import { log } from '@/lib/logger';
 import prisma from '@/lib/prisma';
-import { parseStoredStringArray } from '@/lib/parse-string-array';
 
 export const dynamic = 'force-dynamic';
 
@@ -37,31 +37,35 @@ export async function GET(request: NextRequest) {
             ];
         }
 
-        const devotionals = await prisma.devotional.findMany({
-            where,
-            orderBy: { publishDate: 'desc' },
-            take: limit,
-            skip: skip,
-        });
+        let devotionals;
+        let total;
 
-        const total = await prisma.devotional.count({ where });
+        try {
+            [devotionals, total] = await Promise.all([
+                prisma.devotional.findMany({
+                    where,
+                    orderBy: { publishDate: 'desc' },
+                    take: limit,
+                    skip: skip,
+                }),
+                prisma.devotional.count({ where }),
+            ]);
+        } catch (error) {
+            if (isMissingDevotionalsTableError(error)) {
+                return ApiResponse.success({
+                    devotionals: [],
+                    total: 0,
+                    limit,
+                    skip,
+                    needsDatabaseSetup: true,
+                });
+            }
 
-        // Format response
-        const formattedDevotionals = devotionals.map((devotional) => ({
-            id: devotional.id,
-            title: devotional.title,
-            content: devotional.content,
-            excerpt: devotional.excerpt,
-            author: devotional.author,
-            coverImage: devotional.coverImage,
-            publishDate: devotional.publishDate,
-            tags: parseStoredStringArray(devotional.tags),
-            scripture: devotional.scripture,
-            createdAt: devotional.createdAt,
-        }));
+            throw error;
+        }
 
         return ApiResponse.success({
-            devotionals: formattedDevotionals,
+            devotionals: devotionals.map(serializeDevotional),
             total,
             limit,
             skip,

@@ -2,6 +2,7 @@
 
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
+import Link from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
 import Image from '@tiptap/extension-image';
 import { useState, useEffect } from 'react';
@@ -26,11 +27,12 @@ export default function RichTextEditor({ content, onChange, placeholder = 'Start
                         class: 'border-l-4 border-slate-300 pl-4 italic my-6 text-slate-600',
                     },
                 },
-                link: {
-                    openOnClick: false,
-                    HTMLAttributes: {
-                        class: 'text-blue-600 hover:text-blue-800 underline',
-                    },
+                link: false,
+            }),
+            Link.configure({
+                openOnClick: false,
+                HTMLAttributes: {
+                    class: 'text-blue-600 hover:text-blue-800 underline',
                 },
             }),
             Placeholder.configure({

@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 
 import { ApiResponse } from '@/lib/api/response';
+import { isMissingDevotionalsTableError } from '@/lib/devotionals';
 import { log } from '@/lib/logger';
 import { requireAdminOrLeader } from '@/lib/middleware/auth';
 import { rateLimiters } from '@/lib/middleware/ratelimit';
@@ -30,6 +31,35 @@ async function getConferenceOverview() {
     }
 }
 
+async function getDevotionalOverview() {
+    try {
+        const [totalDevotionals, publishedDevotionals, draftDevotionals, scheduledDevotionals] = await Promise.all([
+            prisma.devotional.count(),
+            prisma.devotional.count({ where: { status: 'PUBLISHED' } }),
+            prisma.devotional.count({ where: { status: 'DRAFT' } }),
+            prisma.devotional.count({ where: { status: 'SCHEDULED' } }),
+        ]);
+
+        return {
+            totalDevotionals,
+            publishedDevotionals,
+            draftDevotionals,
+            scheduledDevotionals,
+        };
+    } catch (error) {
+        if (!isMissingDevotionalsTableError(error)) {
+            throw error;
+        }
+
+        return {
+            totalDevotionals: 0,
+            publishedDevotionals: 0,
+            draftDevotionals: 0,
+            scheduledDevotionals: 0,
+        };
+    }
+}
+
 export async function GET(request: NextRequest) {
     const rateLimitResponse = await rateLimiters.admin(request);
     if (rateLimitResponse) {
@@ -40,6 +70,7 @@ export async function GET(request: NextRequest) {
         const session = await requireAdminOrLeader();
 
         const conferenceOverview = await getConferenceOverview();
+        const devotionalOverview = await getDevotionalOverview();
 
         const [
             totalUsers,
@@ -48,10 +79,6 @@ export async function GET(request: NextRequest) {
             totalMembers,
             totalBooks,
             featuredBooks,
-            totalDevotionals,
-            publishedDevotionals,
-            draftDevotionals,
-            scheduledDevotionals,
             totalPrayers,
             answeredPrayers,
             activePrayers,
@@ -62,10 +89,6 @@ export async function GET(request: NextRequest) {
             prisma.user.count({ where: { role: 'MEMBER' } }),
             prisma.book.count(),
             prisma.book.count({ where: { featured: true } }),
-            prisma.devotional.count(),
-            prisma.devotional.count({ where: { status: 'PUBLISHED' } }),
-            prisma.devotional.count({ where: { status: 'DRAFT' } }),
-            prisma.devotional.count({ where: { status: 'SCHEDULED' } }),
             prisma.prayer.count(),
             prisma.prayer.count({ where: { isAnswered: true } }),
             prisma.prayer.count({ where: { isAnswered: false } }),
@@ -87,10 +110,10 @@ export async function GET(request: NextRequest) {
                 totalConferences: conferenceOverview.totalConferences,
                 publishedConferences: conferenceOverview.publishedConferences,
                 openConferenceRegistrations: conferenceOverview.openConferenceRegistrations,
-                totalDevotionals,
-                publishedDevotionals,
-                draftDevotionals,
-                scheduledDevotionals,
+                totalDevotionals: devotionalOverview.totalDevotionals,
+                publishedDevotionals: devotionalOverview.publishedDevotionals,
+                draftDevotionals: devotionalOverview.draftDevotionals,
+                scheduledDevotionals: devotionalOverview.scheduledDevotionals,
                 totalPrayers,
                 answeredPrayers,
                 activePrayers,

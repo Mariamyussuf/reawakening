@@ -3,13 +3,15 @@ import { requireAdminOrLeader } from '@/lib/middleware/auth';
 import { rateLimiters } from '@/lib/middleware/ratelimit';
 import { validateFile, FileValidationPresets } from '@/lib/validation/file-upload';
 import { ApiResponse } from '@/lib/api/response';
+import { isMissingDevotionalsTableError, serializeDevotional } from '@/lib/devotionals';
 import { log } from '@/lib/logger';
 import prisma from '@/lib/prisma';
-import { parseStoredStringArray } from '@/lib/parse-string-array';
 import { writeFile, mkdir, unlink } from 'fs/promises';
 import { existsSync } from 'fs';
 import path from 'path';
 import { sanitizeRichText, sanitizeText } from '@/lib/sanitize';
+
+export const dynamic = 'force-dynamic';
 
 // GET /api/admin/devotionals/:id - Get single devotional (admin)
 export async function GET(
@@ -33,24 +35,17 @@ export async function GET(
             return ApiResponse.error('Devotional not found', 404);
         }
 
-        const formattedDevotional = {
-            id: devotional.id,
-            title: devotional.title,
-            content: devotional.content,
-            excerpt: devotional.excerpt,
-            author: devotional.author,
-            coverImage: devotional.coverImage,
-            publishDate: devotional.publishDate,
-            scheduledDate: devotional.scheduledDate,
-            status: devotional.status,
-            tags: parseStoredStringArray(devotional.tags),
-            scripture: devotional.scripture,
-            createdAt: devotional.createdAt,
-            updatedAt: devotional.updatedAt,
-        };
+        const formattedDevotional = serializeDevotional(devotional);
 
         return ApiResponse.success({ devotional: formattedDevotional });
     } catch (error: any) {
+        if (isMissingDevotionalsTableError(error)) {
+            return ApiResponse.error(
+                'Devotionals are not available yet because the database schema has not been updated in this environment.',
+                503
+            );
+        }
+
         log.error('Get admin devotional error', error, { endpoint: '/api/admin/devotionals/[id]', devotionalId: params.id });
         return ApiResponse.internalError('An error occurred while fetching devotional');
     }
@@ -170,24 +165,17 @@ export async function PUT(
             data: updates
         });
 
-        const formattedDevotional = {
-            id: devotional.id,
-            title: devotional.title,
-            content: devotional.content,
-            excerpt: devotional.excerpt,
-            author: devotional.author,
-            coverImage: devotional.coverImage,
-            publishDate: devotional.publishDate,
-            scheduledDate: devotional.scheduledDate,
-            status: devotional.status,
-            tags: parseStoredStringArray(devotional.tags),
-            scripture: devotional.scripture,
-            createdAt: devotional.createdAt,
-            updatedAt: devotional.updatedAt,
-        };
+        const formattedDevotional = serializeDevotional(devotional);
 
         return ApiResponse.success({ devotional: formattedDevotional }, 200, 'Devotional updated successfully');
     } catch (error: any) {
+        if (isMissingDevotionalsTableError(error)) {
+            return ApiResponse.error(
+                'Devotionals are not available yet because the database schema has not been updated in this environment.',
+                503
+            );
+        }
+
         log.error('Update devotional error', error, { endpoint: '/api/admin/devotionals/[id]', devotionalId: params.id });
         return ApiResponse.internalError(error.message || 'An error occurred while updating devotional');
     }
@@ -233,6 +221,13 @@ export async function DELETE(
 
         return ApiResponse.success(null, 200, 'Devotional deleted successfully');
     } catch (error: any) {
+        if (isMissingDevotionalsTableError(error)) {
+            return ApiResponse.error(
+                'Devotionals are not available yet because the database schema has not been updated in this environment.',
+                503
+            );
+        }
+
         log.error('Delete devotional error', error, { endpoint: '/api/admin/devotionals/[id]', devotionalId: params.id });
         return ApiResponse.internalError('An error occurred while deleting devotional');
     }

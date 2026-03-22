@@ -21,6 +21,7 @@ export default function AdminDevotionalsPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
+    const [setupRequired, setSetupRequired] = useState(false);
     const [statusFilter, setStatusFilter] = useState<'all' | 'draft' | 'scheduled' | 'published'>('all');
 
     useEffect(() => {
@@ -39,6 +40,10 @@ export default function AdminDevotionalsPage() {
         return [];
     };
 
+    const requiresDatabaseSetup = (payload: any): boolean => {
+        return Boolean(payload?.needsDatabaseSetup || payload?.data?.needsDatabaseSetup);
+    };
+
     const loadDevotionals = async () => {
         try {
             setLoading(true);
@@ -54,10 +59,17 @@ export default function AdminDevotionalsPage() {
             }
 
             const payload = await response.json();
+            const needsDatabaseSetup = requiresDatabaseSetup(payload);
+            setSetupRequired(needsDatabaseSetup);
             setDevotionals(extractDevotionals(payload));
+
+            if (needsDatabaseSetup) {
+                setError("Devotionals are not available in this environment yet. Run the latest database schema update for production.");
+            }
         } catch (error) {
             console.error("Error loading devotionals:", error);
             setError("Failed to load devotionals");
+            setSetupRequired(false);
         } finally {
             setLoading(false);
         }
@@ -178,10 +190,14 @@ export default function AdminDevotionalsPage() {
                 {/* Devotionals List */}
                 {devotionals.length === 0 ? (
                     <div className="text-center py-12 bg-white rounded-lg shadow-sm">
-                        <p className="text-slate-600 mb-4">No devotionals found.</p>
-                        <Link href="/admin/devotionals/create" className="btn-primary inline-block">
-                            Create Your First Devotional
-                        </Link>
+                        <p className="text-slate-600 mb-4">
+                            {setupRequired ? "The devotional database is not ready in this environment yet." : "No devotionals found."}
+                        </p>
+                        {!setupRequired && (
+                            <Link href="/admin/devotionals/create" className="btn-primary inline-block">
+                                Create Your First Devotional
+                            </Link>
+                        )}
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

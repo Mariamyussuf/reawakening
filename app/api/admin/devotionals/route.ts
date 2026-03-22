@@ -3,13 +3,19 @@ import { requireAdminOrLeader } from '@/lib/middleware/auth';
 import { rateLimiters } from '@/lib/middleware/ratelimit';
 import { validateFile, FileValidationPresets } from '@/lib/validation/file-upload';
 import { ApiResponse } from '@/lib/api/response';
+import {
+    DEVOTIONAL_STATUSES,
+    isMissingDevotionalsTableError,
+    serializeDevotional,
+} from '@/lib/devotionals';
 import { log } from '@/lib/logger';
 import prisma from '@/lib/prisma';
-import { parseStoredStringArray } from '@/lib/parse-string-array';
 import { writeFile, mkdir } from 'fs/promises';
 import { existsSync } from 'fs';
 import path from 'path';
 import { sanitizeRichText, sanitizeText } from '@/lib/sanitize';
+
+export const dynamic = 'force-dynamic';
 
 // GET /api/admin/devotionals - Get all devotionals (including drafts)
 export async function GET(request: NextRequest) {
@@ -22,37 +28,39 @@ export async function GET(request: NextRequest) {
         const skip = parseInt(searchParams.get('skip') || '0');
 
         const where: any = {};
-        if (status && status !== 'all') {
+        if (status && status !== 'all' && DEVOTIONAL_STATUSES.includes(status.toUpperCase() as any)) {
             where.status = status.toUpperCase();
         }
 
-        const devotionals = await prisma.devotional.findMany({
-            where,
-            orderBy: { createdAt: 'desc' },
-            take: limit,
-            skip: skip,
-        });
+        let devotionals;
+        let total;
 
-        const total = await prisma.devotional.count({ where });
+        try {
+            [devotionals, total] = await Promise.all([
+                prisma.devotional.findMany({
+                    where,
+                    orderBy: { createdAt: 'desc' },
+                    take: limit,
+                    skip: skip,
+                }),
+                prisma.devotional.count({ where }),
+            ]);
+        } catch (error) {
+            if (isMissingDevotionalsTableError(error)) {
+                return ApiResponse.success({
+                    devotionals: [],
+                    total: 0,
+                    limit,
+                    skip,
+                    needsDatabaseSetup: true,
+                });
+            }
 
-        const formattedDevotionals = devotionals.map((devotional: any) => ({
-            id: devotional.id,
-            title: devotional.title,
-            content: devotional.content,
-            excerpt: devotional.excerpt,
-            author: devotional.author,
-            coverImage: devotional.coverImage,
-            publishDate: devotional.publishDate,
-            scheduledDate: devotional.scheduledDate,
-            status: devotional.status,
-            tags: parseStoredStringArray(devotional.tags),
-            scripture: devotional.scripture,
-            createdAt: devotional.createdAt,
-            updatedAt: devotional.updatedAt,
-        }));
+            throw error;
+        }
 
         return ApiResponse.success({
-            devotionals: formattedDevotionals,
+            devotionals: devotionals.map(serializeDevotional),
             total,
             limit,
             skip,
@@ -145,23 +153,19 @@ export async function POST(request: NextRequest) {
         });
 
         const formattedDevotional = {
-            id: devotional.id,
-            title: devotional.title,
-            content: devotional.content,
-            excerpt: devotional.excerpt,
-            author: devotional.author,
-            coverImage: devotional.coverImage,
-            publishDate: devotional.publishDate,
-            scheduledDate: devotional.scheduledDate,
-            status: devotional.status,
-            tags: tags, // Return parsed tags
-            scripture: devotional.scripture,
-            createdAt: devotional.createdAt,
-            updatedAt: devotional.updatedAt,
+            ...serializeDevotional(devotional),
+            tags,
         };
 
         return ApiResponse.created(formattedDevotional);
     } catch (error: any) {
+        if (isMissingDevotionalsTableError(error)) {
+            return ApiResponse.error(
+                'Devotionals are not available yet because the database schema has not been updated in this environment.',
+                503
+            );
+        }
+
         log.error('Create devotional error', error, { endpoint: '/api/admin/devotionals' });
         return ApiResponse.internalError(error.message || 'An error occurred while creating devotional');
     }
