@@ -120,6 +120,22 @@ REAWKENING/
 - Default password: `reawakening2026`
 - **⚠️ Change this in production!**
 
+### Create An Admin User
+
+Use the database-backed admin account command:
+
+```bash
+npm run admin:create -- --name "Admin Name" --email "admin@example.com" --password "StrongPassword123!"
+```
+
+Optional fields:
+
+```bash
+npm run admin:create -- --name "Admin Name" --email "admin@example.com" --password "StrongPassword123!" --phone "080..." --campus "Main Campus" --bio "Platform administrator"
+```
+
+If the email already exists, the command updates that user and assigns the `ADMIN` role.
+
 ## 🌐 Deployment
 
 ### Vercel (Recommended)

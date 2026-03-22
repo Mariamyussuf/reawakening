@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { PrismaLibSQL } from '@prisma/adapter-libsql';
+import path from 'path';
 
 declare global {
     // eslint-disable-next-line no-var
@@ -30,6 +31,23 @@ function assertValidRemoteDatabaseUrl(value: string): void {
             'DATABASE_URL must be a valid libSQL/Turso connection string when using a remote database.'
         );
     }
+}
+
+function toLocalFileUrl(filePath: string): string {
+    return `file:${filePath.replace(/\\/g, '/')}`;
+}
+
+function getLocalDatabaseUrl(): string {
+    const configuredLocalUrl =
+        normalizeEnvValue(process.env.LOCAL_DATABASE_URL) ??
+        (databaseUrl?.startsWith('file:') ? databaseUrl : undefined);
+
+    if (configuredLocalUrl?.startsWith('file:')) {
+        return configuredLocalUrl;
+    }
+
+    const resolvedPath = path.resolve(process.cwd(), 'prisma', 'dev.db');
+    return toLocalFileUrl(resolvedPath);
 }
 
 const databaseUrl = normalizeEnvValue(process.env.DATABASE_URL);
@@ -65,7 +83,12 @@ if (useRemoteLibsql) {
     });
 } else {
     // Use local SQLite file (development)
+    const adapter = new PrismaLibSQL({
+        url: getLocalDatabaseUrl(),
+    });
+
     prisma = global.prisma || new PrismaClient({
+        adapter: adapter as any,
         log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
     });
 }
