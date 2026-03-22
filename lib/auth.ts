@@ -4,6 +4,16 @@ import bcrypt from 'bcryptjs';
 import prisma from '@/lib/prisma';
 import { env } from '@/lib/env';
 
+function normalizeRole(role: string | null | undefined): 'member' | 'admin' | 'leader' {
+    const normalizedRole = role?.toLowerCase();
+
+    if (normalizedRole === 'admin' || normalizedRole === 'leader') {
+        return normalizedRole;
+    }
+
+    return 'member';
+}
+
 export const authOptions: NextAuthOptions = {
     providers: [
         CredentialsProvider({
@@ -39,11 +49,13 @@ export const authOptions: NextAuthOptions = {
                     data: { lastActive: new Date() }
                 });
 
+                const normalizedRole = normalizeRole(user.role);
+
                 return {
                     id: user.id,
                     email: user.email,
                     name: user.name,
-                    role: user.role,
+                    role: normalizedRole,
                 };
             },
         }),
@@ -52,14 +64,14 @@ export const authOptions: NextAuthOptions = {
         async jwt({ token, user }) {
             if (user) {
                 token.id = user.id;
-                token.role = user.role;
+                token.role = normalizeRole(typeof user.role === 'string' ? user.role : undefined);
             }
             return token;
         },
         async session({ session, token }) {
             if (session.user) {
                 session.user.id = token.id;
-                session.user.role = token.role;
+                session.user.role = normalizeRole(typeof token.role === 'string' ? token.role : undefined);
             }
             return session;
         },

@@ -37,6 +37,16 @@ export interface AuthenticatedSession {
     };
 }
 
+function normalizeRole(role: string | undefined): 'member' | 'admin' | 'leader' {
+    const normalizedRole = role?.toLowerCase();
+
+    if (normalizedRole === 'admin' || normalizedRole === 'leader') {
+        return normalizedRole;
+    }
+
+    return 'member';
+}
+
 /**
  * Require authentication for a route
  * @throws UnauthorizedError if not authenticated
@@ -61,7 +71,7 @@ export async function requireRole(
     roles: ('admin' | 'leader' | 'member')[]
 ): Promise<AuthenticatedSession> {
     const session = await requireAuth();
-    const userRole = session.user.role;
+    const userRole = normalizeRole(session.user.role);
 
     if (!roles.includes(userRole)) {
         throw new ForbiddenError(`Access requires one of: ${roles.join(', ')}`);

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 // Cross icon for branding
@@ -15,6 +15,7 @@ const CrossIcon = () => (
 
 export default function SignInPage() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const [formData, setFormData] = useState({ email: "", password: "" });
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
@@ -24,16 +25,18 @@ export default function SignInPage() {
         e.preventDefault();
         setError("");
         setLoading(true);
+        const callbackUrl = searchParams.get("callbackUrl") || "/hub";
         try {
             const result = await signIn("credentials", {
                 email: formData.email,
                 password: formData.password,
                 redirect: false,
+                callbackUrl,
             });
             if (result?.error) {
                 setError("Invalid email or password. Please try again.");
             } else {
-                router.push("/hub");
+                router.push(result?.url || callbackUrl);
                 router.refresh();
             }
         } catch {

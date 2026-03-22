@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
+import { signOut, useSession } from "next-auth/react";
 
 const adminModules = [
     {
@@ -54,29 +54,45 @@ const adminModules = [
     },
 ];
 
+function AdminSignOutButton({ className = "" }: { className?: string }) {
+    return (
+        <button
+            onClick={() => signOut({ callbackUrl: "/auth/signin?callbackUrl=%2Fadmin" })}
+            className={className}
+        >
+            Sign Out
+        </button>
+    );
+}
+
 export default function AdminPage() {
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
+    const { data: session, status } = useSession();
+    const userRole = session?.user?.role;
+    const canAccessAdmin = userRole === "admin" || userRole === "leader";
+    const visibleModules =
+        userRole === "leader"
+            ? adminModules.filter((module) => module.id !== "users")
+            : adminModules;
 
-    const handleLogin = (e: React.FormEvent) => {
-        e.preventDefault();
-        setError("");
-        // Simple password check (in production, use proper authentication)
-        if (password === "reawakening2026") {
-            setIsAuthenticated(true);
-        } else {
-            setError("Incorrect administrator password.");
-        }
-    };
+    if (status === "loading") {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-cream-50">
+                <div className="text-center">
+                    <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-navy-900 border-t-transparent" />
+                    <p className="mt-4 font-sans text-sm uppercase tracking-[0.2em] text-ink-400">
+                        Checking Access
+                    </p>
+                </div>
+            </div>
+        );
+    }
 
-    if (!isAuthenticated) {
+    if (status === "unauthenticated") {
         return (
             <div className="min-h-screen flex items-center justify-center bg-cream-50 overflow-hidden relative">
-                {/* Background Decor */}
                 <div className="absolute top-0 left-0 w-full h-1 bg-navy-950" />
                 <div className="absolute top-1 left-0 w-full h-px bg-gold-500/30" />
-                
+
                 <div className="w-full max-w-md px-6 relative z-10">
                     <div className="text-center mb-10">
                         <Link href="/" className="inline-flex flex-col items-center group">
@@ -90,35 +106,18 @@ export default function AdminPage() {
                         </Link>
                     </div>
 
-                    <div className="card-glass p-8 rounded-3xl shadow-premium">
-                        <form onSubmit={handleLogin} className="space-y-6">
-                            {error && (
-                                <div className="flex items-center gap-3 p-4 rounded-xl bg-red-50 border border-red-100 mb-6 animate-fade-in">
-                                    <svg className="w-4 h-4 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                    <p className="font-sans text-xs font-semibold text-red-600 uppercase tracking-wide">{error}</p>
-                                </div>
-                            )}
+                    <div className="card-glass p-8 rounded-3xl shadow-premium text-center space-y-6">
+                        <p className="font-sans text-sm text-ink-400 leading-relaxed">
+                            Sign in with an account that has the <span className="font-bold text-navy-900">ADMIN</span> or <span className="font-bold text-navy-900">LEADER</span> role.
+                        </p>
 
-                            <div>
-                                <label htmlFor="password" title="Enter Password" className="block font-sans text-[10px] font-bold tracking-[0.2em] uppercase text-ink-400 mb-3">
-                                    Administrative Key
-                                </label>
-                                <input
-                                    type="password"
-                                    id="password"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    className="input-field pr-12 text-center tracking-[0.5em] font-bold"
-                                    placeholder="••••••••"
-                                    required
-                                />
-                            </div>
-
-                            <button type="submit" className="btn-navy w-full py-4 text-xs font-bold tracking-widest uppercase flex items-center justify-center gap-3 group">
-                                Authorize Access
-                                <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
-                            </button>
-                        </form>
+                        <Link
+                            href="/auth/signin?callbackUrl=%2Fadmin"
+                            className="btn-navy w-full py-4 text-xs font-bold tracking-widest uppercase flex items-center justify-center gap-3 group"
+                        >
+                            Sign In To Continue
+                            <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+                        </Link>
                     </div>
 
                     <div className="mt-10 text-center">
@@ -132,14 +131,42 @@ export default function AdminPage() {
         );
     }
 
+    if (!canAccessAdmin) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-cream-50 overflow-hidden relative">
+                <div className="w-full max-w-md px-6 relative z-10">
+                    <div className="card-glass p-8 rounded-3xl shadow-premium text-center space-y-6">
+                        <div>
+                            <p className="font-sans text-[10px] font-bold tracking-[0.2em] uppercase text-gold-600 mb-3">
+                                Access Restricted
+                            </p>
+                            <h1 className="font-display text-3xl font-semibold text-navy-900">
+                                Admin Role Required
+                            </h1>
+                        </div>
+
+                        <p className="font-sans text-sm text-ink-400 leading-relaxed">
+                            You are signed in as <span className="font-bold text-navy-900">{session?.user?.email}</span>, but this account does not have admin access.
+                        </p>
+
+                        <div className="flex flex-col gap-3">
+                            <Link href="/hub" className="btn-outline py-4 text-xs font-bold tracking-widest uppercase">
+                                Go To Hub
+                            </Link>
+                            <AdminSignOutButton className="btn-navy py-4 text-xs font-bold tracking-widest uppercase" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="min-h-screen bg-faint-gold/5 flex">
-            
-            {/* Admin Header / Side Decoration */}
             <div className="hidden lg:block w-80 bg-navy-950 relative overflow-hidden flex-shrink-0">
                 <div className="absolute inset-0 bg-hero-pattern opacity-100" />
                 <div className="absolute inset-0 bg-gradient-to-b from-navy-950 via-navy-900/50 to-navy-950" />
-                
+
                 <div className="relative z-10 p-10 h-full flex flex-col">
                     <Link href="/" className="flex items-center gap-4 mb-16 group">
                         <div className="relative">
@@ -162,7 +189,7 @@ export default function AdminPage() {
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <div className="w-1.5 h-1.5 rounded-full bg-gold-500" />
-                                    <span className="font-sans text-xs text-navy-300">Version 2.0.4 Premium</span>
+                                    <span className="font-sans text-xs text-navy-300">Role: {userRole?.toUpperCase()}</span>
                                 </div>
                             </div>
                         </div>
@@ -172,40 +199,31 @@ export default function AdminPage() {
                             <p className="font-display italic text-base text-navy-300 leading-relaxed">
                                 &ldquo;Whatever you do, work at it with all your heart, as working for the Lord.&rdquo;
                             </p>
-                            <p className="text-[10px] font-sans text-gold-600 uppercase tracking-widest mt-4">— Colossians 3:23</p>
+                            <p className="text-[10px] font-sans text-gold-600 uppercase tracking-widest mt-4">Colossians 3:23</p>
                         </div>
                     </div>
 
-                    <button 
-                        onClick={() => setIsAuthenticated(false)}
-                        className="mt-auto flex items-center gap-3 text-navy-400 hover:text-red-400 transition-colors py-4 border-t border-navy-800/80 font-sans text-xs font-bold uppercase tracking-widest"
-                    >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
-                        End Session
-                    </button>
+                    <AdminSignOutButton className="mt-auto flex items-center gap-3 text-navy-400 hover:text-red-400 transition-colors py-4 border-t border-navy-800/80 font-sans text-xs font-bold uppercase tracking-widest" />
                 </div>
             </div>
 
-            {/* Main Content Area */}
             <main className="flex-1 min-w-0 bg-cream-50 overflow-y-auto">
-                {/* Mobile Top Bar */}
                 <div className="lg:hidden flex items-center justify-between p-6 bg-navy-950 border-b border-gold-500/20">
-                     <Link href="/" className="flex items-center gap-3">
+                    <Link href="/" className="flex items-center gap-3">
                         <img src="/images/logo.png" alt="" className="w-7 h-7" />
                         <span className="font-display text-lg font-bold text-cream-50">Admin Panel</span>
                     </Link>
-                    <button onClick={() => setIsAuthenticated(false)} className="text-gold-500">
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
-                    </button>
+                    <AdminSignOutButton className="text-gold-500 font-sans text-xs font-bold uppercase tracking-[0.2em]" />
                 </div>
 
                 <div className="max-w-6xl mx-auto px-6 lg:px-12 py-12">
-                    
-                    {/* Welcome */}
                     <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6 pb-8 border-b border-cream-200">
                         <div>
                             <p className="font-sans text-[10px] font-bold tracking-[0.3em] uppercase text-gold-600 mb-2">Management Console</p>
                             <h2 className="font-display text-5xl font-semibold text-navy-950">Administrative Control</h2>
+                            <p className="mt-3 font-sans text-sm text-ink-400">
+                                Signed in as <span className="font-semibold text-navy-900">{session?.user?.name || session?.user?.email}</span>
+                            </p>
                         </div>
                         <div className="flex gap-3">
                             <Link href="/" className="btn-outline py-3 px-6 text-xs font-bold tracking-widest uppercase">Visit Site</Link>
@@ -213,7 +231,6 @@ export default function AdminPage() {
                         </div>
                     </div>
 
-                    {/* Stats Ribbon */}
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
                         {[
                             { label: "Total Members", val: "542", icon: "M12 4.354a4 4 0 110 5.292" },
@@ -233,30 +250,28 @@ export default function AdminPage() {
                         ))}
                     </div>
 
-                    {/* Module Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
-                        {adminModules.map((mod) => (
-                            <Link 
-                                key={mod.id} 
+                        {visibleModules.map((mod) => (
+                            <Link
+                                key={mod.id}
                                 href={mod.href}
                                 className="group relative bg-white p-8 rounded-3xl border border-cream-200 shadow-sm hover:shadow-premium hover:-translate-y-1 transition-all duration-300"
                             >
-                                {/* Accent Corner */}
                                 <div className={`absolute top-0 right-0 w-24 h-24 bg-gradient-to-br transition-opacity duration-300 opacity-0 group-hover:opacity-100 rounded-bl-[100px] border-l border-b border-cream-100 ${
-                                    mod.color === 'gold' ? 'from-gold-50/40 to-white' : 'from-navy-50/40 to-white'
+                                    mod.color === "gold" ? "from-gold-50/40 to-white" : "from-navy-50/40 to-white"
                                 }`} />
-                                
+
                                 <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-all duration-500 group-hover:scale-110 shadow-sm ${
-                                    mod.color === 'gold' 
-                                        ? 'bg-gradient-to-br from-gold-400 to-gold-600 text-white' 
-                                        : 'bg-navy-900 text-gold-400'
+                                    mod.color === "gold"
+                                        ? "bg-gradient-to-br from-gold-400 to-gold-600 text-white"
+                                        : "bg-navy-900 text-gold-400"
                                 }`}>
                                     {mod.icon}
                                 </div>
 
                                 <h3 className="font-display text-2xl font-semibold text-navy-950 mb-3 group-hover:text-gold-600 transition-colors uppercase tracking-tight">{mod.title}</h3>
                                 <p className="font-sans text-sm text-ink-400 leading-relaxed mb-8">{mod.description}</p>
-                                
+
                                 <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-gold-600 group-hover:gap-4 transition-all">
                                     Launch Module
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
@@ -265,7 +280,6 @@ export default function AdminPage() {
                         ))}
                     </div>
 
-                    {/* Security Footer */}
                     <div className="card-navy p-10 rounded-3xl relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-64 h-64 bg-gold-400/5 rounded-full blur-3xl -mr-32 -mt-32" />
                         <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
@@ -287,7 +301,6 @@ export default function AdminPage() {
                             </div>
                         </div>
                     </div>
-
                 </div>
             </main>
         </div>
