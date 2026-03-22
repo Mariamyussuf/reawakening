@@ -1,19 +1,62 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
+
+type DevotionalStatus = "DRAFT" | "SCHEDULED" | "PUBLISHED";
+type StatusFilter = "ALL" | "DRAFT" | "SCHEDULED" | "PUBLISHED";
 
 interface Devotional {
     id: string;
     title: string;
     excerpt: string;
     author: string;
-    coverImage?: string;
+    coverImage?: string | null;
     publishDate: string;
-    scheduledDate?: string;
-    status: 'draft' | 'scheduled' | 'published';
+    scheduledDate?: string | null;
+    status: DevotionalStatus;
     tags: string[];
-    scripture?: string;
+    scripture?: string | null;
+}
+
+function normalizeDevotionalStatus(value: string | null | undefined): DevotionalStatus {
+    const normalizedValue = value?.toUpperCase();
+
+    if (normalizedValue === "PUBLISHED" || normalizedValue === "SCHEDULED") {
+        return normalizedValue;
+    }
+
+    return "DRAFT";
+}
+
+function extractDevotionals(payload: any): Devotional[] {
+    const data = payload?.data ?? payload;
+
+    if (!Array.isArray(data?.devotionals)) {
+        return [];
+    }
+
+    return data.devotionals.map((devotional: any) => ({
+        ...devotional,
+        status: normalizeDevotionalStatus(devotional?.status),
+        tags: Array.isArray(devotional?.tags) ? devotional.tags : [],
+    }));
+}
+
+function requiresDatabaseSetup(payload: any): boolean {
+    return Boolean(payload?.needsDatabaseSetup || payload?.data?.needsDatabaseSetup);
+}
+
+function getStatusBadgeClass(status: DevotionalStatus) {
+    if (status === "PUBLISHED") {
+        return "bg-emerald-50 text-emerald-700 border border-emerald-200";
+    }
+
+    if (status === "SCHEDULED") {
+        return "bg-deep text-cream border border-deep";
+    }
+
+    return "bg-gold/15 text-gold-dark border border-gold/30";
 }
 
 export default function AdminDevotionalsPage() {
@@ -22,35 +65,51 @@ export default function AdminDevotionalsPage() {
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
     const [setupRequired, setSetupRequired] = useState(false);
-    const [statusFilter, setStatusFilter] = useState<'all' | 'draft' | 'scheduled' | 'published'>('all');
+    const [statusFilter, setStatusFilter] = useState<StatusFilter>("ALL");
 
     useEffect(() => {
-        loadDevotionals();
+        void loadDevotionals();
     }, [statusFilter]);
 
-    const extractDevotionals = (payload: any): Devotional[] => {
-        if (Array.isArray(payload?.devotionals)) {
-            return payload.devotionals;
+    useEffect(() => {
+        if (!error) {
+            return;
         }
 
-        if (Array.isArray(payload?.data?.devotionals)) {
-            return payload.data.devotionals;
+        const timer = setTimeout(() => setError(""), 5000);
+        return () => clearTimeout(timer);
+    }, [error]);
+
+    useEffect(() => {
+        if (!success) {
+            return;
         }
 
-        return [];
-    };
+        const timer = setTimeout(() => setSuccess(""), 4000);
+        return () => clearTimeout(timer);
+    }, [success]);
 
-    const requiresDatabaseSetup = (payload: any): boolean => {
-        return Boolean(payload?.needsDatabaseSetup || payload?.data?.needsDatabaseSetup);
-    };
+    const publishedCount = useMemo(
+        () => devotionals.filter((devotional) => devotional.status === "PUBLISHED").length,
+        [devotionals]
+    );
+    const scheduledCount = useMemo(
+        () => devotionals.filter((devotional) => devotional.status === "SCHEDULED").length,
+        [devotionals]
+    );
+    const draftCount = useMemo(
+        () => devotionals.filter((devotional) => devotional.status === "DRAFT").length,
+        [devotionals]
+    );
 
-    const loadDevotionals = async () => {
+    async function loadDevotionals() {
         try {
             setLoading(true);
             setError("");
+
             const params = new URLSearchParams();
-            if (statusFilter !== 'all') {
-                params.append('status', statusFilter);
+            if (statusFilter !== "ALL") {
+                params.set("status", statusFilter.toLowerCase());
             }
 
             const response = await fetch(`/api/admin/devotionals?${params.toString()}`, {
@@ -67,208 +126,237 @@ export default function AdminDevotionalsPage() {
             setDevotionals(extractDevotionals(payload));
 
             if (needsDatabaseSetup) {
-                setError("Devotionals are not available in this environment yet. Run the latest database schema update for production.");
+                setError("Devotional data is not available in this environment yet. Run the latest production database schema update.");
             }
-        } catch (error: any) {
-            console.error("Error loading devotionals:", error);
-            setError(error?.message || "Failed to load devotionals");
+        } catch (loadError: any) {
             setSetupRequired(false);
+            setError(loadError?.message || "Failed to load devotionals");
         } finally {
             setLoading(false);
         }
-    };
+    }
 
-    const handleDelete = async (devotionalId: string) => {
-        if (!confirm("Are you sure you want to delete this devotional? This action cannot be undone.")) {
+    async function handleDelete(devotional: Devotional) {
+        if (!confirm(`Delete "${devotional.title}"? This cannot be undone.`)) {
             return;
         }
 
         try {
-            const response = await fetch(`/api/admin/devotionals/${devotionalId}`, {
+            const response = await fetch(`/api/admin/devotionals/${devotional.id}`, {
                 method: "DELETE",
             });
+            const payload = await response.json().catch(() => null);
 
             if (!response.ok) {
-                const data = await response.json();
-                throw new Error(data.error || "Failed to delete devotional");
+                throw new Error(payload?.error || "Failed to delete devotional");
             }
 
-            setSuccess("Devotional deleted successfully!");
+            setSuccess("Devotional deleted successfully.");
             await loadDevotionals();
-            setTimeout(() => setSuccess(""), 3000);
-        } catch (err: any) {
-            setError(err.message || "Failed to delete devotional");
-            setTimeout(() => setError(""), 5000);
+        } catch (deleteError: any) {
+            setError(deleteError?.message || "Failed to delete devotional");
         }
-    };
+    }
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
+            <div className="min-h-screen flex items-center justify-center bg-cream px-6">
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                    <p className="mt-4 text-slate-600">Loading devotionals...</p>
+                    <div className="w-8 h-8 border-2 border-gold/30 border-t-gold rounded-full animate-spin mx-auto mb-4" />
+                    <p className="font-display text-lg text-deep/70">Loading devotionals...</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
-            {/* Header */}
-            <header className="bg-white/90 backdrop-blur-md shadow-sm border-b border-slate-200">
-                <div className="container-custom py-4">
-                    <div className="flex items-center justify-between">
-                        <Link href="/admin" className="flex items-center space-x-2 text-slate-600 hover:text-slate-800">
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                            </svg>
-                            <span className="font-medium">Back to Admin</span>
-                        </Link>
-                        <h1 className="text-2xl font-bold text-slate-800">Devotionals Management</h1>
+        <div className="min-h-screen bg-cream font-body">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8">
+                    <div>
+                        <p className="eyebrow mb-1">Admin Workspace</p>
+                        <h1 className="font-display text-3xl text-deep">Devotional management</h1>
+                    </div>
+
+                    <div className="flex flex-wrap gap-3">
                         <Link href="/admin/devotionals/create" className="btn-primary">
-                            + New Devotional
+                            New Devotional
+                        </Link>
+                        <Link href="/admin" className="btn-outline">
+                            Back to Admin
                         </Link>
                     </div>
                 </div>
-            </header>
 
-            <main className="container-custom py-8">
-                {/* Messages */}
+                <div className="bg-warm-white border border-mid/20 rounded-3xl p-6 sm:p-8 mb-8 shadow-sm">
+                    <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
+                        <div className="max-w-2xl">
+                            <p className="text-xs text-deep/50 tracking-wide uppercase mb-2">Devotional Flow</p>
+                            <h2 className="font-display text-2xl sm:text-4xl text-deep mb-3">
+                                Keep the reading journey steady and clear
+                            </h2>
+                            <p className="text-deep/70 leading-relaxed">
+                                Review drafts, schedule upcoming devotionals, and publish the pieces that should reach readers right away.
+                            </p>
+                        </div>
+
+                        <div className="rounded-2xl bg-deep p-5 min-w-[220px]">
+                            <p className="text-[10px] tracking-[0.2em] uppercase text-gold/70 mb-2">Current Filter</p>
+                            <p className="font-display text-xl text-cream">
+                                {statusFilter === "ALL" ? "All devotionals" : `${statusFilter.toLowerCase()} devotionals`}
+                            </p>
+                            <p className="text-sm text-cream/60 mt-1">
+                                {publishedCount} published, {scheduledCount} scheduled
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
                 {error && (
-                    <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+                    <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-red-700">
                         {error}
                     </div>
                 )}
                 {success && (
-                    <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg text-green-700">
+                    <div className="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-emerald-700">
                         {success}
                     </div>
                 )}
 
-                {/* Filters */}
-                <div className="mb-6 flex gap-2">
-                    <button
-                        onClick={() => setStatusFilter('all')}
-                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                            statusFilter === 'all'
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-white text-slate-700 hover:bg-slate-100'
-                        }`}
-                    >
-                        All
-                    </button>
-                    <button
-                        onClick={() => setStatusFilter('draft')}
-                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                            statusFilter === 'draft'
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-white text-slate-700 hover:bg-slate-100'
-                        }`}
-                    >
-                        Drafts
-                    </button>
-                    <button
-                        onClick={() => setStatusFilter('scheduled')}
-                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                            statusFilter === 'scheduled'
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-white text-slate-700 hover:bg-slate-100'
-                        }`}
-                    >
-                        Scheduled
-                    </button>
-                    <button
-                        onClick={() => setStatusFilter('published')}
-                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                            statusFilter === 'published'
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-white text-slate-700 hover:bg-slate-100'
-                        }`}
-                    >
-                        Published
-                    </button>
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
+                    {[
+                        ["Total Devotionals", `${devotionals.length}`, "All devotional records in the selected view"],
+                        ["Published", `${publishedCount}`, "Live and visible to readers"],
+                        ["Scheduled", `${scheduledCount}`, "Prepared for future release"],
+                        ["Drafts", `${draftCount}`, "Still being refined"],
+                    ].map(([label, value, detail], index) => (
+                        <div
+                            key={label}
+                            className={`rounded-2xl border p-5 shadow-sm ${
+                                index === 1
+                                    ? "bg-deep border-deep text-cream"
+                                    : index === 2
+                                        ? "bg-gold/15 border-gold/30 text-deep"
+                                        : "bg-warm-white border-mid/20 text-deep"
+                            }`}
+                        >
+                            <p className={`text-xs tracking-wide uppercase mb-2 ${index === 1 ? "text-gold/75" : "text-deep/50"}`}>{label}</p>
+                            <p className="font-display text-3xl mb-2">{value}</p>
+                            <p className={`text-sm leading-relaxed ${index === 1 ? "text-cream/70" : "text-deep/70"}`}>{detail}</p>
+                        </div>
+                    ))}
                 </div>
 
-                {/* Devotionals List */}
-                {devotionals.length === 0 ? (
-                    <div className="text-center py-12 bg-white rounded-lg shadow-sm">
-                        <p className="text-slate-600 mb-4">
-                            {setupRequired ? "The devotional database is not ready in this environment yet." : "No devotionals found."}
-                        </p>
-                        {!setupRequired && (
-                            <Link href="/admin/devotionals/create" className="btn-primary inline-block">
-                                Create Your First Devotional
-                            </Link>
-                        )}
+                <div className="bg-warm-white border border-mid/20 rounded-3xl p-6 shadow-sm">
+                    <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
+                        <div>
+                            <p className="eyebrow mb-2">Devotional Library</p>
+                            <h2 className="font-display text-2xl text-deep">Saved devotionals</h2>
+                        </div>
+
+                        <select
+                            value={statusFilter}
+                            onChange={(event) => setStatusFilter(event.target.value as StatusFilter)}
+                            className="rounded-2xl border border-mid/20 bg-cream px-4 py-3 text-sm text-deep focus:border-gold/50 focus:outline-none focus:ring-2 focus:ring-gold/20"
+                        >
+                            <option value="ALL">All statuses</option>
+                            <option value="DRAFT">Drafts</option>
+                            <option value="SCHEDULED">Scheduled</option>
+                            <option value="PUBLISHED">Published</option>
+                        </select>
                     </div>
-                ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {devotionals.map((devotional) => (
-                            <div key={devotional.id} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
-                                {devotional.coverImage && (
-                                    <img
-                                        src={devotional.coverImage}
-                                        alt={devotional.title}
-                                        className="w-full h-48 object-cover"
-                                    />
-                                )}
-                                <div className="p-6">
-                                    <div className="flex items-start justify-between mb-2">
-                                        <span className={`px-2 py-1 rounded text-xs font-medium ${
-                                            devotional.status === 'published'
-                                                ? 'bg-green-100 text-green-700'
-                                                : devotional.status === 'scheduled'
-                                                ? 'bg-yellow-100 text-yellow-700'
-                                                : 'bg-slate-100 text-slate-700'
-                                        }`}>
-                                            {devotional.status}
-                                        </span>
-                                    </div>
-                                    <h3 className="text-xl font-bold text-slate-800 mb-2 line-clamp-2">
-                                        {devotional.title}
-                                    </h3>
-                                    <p className="text-slate-600 text-sm mb-4 line-clamp-3">
-                                        {devotional.excerpt}
-                                    </p>
-                                    <div className="flex items-center justify-between text-sm text-slate-500 mb-4">
-                                        <span>By {devotional.author}</span>
-                                        <span>{new Date(devotional.publishDate).toLocaleDateString()}</span>
-                                    </div>
-                                    {devotional.scripture && (
-                                        <p className="text-sm text-blue-600 mb-4 italic">
-                                            {devotional.scripture}
-                                        </p>
-                                    )}
-                                    {devotional.tags.length > 0 && (
-                                        <div className="flex flex-wrap gap-2 mb-4">
-                                            {devotional.tags.slice(0, 3).map((tag, idx) => (
-                                                <span key={idx} className="px-2 py-1 bg-slate-100 text-slate-600 rounded text-xs">
-                                                    {tag}
-                                                </span>
-                                            ))}
+
+                    {devotionals.length === 0 ? (
+                        <div className="rounded-2xl border border-dashed border-mid/30 bg-cream px-6 py-16 text-center">
+                            <p className="eyebrow mb-3">
+                                {setupRequired ? "Database Setup Required" : "No Devotionals Yet"}
+                            </p>
+                            <h3 className="font-display text-2xl text-deep mb-2">
+                                {setupRequired ? "Devotional data is not ready in this environment" : "Create the first devotional record"}
+                            </h3>
+                            <p className="text-deep/65 leading-relaxed mb-6">
+                                {setupRequired
+                                    ? "Sync the latest Prisma schema to the production database, then reload this page."
+                                    : "Once you publish one here, readers will be able to discover it from the devotional experience."}
+                            </p>
+                            {!setupRequired && (
+                                <Link href="/admin/devotionals/create" className="btn-primary inline-block">
+                                    Create Devotional
+                                </Link>
+                            )}
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                            {devotionals.map((devotional) => (
+                                <article
+                                    key={devotional.id}
+                                    className="rounded-2xl border border-mid/20 bg-cream p-5 hover:border-gold/35 hover:shadow-lift transition-all"
+                                >
+                                    <div className="flex flex-col gap-5">
+                                        {devotional.coverImage && (
+                                            <img
+                                                src={devotional.coverImage}
+                                                alt={devotional.title}
+                                                className="h-48 w-full rounded-2xl object-cover border border-mid/15"
+                                            />
+                                        )}
+
+                                        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                                            <div className="min-w-0">
+                                                <div className="flex flex-wrap items-center gap-2 mb-2">
+                                                    <h3 className="font-display text-2xl text-deep">{devotional.title}</h3>
+                                                    <span className={`inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] ${getStatusBadgeClass(devotional.status)}`}>
+                                                        {devotional.status}
+                                                    </span>
+                                                </div>
+                                                <p className="text-deep/70 leading-relaxed mb-3">{devotional.excerpt}</p>
+                                                <div className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-deep/55">
+                                                    <span>By {devotional.author}</span>
+                                                    <span>
+                                                        {devotional.status === "SCHEDULED" && devotional.scheduledDate
+                                                            ? `Scheduled ${new Date(devotional.scheduledDate).toLocaleDateString()}`
+                                                            : `Published ${new Date(devotional.publishDate).toLocaleDateString()}`}
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex flex-wrap gap-2">
+                                                <Link href={`/admin/devotionals/${devotional.id}/edit`} className="btn-outline">
+                                                    Edit
+                                                </Link>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleDelete(devotional)}
+                                                    className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700 transition-colors hover:bg-red-100"
+                                                >
+                                                    Delete
+                                                </button>
+                                            </div>
                                         </div>
-                                    )}
-                                    <div className="flex gap-2">
-                                        <Link
-                                            href={`/admin/devotionals/${devotional.id}/edit`}
-                                            className="flex-1 text-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-                                        >
-                                            Edit
-                                        </Link>
-                                        <button
-                                            onClick={() => handleDelete(devotional.id)}
-                                            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
-                                        >
-                                            Delete
-                                        </button>
+
+                                        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3 text-sm">
+                                            <div className="rounded-2xl bg-warm-white border border-mid/15 px-4 py-3 text-deep/70">
+                                                <span className="block text-xs uppercase tracking-[0.18em] text-deep/40 mb-1">Scripture</span>
+                                                {devotional.scripture || "Not provided"}
+                                            </div>
+                                            <div className="rounded-2xl bg-warm-white border border-mid/15 px-4 py-3 text-deep/70">
+                                                <span className="block text-xs uppercase tracking-[0.18em] text-deep/40 mb-1">Tags</span>
+                                                {devotional.tags.length > 0 ? devotional.tags.slice(0, 3).join(", ") : "No tags yet"}
+                                            </div>
+                                            <div className="rounded-2xl bg-warm-white border border-mid/15 px-4 py-3 text-deep/70">
+                                                <span className="block text-xs uppercase tracking-[0.18em] text-deep/40 mb-1">Reader View</span>
+                                                <Link href="/hub/devotionals" className="text-gold-dark hover:text-gold transition-colors">
+                                                    Open devotionals
+                                                </Link>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                )}
-            </main>
+                                </article>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </div>
         </div>
     );
 }

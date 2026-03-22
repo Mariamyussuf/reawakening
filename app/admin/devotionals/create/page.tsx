@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+
 import RichTextEditor from "@/components/admin/RichTextEditor";
 
 export default function CreateDevotionalPage() {
@@ -13,41 +14,42 @@ export default function CreateDevotionalPage() {
         excerpt: "",
         author: "",
         status: "draft" as "draft" | "scheduled" | "published",
-        publishDate: new Date().toISOString().split('T')[0],
+        publishDate: new Date().toISOString().split("T")[0],
         scheduledDate: "",
         scripture: "",
         tags: "",
     });
-
     const [coverImage, setCoverImage] = useState<File | null>(null);
-    const [coverPreview, setCoverPreview] = useState<string>("");
+    const [coverPreview, setCoverPreview] = useState("");
     const [uploading, setUploading] = useState(false);
     const [error, setError] = useState("");
 
-    const handleCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            setCoverImage(file);
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setCoverPreview(reader.result as string);
-            };
-            reader.readAsDataURL(file);
-        }
-    };
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setError("");
-
-        // Validation
-        if (!formData.title || !formData.content || !formData.excerpt || !formData.author) {
-            setError("Please fill in all required fields");
+    function handleCoverChange(event: React.ChangeEvent<HTMLInputElement>) {
+        const file = event.target.files?.[0];
+        if (!file) {
             return;
         }
 
-        if (formData.status === 'scheduled' && !formData.scheduledDate) {
-            setError("Scheduled date is required for scheduled devotionals");
+        setCoverImage(file);
+
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setCoverPreview(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+    }
+
+    async function handleSubmit(event: React.FormEvent) {
+        event.preventDefault();
+        setError("");
+
+        if (!formData.title || !formData.content || !formData.excerpt || !formData.author) {
+            setError("Please fill in all required fields.");
+            return;
+        }
+
+        if (formData.status === "scheduled" && !formData.scheduledDate) {
+            setError("Scheduled date is required for scheduled devotionals.");
             return;
         }
 
@@ -61,15 +63,19 @@ export default function CreateDevotionalPage() {
             formDataToSend.append("author", formData.author);
             formDataToSend.append("status", formData.status);
             formDataToSend.append("publishDate", formData.publishDate);
+
             if (formData.scheduledDate) {
                 formDataToSend.append("scheduledDate", formData.scheduledDate);
             }
+
             if (formData.scripture) {
                 formDataToSend.append("scripture", formData.scripture);
             }
+
             if (formData.tags) {
                 formDataToSend.append("tags", formData.tags);
             }
+
             if (coverImage) {
                 formDataToSend.append("cover", coverImage);
             }
@@ -78,216 +84,233 @@ export default function CreateDevotionalPage() {
                 method: "POST",
                 body: formDataToSend,
             });
+            const payload = await response.json().catch(() => null);
 
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || "Failed to create devotional");
+                throw new Error(payload?.error || "Failed to create devotional");
             }
 
             router.push("/admin/devotionals");
-        } catch (err: any) {
-            setError(err.message || "Failed to create devotional");
+        } catch (submitError: any) {
+            setError(submitError?.message || "Failed to create devotional");
         } finally {
             setUploading(false);
         }
-    };
+    }
 
     return (
-        <div className="min-h-screen bg-white">
-            {/* Minimal Header */}
-            <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-slate-200">
-                <div className="max-w-4xl mx-auto px-6 py-4">
-                    <div className="flex items-center justify-between">
-                        <Link href="/admin/devotionals" className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors text-sm font-medium">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                            </svg>
+        <div className="min-h-screen bg-cream font-body">
+            <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8">
+                    <div>
+                        <p className="eyebrow mb-1">Admin Workspace</p>
+                        <h1 className="font-display text-3xl text-deep">Create devotional</h1>
+                    </div>
+
+                    <div className="flex flex-wrap gap-3">
+                        <Link href="/admin/devotionals" className="btn-outline">
                             Back to Devotionals
                         </Link>
-                        <h1 className="text-lg font-semibold text-slate-900">New Devotional</h1>
+                        <Link href="/admin" className="btn-primary">
+                            Back to Admin
+                        </Link>
                     </div>
                 </div>
-            </header>
 
-            <main className="max-w-4xl mx-auto px-6 py-8">
-                <form onSubmit={handleSubmit} className="space-y-8">
-                    {error && (
-                        <div className="p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded">
-                            {error}
+                <div className="bg-warm-white border border-mid/20 rounded-3xl p-6 sm:p-8 mb-8 shadow-sm">
+                    <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
+                        <div className="max-w-2xl">
+                            <p className="text-xs text-deep/50 tracking-wide uppercase mb-2">Devotional Editor</p>
+                            <h2 className="font-display text-2xl sm:text-4xl text-deep mb-3">
+                                Shape the next message with clarity and care
+                            </h2>
+                            <p className="text-deep/70 leading-relaxed">
+                                Write the core message, choose how it should be released, and keep the devotional experience consistent for readers.
+                            </p>
                         </div>
-                    )}
 
-                    {/* Title */}
-                    <div>
-                        <input
-                            type="text"
-                            id="title"
-                            value={formData.title}
-                            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                            placeholder="Title *"
-                            className="w-full text-4xl font-bold text-slate-900 placeholder:text-slate-400 border-none outline-none focus:ring-0 p-0"
-                            required
-                        />
+                        <div className="rounded-2xl bg-deep p-5 min-w-[220px]">
+                            <p className="text-[10px] tracking-[0.2em] uppercase text-gold/70 mb-2">Publishing Mode</p>
+                            <p className="font-display text-xl text-cream">
+                                {formData.status === "published" ? "Publish now" : formData.status === "scheduled" ? "Schedule release" : "Save draft"}
+                            </p>
+                            <p className="text-sm text-cream/60 mt-1">
+                                {coverPreview ? "Cover image ready" : "No cover image selected"}
+                            </p>
+                        </div>
                     </div>
+                </div>
 
-                    {/* Excerpt */}
-                    <div>
-                        <textarea
-                            id="excerpt"
-                            value={formData.excerpt}
-                            onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
-                            placeholder="Excerpt * (Brief summary, max 500 characters)"
-                            className="w-full text-lg text-slate-600 placeholder:text-slate-400 border-none outline-none focus:ring-0 p-0 resize-none"
-                            rows={2}
-                            maxLength={500}
-                            required
-                        />
-                        <p className="mt-2 text-sm text-slate-400">{formData.excerpt.length}/500</p>
+                {error && (
+                    <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-red-700">
+                        {error}
                     </div>
+                )}
 
-                    {/* Content */}
-                    <div>
-                        <RichTextEditor
-                            content={formData.content}
-                            onChange={(content) => setFormData({ ...formData, content })}
-                            placeholder="Start writing your devotional..."
-                        />
-                    </div>
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    <div className="bg-warm-white border border-mid/20 rounded-3xl p-6 shadow-sm">
+                        <div className="mb-6">
+                            <p className="eyebrow mb-2">Core Content</p>
+                            <h2 className="font-display text-2xl text-deep">Message details</h2>
+                        </div>
 
-                    {/* Metadata Section */}
-                    <div className="border-t border-slate-200 pt-8 space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {/* Author */}
-                            <div>
-                                <label htmlFor="author" className="block text-sm font-medium text-slate-700 mb-2">
-                                    Author *
-                                </label>
+                        <div className="space-y-5">
+                            <label className="block">
+                                <span className="block text-xs uppercase tracking-[0.18em] text-deep/45 mb-2">Title</span>
                                 <input
                                     type="text"
-                                    id="author"
-                                    value={formData.author}
-                                    onChange={(e) => setFormData({ ...formData, author: e.target.value })}
-                                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-slate-900 transition-colors"
+                                    value={formData.title}
+                                    onChange={(event) => setFormData({ ...formData, title: event.target.value })}
+                                    placeholder="A steady heart in uncertain seasons"
+                                    className="w-full rounded-2xl border border-mid/20 bg-cream px-4 py-3 text-deep focus:border-gold/50 focus:outline-none focus:ring-2 focus:ring-gold/20"
                                     required
                                 />
-                            </div>
-
-                            {/* Scripture */}
-                            <div>
-                                <label htmlFor="scripture" className="block text-sm font-medium text-slate-700 mb-2">
-                                    Scripture Reference (Optional)
-                                </label>
-                                <input
-                                    type="text"
-                                    id="scripture"
-                                    value={formData.scripture}
-                                    onChange={(e) => setFormData({ ...formData, scripture: e.target.value })}
-                                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-slate-900 transition-colors"
-                                    placeholder="e.g., John 3:16"
-                                />
-                            </div>
-                        </div>
-
-                        {/* Tags */}
-                        <div>
-                            <label htmlFor="tags" className="block text-sm font-medium text-slate-700 mb-2">
-                                Tags (comma-separated)
                             </label>
-                            <input
-                                type="text"
-                                id="tags"
-                                value={formData.tags}
-                                onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-                                className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-slate-900 transition-colors"
-                                placeholder="faith, prayer, hope"
-                            />
-                        </div>
 
-                        {/* Cover Image */}
-                        <div>
-                            <label htmlFor="cover" className="block text-sm font-medium text-slate-700 mb-2">
-                                Cover Image (Optional)
-                            </label>
-                            <input
-                                type="file"
-                                id="cover"
-                                accept="image/jpeg,image/jpg,image/png,image/webp"
-                                onChange={handleCoverChange}
-                                className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-slate-900 transition-colors"
-                            />
-                            {coverPreview && (
-                                <div className="mt-4">
-                                    <img src={coverPreview} alt="Cover preview" className="max-w-md rounded-lg shadow-sm" />
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Status and Dates */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div>
-                                <label htmlFor="status" className="block text-sm font-medium text-slate-700 mb-2">
-                                    Status *
-                                </label>
-                                <select
-                                    id="status"
-                                    value={formData.status}
-                                    onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
-                                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-slate-900 transition-colors"
-                                >
-                                    <option value="draft">Draft</option>
-                                    <option value="scheduled">Scheduled</option>
-                                    <option value="published">Published</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label htmlFor="publishDate" className="block text-sm font-medium text-slate-700 mb-2">
-                                    Publish Date *
-                                </label>
-                                <input
-                                    type="date"
-                                    id="publishDate"
-                                    value={formData.publishDate}
-                                    onChange={(e) => setFormData({ ...formData, publishDate: e.target.value })}
-                                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-slate-900 transition-colors"
+                            <label className="block">
+                                <span className="block text-xs uppercase tracking-[0.18em] text-deep/45 mb-2">Excerpt</span>
+                                <textarea
+                                    value={formData.excerpt}
+                                    onChange={(event) => setFormData({ ...formData, excerpt: event.target.value })}
+                                    placeholder="A short summary readers will see before opening the devotional."
+                                    className="w-full min-h-[100px] rounded-2xl border border-mid/20 bg-cream px-4 py-3 text-deep focus:border-gold/50 focus:outline-none focus:ring-2 focus:ring-gold/20 resize-none"
+                                    maxLength={500}
                                     required
                                 />
-                            </div>
-                            {formData.status === 'scheduled' && (
-                                <div>
-                                    <label htmlFor="scheduledDate" className="block text-sm font-medium text-slate-700 mb-2">
-                                        Scheduled Date *
-                                    </label>
-                                    <input
-                                        type="datetime-local"
-                                        id="scheduledDate"
-                                        value={formData.scheduledDate}
-                                        onChange={(e) => setFormData({ ...formData, scheduledDate: e.target.value })}
-                                        className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-slate-900 transition-colors"
-                                        required={formData.status === 'scheduled'}
+                                <p className="mt-2 text-sm text-deep/45">{formData.excerpt.length}/500</p>
+                            </label>
+
+                            <div>
+                                <span className="block text-xs uppercase tracking-[0.18em] text-deep/45 mb-2">Content</span>
+                                <div className="rounded-3xl border border-mid/20 overflow-hidden">
+                                    <RichTextEditor
+                                        content={formData.content}
+                                        onChange={(content) => setFormData({ ...formData, content })}
+                                        placeholder="Start writing your devotional..."
                                     />
                                 </div>
-                            )}
+                            </div>
                         </div>
                     </div>
 
-                    {/* Submit */}
-                    <div className="flex gap-4 pt-4 border-t border-slate-200">
-                        <button
-                            type="submit"
-                            disabled={uploading}
-                            className="px-8 py-3 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            {uploading ? "Creating..." : "Publish Devotional"}
+                    <div className="grid gap-6 lg:grid-cols-[1fr_0.9fr]">
+                        <div className="bg-warm-white border border-mid/20 rounded-3xl p-6 shadow-sm">
+                            <div className="mb-6">
+                                <p className="eyebrow mb-2">Metadata</p>
+                                <h2 className="font-display text-2xl text-deep">Context and references</h2>
+                            </div>
+
+                            <div className="grid gap-5 md:grid-cols-2">
+                                <label>
+                                    <span className="block text-xs uppercase tracking-[0.18em] text-deep/45 mb-2">Author</span>
+                                    <input
+                                        type="text"
+                                        value={formData.author}
+                                        onChange={(event) => setFormData({ ...formData, author: event.target.value })}
+                                        className="w-full rounded-2xl border border-mid/20 bg-cream px-4 py-3 text-deep focus:border-gold/50 focus:outline-none focus:ring-2 focus:ring-gold/20"
+                                        required
+                                    />
+                                </label>
+
+                                <label>
+                                    <span className="block text-xs uppercase tracking-[0.18em] text-deep/45 mb-2">Scripture Reference</span>
+                                    <input
+                                        type="text"
+                                        value={formData.scripture}
+                                        onChange={(event) => setFormData({ ...formData, scripture: event.target.value })}
+                                        placeholder="e.g., John 15:5"
+                                        className="w-full rounded-2xl border border-mid/20 bg-cream px-4 py-3 text-deep focus:border-gold/50 focus:outline-none focus:ring-2 focus:ring-gold/20"
+                                    />
+                                </label>
+
+                                <label className="md:col-span-2">
+                                    <span className="block text-xs uppercase tracking-[0.18em] text-deep/45 mb-2">Tags</span>
+                                    <input
+                                        type="text"
+                                        value={formData.tags}
+                                        onChange={(event) => setFormData({ ...formData, tags: event.target.value })}
+                                        placeholder="faith, prayer, hope"
+                                        className="w-full rounded-2xl border border-mid/20 bg-cream px-4 py-3 text-deep focus:border-gold/50 focus:outline-none focus:ring-2 focus:ring-gold/20"
+                                    />
+                                </label>
+                            </div>
+                        </div>
+
+                        <div className="bg-warm-white border border-mid/20 rounded-3xl p-6 shadow-sm">
+                            <div className="mb-6">
+                                <p className="eyebrow mb-2">Publishing</p>
+                                <h2 className="font-display text-2xl text-deep">Release settings</h2>
+                            </div>
+
+                            <div className="space-y-5">
+                                <label className="block">
+                                    <span className="block text-xs uppercase tracking-[0.18em] text-deep/45 mb-2">Cover Image</span>
+                                    <input
+                                        type="file"
+                                        accept="image/jpeg,image/jpg,image/png,image/webp"
+                                        onChange={handleCoverChange}
+                                        className="w-full rounded-2xl border border-mid/20 bg-cream px-4 py-3 text-deep file:mr-4 file:rounded-xl file:border-0 file:bg-deep file:px-4 file:py-2 file:text-sm file:font-medium file:text-cream hover:file:bg-deep/90"
+                                    />
+                                </label>
+
+                                {coverPreview && (
+                                    <img
+                                        src={coverPreview}
+                                        alt="Cover preview"
+                                        className="h-48 w-full rounded-2xl object-cover border border-mid/15"
+                                    />
+                                )}
+
+                                <label className="block">
+                                    <span className="block text-xs uppercase tracking-[0.18em] text-deep/45 mb-2">Status</span>
+                                    <select
+                                        value={formData.status}
+                                        onChange={(event) => setFormData({ ...formData, status: event.target.value as "draft" | "scheduled" | "published" })}
+                                        className="w-full rounded-2xl border border-mid/20 bg-cream px-4 py-3 text-deep focus:border-gold/50 focus:outline-none focus:ring-2 focus:ring-gold/20"
+                                    >
+                                        <option value="draft">Draft</option>
+                                        <option value="scheduled">Scheduled</option>
+                                        <option value="published">Published</option>
+                                    </select>
+                                </label>
+
+                                <label className="block">
+                                    <span className="block text-xs uppercase tracking-[0.18em] text-deep/45 mb-2">Publish Date</span>
+                                    <input
+                                        type="date"
+                                        value={formData.publishDate}
+                                        onChange={(event) => setFormData({ ...formData, publishDate: event.target.value })}
+                                        className="w-full rounded-2xl border border-mid/20 bg-cream px-4 py-3 text-deep focus:border-gold/50 focus:outline-none focus:ring-2 focus:ring-gold/20"
+                                        required
+                                    />
+                                </label>
+
+                                {formData.status === "scheduled" && (
+                                    <label className="block">
+                                        <span className="block text-xs uppercase tracking-[0.18em] text-deep/45 mb-2">Scheduled Date</span>
+                                        <input
+                                            type="datetime-local"
+                                            value={formData.scheduledDate}
+                                            onChange={(event) => setFormData({ ...formData, scheduledDate: event.target.value })}
+                                            className="w-full rounded-2xl border border-mid/20 bg-cream px-4 py-3 text-deep focus:border-gold/50 focus:outline-none focus:ring-2 focus:ring-gold/20"
+                                            required
+                                        />
+                                    </label>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="flex flex-wrap gap-3">
+                        <button type="submit" className="btn-primary" disabled={uploading}>
+                            {uploading ? "Creating..." : "Create Devotional"}
                         </button>
-                        <Link 
-                            href="/admin/devotionals" 
-                            className="px-8 py-3 bg-white border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors font-medium"
-                        >
+                        <Link href="/admin/devotionals" className="btn-outline">
                             Cancel
                         </Link>
                     </div>
                 </form>
-            </main>
+            </div>
         </div>
     );
 }
