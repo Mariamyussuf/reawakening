@@ -131,104 +131,105 @@ export default function AdminBooksPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-pink-50 flex items-center justify-center">
+            <div className="min-h-screen bg-cream flex items-center justify-center">
                 <div className="text-center">
-                    <div className="text-5xl font-bold text-purple-600 mb-4">Books</div>
-                    <p className="text-slate-700 font-semibold">Loading books...</p>
+                    <div className="w-8 h-8 border-2 border-gold/30 border-t-gold rounded-full animate-spin mx-auto mb-4" />
+                    <p className="text-deep/70 font-display text-lg">Loading books...</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-pink-50">
+        <div className="min-h-screen bg-cream font-body">
             {/* Header */}
-            <header className="bg-white/90 backdrop-blur-md shadow-sm border-b border-slate-200">
-                <div className="container-custom py-4">
+            <header className="border-b border-mid/20 bg-warm-white">
+                <div className="max-w-6xl mx-auto px-4 sm:px-6 py-5">
                     <div className="flex items-center justify-between">
-                        <Link href="/hub" className="flex items-center space-x-2 text-slate-600 hover:text-slate-800">
+                        <Link href="/admin" className="flex items-center space-x-2 text-deep/60 hover:text-deep">
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                             </svg>
-                            <span className="font-medium">Back to Hub</span>
+                            <span className="font-medium">Back to Admin</span>
                         </Link>
-                        <h1 className="text-2xl font-bold text-slate-800">Books Admin</h1>
+                        <h1 className="font-display text-2xl text-deep">Books Library</h1>
                         <div className="w-20"></div>
                     </div>
                 </div>
             </header>
 
-            <main className="container-custom py-8">
+            <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
                 {/* Error/Success Messages */}
                 {error && (
-                    <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+                    <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-red-700">
                         {error}
                     </div>
                 )}
                 {success && (
-                    <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg text-green-700">
+                    <div className="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-emerald-700">
                         {success}
                     </div>
                 )}
 
                 {/* Stats */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                    <div className="card bg-gradient-to-br from-purple-500 to-pink-500 text-white">
+                    <div className="rounded-2xl border border-mid/20 bg-warm-white p-5 shadow-sm">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-purple-100 text-sm mb-1">Total Books</p>
-                                <p className="text-3xl font-bold">{books.length}</p>
+                                <p className="text-deep/50 text-xs uppercase tracking-wide mb-1">Total Books</p>
+                                <p className="text-3xl font-display text-deep">{books.length}</p>
                             </div>
-                            <div className="text-lg font-semibold opacity-40">Books</div>
+                            <div className="text-lg font-semibold text-deep/20">Books</div>
                         </div>
                     </div>
 
-                    <div className="card bg-gradient-to-br from-green-500 to-emerald-500 text-white">
+                    <div className="rounded-2xl border border-deep bg-deep p-5 shadow-sm text-cream">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-green-100 text-sm mb-1">Featured</p>
-                                <p className="text-3xl font-bold">{books.filter(b => b.featured).length}</p>
+                                <p className="text-gold/75 text-xs uppercase tracking-wide mb-1">Featured</p>
+                                <p className="text-3xl font-display">{books.filter(b => b.featured).length}</p>
                             </div>
-                            <div className="text-lg font-semibold opacity-40">Featured</div>
+                            <div className="text-lg font-semibold text-cream/20">Featured</div>
                         </div>
                     </div>
 
-                    <div className="card bg-gradient-to-br from-blue-500 to-indigo-500 text-white">
+                    <div className="rounded-2xl border border-gold/30 bg-gold/15 p-5 shadow-sm text-deep">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-blue-100 text-sm mb-1">Total Views</p>
-                                <p className="text-3xl font-bold">
+                                <p className="text-deep/50 text-xs uppercase tracking-wide mb-1">Total Views</p>
+                                <p className="text-3xl font-display">
                                     {books.reduce((sum, b) => sum + b.totalViews, 0).toLocaleString()}
                                 </p>
                             </div>
-                            <div className="text-lg font-semibold opacity-40">Views</div>
+                            <div className="text-lg font-semibold text-deep/20">Views</div>
                         </div>
                     </div>
 
-                    <div className="card bg-gradient-to-br from-orange-500 to-red-500 text-white">
+                    <div className="rounded-2xl border border-mid/20 bg-warm-white p-5 shadow-sm">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-orange-100 text-sm mb-1">Downloads</p>
-                                <p className="text-3xl font-bold">
+                                <p className="text-deep/50 text-xs uppercase tracking-wide mb-1">Downloads</p>
+                                <p className="text-3xl font-display text-deep">
                                     {books.reduce((sum, b) => sum + b.totalDownloads, 0).toLocaleString()}
                                 </p>
                             </div>
-                            <div className="text-lg font-semibold opacity-40">Downloads</div>
+                            <div className="text-lg font-semibold text-deep/20">Downloads</div>
                         </div>
                     </div>
                 </div>
 
                 {/* Actions */}
-                <div className="card mb-8">
+                <div className="rounded-3xl border border-mid/20 bg-warm-white p-6 shadow-sm mb-8">
                     <div className="flex items-center justify-between">
                         <div>
-                            <h2 className="text-2xl font-bold text-slate-800 mb-1">Manage Books</h2>
-                            <p className="text-slate-600">Upload, edit, and manage your book library</p>
+                            <p className="eyebrow mb-2">Library Tools</p>
+                            <h2 className="text-2xl font-display text-deep mb-1">Manage Books</h2>
+                            <p className="text-deep/70">Upload, edit, and manage your book library</p>
                         </div>
                         <div className="flex gap-3">
                             <Link
                                 href="/admin/books/stats"
-                                className="px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center gap-2"
+                                className="btn-outline flex items-center gap-2"
                             >
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -237,7 +238,7 @@ export default function AdminBooksPage() {
                             </Link>
                             <Link
                                 href="/admin/books/upload"
-                                className="px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition-colors flex items-center gap-2"
+                                className="btn-primary flex items-center gap-2"
                             >
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -250,35 +251,35 @@ export default function AdminBooksPage() {
 
                 {/* Bulk Actions */}
                 {selectedBooks.size > 0 && (
-                    <div className="card bg-purple-50 border-2 border-purple-200 mb-6">
+                    <div className="rounded-3xl border border-gold/30 bg-gold/10 p-6 mb-6 shadow-sm">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="font-semibold text-purple-800">
+                                <p className="font-semibold text-deep">
                                     {selectedBooks.size} book{selectedBooks.size === 1 ? "" : "s"} selected
                                 </p>
                             </div>
                             <div className="flex gap-2">
                                 <button
                                     onClick={() => handleBulkAction("feature")}
-                                    className="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700 transition-colors"
+                                    className="rounded-2xl bg-deep px-4 py-2 text-sm font-medium text-cream transition-colors hover:bg-deep/90"
                                 >
                                     Feature Selected
                                 </button>
                                 <button
                                     onClick={() => handleBulkAction("unfeature")}
-                                    className="px-4 py-2 bg-slate-600 text-white rounded-lg text-sm font-medium hover:bg-slate-700 transition-colors"
+                                    className="rounded-2xl bg-warm-white px-4 py-2 text-sm font-medium text-deep border border-mid/20 transition-colors hover:bg-cream"
                                 >
                                     Unfeature Selected
                                 </button>
                                 <button
                                     onClick={() => handleBulkAction("delete")}
-                                    className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-colors"
+                                    className="rounded-2xl border border-red-200 bg-red-50 px-4 py-2 text-sm font-medium text-red-700 transition-colors hover:bg-red-100"
                                 >
                                     Delete Selected
                                 </button>
                                 <button
                                     onClick={() => setSelectedBooks(new Set())}
-                                    className="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-300 transition-colors"
+                                    className="rounded-2xl bg-warm-white px-4 py-2 text-sm font-medium text-deep border border-mid/20 transition-colors hover:bg-cream"
                                 >
                                     Clear Selection
                                 </button>
@@ -288,12 +289,12 @@ export default function AdminBooksPage() {
                 )}
 
                 {/* Books List */}
-                <div className="card">
+                <div className="rounded-3xl border border-mid/20 bg-warm-white p-6 shadow-sm">
                     <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-2xl font-bold text-slate-800">All Books ({books.length})</h2>
+                        <h2 className="text-2xl font-display text-deep">All Books ({books.length})</h2>
                         <button
                             onClick={selectAll}
-                            className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200 transition-colors"
+                            className="rounded-2xl bg-cream px-4 py-2 text-sm font-medium text-deep border border-mid/20 transition-colors hover:bg-warm-white"
                         >
                             {selectedBooks.size === books.length ? "Deselect All" : "Select All"}
                         </button>
@@ -304,10 +305,10 @@ export default function AdminBooksPage() {
                             {books.map((book) => (
                                 <div
                                     key={book.id}
-                                    className={`p-4 rounded-lg border-2 transition-all ${
+                                    className={`p-4 rounded-2xl border transition-all ${
                                         selectedBooks.has(book.id)
-                                            ? "bg-purple-50 border-purple-300"
-                                            : "bg-slate-50 border-slate-200 hover:shadow-md"
+                                            ? "bg-gold/10 border-gold/30"
+                                            : "bg-cream border-mid/20 hover:shadow-lift hover:border-gold/35"
                                     }`}
                                 >
                                     <div className="flex items-start gap-4">
@@ -315,10 +316,10 @@ export default function AdminBooksPage() {
                                             type="checkbox"
                                             checked={selectedBooks.has(book.id)}
                                             onChange={() => toggleBookSelection(book.id)}
-                                            className="mt-2 w-4 h-4 rounded border-slate-300 text-purple-600 focus:ring-purple-500"
+                                            className="mt-2 w-4 h-4 rounded border-mid/30 text-gold focus:ring-gold/30"
                                         />
                                         {/* Cover Thumbnail */}
-                                        <div className="w-16 h-24 bg-gradient-to-br from-slate-200 to-slate-300 rounded flex-shrink-0 overflow-hidden">
+                                        <div className="w-16 h-24 bg-warm-white border border-mid/20 rounded-xl flex-shrink-0 overflow-hidden">
                                             {book.coverImage ? (
                                                 <img
                                                     src={book.coverImage}
@@ -336,37 +337,37 @@ export default function AdminBooksPage() {
                                         <div className="flex-1">
                                             <div className="flex items-start justify-between mb-2">
                                                 <div>
-                                                    <h3 className="font-bold text-lg text-slate-800">{book.title}</h3>
-                                                    <p className="text-sm text-slate-600">by {book.author}</p>
+                                                    <h3 className="font-display text-lg text-deep">{book.title}</h3>
+                                                    <p className="text-sm text-deep/65">by {book.author}</p>
                                                 </div>
                                                 <div className="flex gap-2">
                                                     {book.featured && (
-                                                        <span className="px-2 py-1 bg-yellow-100 text-yellow-700 rounded text-xs font-semibold">
+                                                        <span className="px-2 py-1 bg-deep text-cream rounded-full text-xs font-semibold uppercase tracking-wide">
                                                             Featured
                                                         </span>
                                                     )}
                                                     {book.newRelease && (
-                                                        <span className="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-semibold">
+                                                        <span className="px-2 py-1 bg-gold/15 text-gold-dark rounded-full text-xs font-semibold uppercase tracking-wide">
                                                             New
                                                         </span>
                                                     )}
                                                 </div>
                                             </div>
 
-                                            <p className="text-sm text-slate-600 mb-3 line-clamp-2">{book.description}</p>
+                                            <p className="text-sm text-deep/70 mb-3 line-clamp-2">{book.description}</p>
 
                                             {/* Categories */}
                                             <div className="flex flex-wrap gap-1 mb-3">
                                                 {book.categories.slice(0, 3).map((category, index) => (
                                                     <span
                                                         key={index}
-                                                        className="px-2 py-1 bg-purple-100 text-purple-700 rounded text-xs"
+                                                        className="px-2 py-1 bg-warm-white text-deep/75 border border-mid/20 rounded-full text-xs"
                                                     >
                                                         {category}
                                                     </span>
                                                 ))}
                                                 {book.categories.length > 3 && (
-                                                    <span className="px-2 py-1 bg-slate-200 text-slate-600 rounded text-xs">
+                                                    <span className="px-2 py-1 bg-warm-white text-deep/60 border border-mid/20 rounded-full text-xs">
                                                         +{book.categories.length - 3} more
                                                     </span>
                                                 )}
@@ -374,7 +375,7 @@ export default function AdminBooksPage() {
 
                                             {/* Stats & Actions */}
                                             <div className="flex items-center justify-between">
-                                                <div className="flex items-center gap-4 text-xs text-slate-500">
+                                                <div className="flex items-center gap-4 text-xs text-deep/50">
                                                     <span>Views: {book.totalViews.toLocaleString()}</span>
                                                     <span>Downloads: {book.totalDownloads.toLocaleString()}</span>
                                                     {book.fileSize && <span>Size: {book.fileSize} MB</span>}
@@ -383,19 +384,19 @@ export default function AdminBooksPage() {
                                                 <div className="flex gap-2">
                                                     <Link
                                                         href={`/hub/books/${book.id}`}
-                                                        className="px-3 py-1 bg-white border border-slate-300 text-slate-700 rounded text-sm font-medium hover:bg-slate-50 transition-colors"
+                                                        className="px-3 py-1 bg-warm-white border border-mid/20 text-deep rounded-2xl text-sm font-medium hover:bg-cream transition-colors"
                                                     >
                                                         View
                                                     </Link>
                                                     <button
                                                         onClick={() => handleEdit(book)}
-                                                        className="px-3 py-1 bg-purple-600 text-white rounded text-sm font-medium hover:bg-purple-700 transition-colors"
+                                                        className="px-3 py-1 bg-deep text-cream rounded-2xl text-sm font-medium hover:bg-deep/90 transition-colors"
                                                     >
                                                         Edit
                                                     </button>
                                                     <button
                                                         onClick={() => handleDelete(book.id)}
-                                                        className="px-3 py-1 bg-red-600 text-white rounded text-sm font-medium hover:bg-red-700 transition-colors"
+                                                        className="px-3 py-1 bg-red-50 text-red-700 border border-red-200 rounded-2xl text-sm font-medium hover:bg-red-100 transition-colors"
                                                     >
                                                         Delete
                                                     </button>
@@ -408,11 +409,11 @@ export default function AdminBooksPage() {
                         </div>
                     ) : (
                         <div className="text-center py-12">
-                            <div className="text-5xl font-bold text-purple-600 mb-4">Books</div>
-                            <p className="text-slate-600 text-lg mb-4">No books uploaded yet</p>
+                            <div className="w-14 h-14 rounded-2xl bg-gold/10 text-gold-dark flex items-center justify-center mx-auto mb-4 text-2xl font-semibold">B</div>
+                            <p className="text-deep/70 text-lg mb-4">No books uploaded yet</p>
                             <Link
                                 href="/admin/books/upload"
-                                className="inline-block px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition-colors"
+                                className="btn-primary inline-block"
                             >
                                 Upload Your First Book
                             </Link>

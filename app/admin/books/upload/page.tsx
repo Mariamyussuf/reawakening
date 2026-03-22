@@ -128,27 +128,27 @@ export default function AdminUploadBookPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-pink-50">
+        <div className="min-h-screen bg-cream font-body">
             {/* Header */}
-            <header className="bg-white/90 backdrop-blur-md shadow-sm border-b border-slate-200">
-                <div className="container-custom py-4">
+            <header className="border-b border-mid/20 bg-warm-white">
+                <div className="max-w-4xl mx-auto px-4 sm:px-6 py-5">
                     <div className="flex items-center justify-between">
-                        <Link href="/admin/books" className="flex items-center space-x-2 text-slate-600 hover:text-slate-800">
+                        <Link href="/admin/books" className="flex items-center space-x-2 text-deep/60 hover:text-deep">
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                             </svg>
                             <span className="font-medium">Back to Books Admin</span>
                         </Link>
-                        <h1 className="text-2xl font-bold text-slate-800">Upload New Book</h1>
+                        <h1 className="font-display text-2xl text-deep">Upload New Book</h1>
                         <div className="w-20"></div>
                     </div>
                 </div>
             </header>
 
-            <main className="container-custom py-8 max-w-4xl mx-auto">
+            <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
                 {/* Success Message */}
                 {uploadSuccess && (
-                    <div className="card bg-green-50 border-2 border-green-200 mb-6">
+                    <div className="rounded-3xl border border-emerald-200 bg-emerald-50 p-6 mb-6 shadow-sm">
                         <div className="flex items-center gap-3">
                             <div className="text-3xl">Done</div>
                             <div>
@@ -161,7 +161,7 @@ export default function AdminUploadBookPage() {
 
                 {/* Error Message */}
                 {error && (
-                    <div className="card bg-red-50 border-2 border-red-200 mb-6">
+                    <div className="rounded-3xl border border-red-200 bg-red-50 p-6 mb-6 shadow-sm">
                         <div className="flex items-center gap-3">
                             <div className="text-3xl">Error</div>
                             <div>
@@ -172,8 +172,9 @@ export default function AdminUploadBookPage() {
                     </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="card">
-                    <h2 className="text-2xl font-bold text-slate-800 mb-6">Book Information</h2>
+                <form onSubmit={handleSubmit} className="rounded-3xl border border-mid/20 bg-warm-white p-6 shadow-sm">
+                    <p className="eyebrow mb-2">Library Intake</p>
+                    <h2 className="text-2xl font-display text-deep mb-6">Book Information</h2>
 
                     {/* Basic Info */}
                     <div className="space-y-4 mb-6">
@@ -186,7 +187,7 @@ export default function AdminUploadBookPage() {
                                 value={formData.title}
                                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                                 placeholder="e.g., Mere Christianity"
-                                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                className="w-full px-4 py-3 border border-mid/20 bg-cream rounded-2xl focus:ring-2 focus:ring-gold/20 focus:border-gold/40 focus:outline-none"
                                 required
                             />
                         </div>
@@ -200,7 +201,7 @@ export default function AdminUploadBookPage() {
                                 value={formData.author}
                                 onChange={(e) => setFormData({ ...formData, author: e.target.value })}
                                 placeholder="e.g., C.S. Lewis"
-                                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                className="w-full px-4 py-3 border border-mid/20 bg-cream rounded-2xl focus:ring-2 focus:ring-gold/20 focus:border-gold/40 focus:outline-none"
                                 required
                             />
                         </div>
@@ -214,15 +215,15 @@ export default function AdminUploadBookPage() {
                                 value={formData.description}
                                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                 placeholder="Brief description of the book..."
-                                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                className="w-full px-4 py-3 border border-mid/20 bg-cream rounded-2xl focus:ring-2 focus:ring-gold/20 focus:border-gold/40 focus:outline-none"
                                 required
                             />
                         </div>
                     </div>
 
                     {/* Files */}
-                    <div className="space-y-4 mb-6 p-4 bg-slate-50 rounded-lg">
-                        <h3 className="font-bold text-slate-800 mb-3">Files</h3>
+                    <div className="space-y-4 mb-6 p-5 bg-cream border border-mid/15 rounded-2xl">
+                        <h3 className="font-display text-xl text-deep mb-3">Files</h3>
 
                         <div>
                             <label className="block text-sm font-medium text-slate-700 mb-2">
@@ -233,11 +234,11 @@ export default function AdminUploadBookPage() {
                                 type="file"
                                 accept=".pdf"
                                 onChange={(e) => setPdfFile(e.target.files?.[0] || null)}
-                                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                className="w-full px-4 py-3 border border-mid/20 bg-warm-white rounded-2xl focus:ring-2 focus:ring-gold/20 focus:border-gold/40 focus:outline-none"
                                 required
                             />
                             {pdfFile && (
-                                <p className="text-sm text-green-600 mt-2">
+                                <p className="text-sm text-emerald-700 mt-2">
                                     Selected: {pdfFile.name} ({(pdfFile.size / 1024 / 1024).toFixed(2)} MB)
                                 </p>
                             )}
@@ -252,10 +253,10 @@ export default function AdminUploadBookPage() {
                                 type="file"
                                 accept="image/*"
                                 onChange={(e) => setCoverImage(e.target.files?.[0] || null)}
-                                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                className="w-full px-4 py-3 border border-mid/20 bg-warm-white rounded-2xl focus:ring-2 focus:ring-gold/20 focus:border-gold/40 focus:outline-none"
                             />
                             {coverImage && (
-                                <p className="text-sm text-green-600 mt-2">
+                                <p className="text-sm text-emerald-700 mt-2">
                                     Selected: {coverImage.name}
                                 </p>
                             )}
@@ -273,9 +274,9 @@ export default function AdminUploadBookPage() {
                                     key={category}
                                     type="button"
                                     onClick={() => handleCategoryToggle(category)}
-                                    className={`px-3 py-2 rounded-lg border-2 transition-all text-sm font-medium ${formData.categories.includes(category)
-                                            ? "border-purple-500 bg-purple-50 text-purple-700"
-                                            : "border-slate-200 hover:border-slate-300 text-slate-700"
+                                    className={`px-3 py-2 rounded-2xl border transition-all text-sm font-medium ${formData.categories.includes(category)
+                                            ? "border-deep bg-deep text-cream"
+                                            : "border-mid/20 bg-cream hover:border-gold/30 text-deep/75"
                                         }`}
                                 >
                                     {category}
@@ -298,7 +299,7 @@ export default function AdminUploadBookPage() {
                                 value={formData.publishYear}
                                 onChange={(e) => setFormData({ ...formData, publishYear: e.target.value })}
                                 placeholder="e.g., 2020"
-                                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                className="w-full px-4 py-3 border border-mid/20 bg-cream rounded-2xl focus:ring-2 focus:ring-gold/20 focus:border-gold/40 focus:outline-none"
                             />
                         </div>
 
@@ -311,7 +312,7 @@ export default function AdminUploadBookPage() {
                                 value={formData.publisher}
                                 onChange={(e) => setFormData({ ...formData, publisher: e.target.value })}
                                 placeholder="e.g., Zondervan"
-                                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                className="w-full px-4 py-3 border border-mid/20 bg-cream rounded-2xl focus:ring-2 focus:ring-gold/20 focus:border-gold/40 focus:outline-none"
                             />
                         </div>
 
@@ -324,7 +325,7 @@ export default function AdminUploadBookPage() {
                                 value={formData.isbn}
                                 onChange={(e) => setFormData({ ...formData, isbn: e.target.value })}
                                 placeholder="e.g., 978-0-06-065292-0"
-                                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                className="w-full px-4 py-3 border border-mid/20 bg-cream rounded-2xl focus:ring-2 focus:ring-gold/20 focus:border-gold/40 focus:outline-none"
                             />
                         </div>
 
@@ -335,7 +336,7 @@ export default function AdminUploadBookPage() {
                             <select
                                 value={formData.difficulty}
                                 onChange={(e) => setFormData({ ...formData, difficulty: e.target.value as any })}
-                                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                className="w-full px-4 py-3 border border-mid/20 bg-cream rounded-2xl focus:ring-2 focus:ring-gold/20 focus:border-gold/40 focus:outline-none"
                             >
                                 <option value="beginner">Beginner</option>
                                 <option value="intermediate">Intermediate</option>
@@ -354,20 +355,20 @@ export default function AdminUploadBookPage() {
                             value={formData.tags}
                             onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
                             placeholder="e.g., faith, apologetics, classic"
-                            className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            className="w-full px-4 py-3 border border-mid/20 bg-cream rounded-2xl focus:ring-2 focus:ring-gold/20 focus:border-gold/40 focus:outline-none"
                         />
                     </div>
 
                     {/* Display Options */}
-                    <div className="mb-6 p-4 bg-slate-50 rounded-lg">
-                        <h3 className="font-bold text-slate-800 mb-3">Display Options</h3>
+                    <div className="mb-6 p-5 bg-cream border border-mid/15 rounded-2xl">
+                        <h3 className="font-display text-xl text-deep mb-3">Display Options</h3>
                         <div className="space-y-2">
                             <label className="flex items-center gap-2 cursor-pointer">
                                 <input
                                     type="checkbox"
                                     checked={formData.featured}
                                     onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
-                                    className="w-4 h-4 rounded border-slate-300 text-purple-600 focus:ring-purple-500"
+                                    className="w-4 h-4 rounded border-mid/30 text-gold focus:ring-gold/30"
                                 />
                                 <span className="text-sm text-slate-700">Featured Book (show on homepage)</span>
                             </label>
@@ -376,7 +377,7 @@ export default function AdminUploadBookPage() {
                                     type="checkbox"
                                     checked={formData.popular}
                                     onChange={(e) => setFormData({ ...formData, popular: e.target.checked })}
-                                    className="w-4 h-4 rounded border-slate-300 text-purple-600 focus:ring-purple-500"
+                                    className="w-4 h-4 rounded border-mid/30 text-gold focus:ring-gold/30"
                                 />
                                 <span className="text-sm text-slate-700">Popular Book</span>
                             </label>
@@ -385,7 +386,7 @@ export default function AdminUploadBookPage() {
                                     type="checkbox"
                                     checked={formData.newRelease}
                                     onChange={(e) => setFormData({ ...formData, newRelease: e.target.checked })}
-                                    className="w-4 h-4 rounded border-slate-300 text-purple-600 focus:ring-purple-500"
+                                    className="w-4 h-4 rounded border-mid/30 text-gold focus:ring-gold/30"
                                 />
                                 <span className="text-sm text-slate-700">New Release</span>
                             </label>
@@ -397,13 +398,13 @@ export default function AdminUploadBookPage() {
                         <button
                             type="submit"
                             disabled={uploading}
-                            className="flex-1 px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition-colors disabled:bg-slate-400 disabled:cursor-not-allowed"
+                            className="flex-1 px-6 py-3 bg-deep text-cream rounded-2xl font-semibold hover:bg-deep/90 transition-colors disabled:bg-slate-400 disabled:cursor-not-allowed"
                         >
                             {uploading ? "Uploading..." : "Upload Book"}
                         </button>
                         <Link
                             href="/admin/books"
-                            className="px-6 py-3 bg-slate-100 text-slate-700 rounded-lg font-semibold hover:bg-slate-200 transition-colors text-center"
+                            className="px-6 py-3 bg-cream text-deep rounded-2xl font-semibold border border-mid/20 hover:bg-warm-white transition-colors text-center"
                         >
                             Cancel
                         </Link>

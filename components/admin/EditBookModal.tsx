@@ -140,10 +140,10 @@ export default function EditBookModal({ book, isOpen, onClose, onSave }: EditBoo
 
     return (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-            <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-                <div className="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
-                    <h2 className="text-2xl font-bold text-slate-800">Edit Book</h2>
-                    <button onClick={onClose} className="text-slate-400 hover:text-slate-600 transition-colors">
+            <div className="bg-warm-white rounded-3xl border border-mid/20 max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-premium">
+                <div className="sticky top-0 bg-warm-white border-b border-mid/20 px-6 py-4 flex items-center justify-between">
+                    <h2 className="text-2xl font-display text-deep">Edit Book</h2>
+                    <button onClick={onClose} className="text-deep/40 hover:text-deep transition-colors">
                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                         </svg>
@@ -151,26 +151,26 @@ export default function EditBookModal({ book, isOpen, onClose, onSave }: EditBoo
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-6">
-                    {error && <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">{error}</div>}
-                    {success && <div className="p-4 bg-green-50 border border-green-200 rounded-lg text-green-700">{success}</div>}
+                    {error && <div className="p-4 bg-red-50 border border-red-200 rounded-2xl text-red-700">{error}</div>}
+                    {success && <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-emerald-700">{success}</div>}
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <input className="w-full px-4 py-3 border border-slate-300 rounded-lg" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} placeholder="Title" required />
-                        <input className="w-full px-4 py-3 border border-slate-300 rounded-lg" value={formData.author} onChange={(e) => setFormData({ ...formData, author: e.target.value })} placeholder="Author" required />
+                        <input className="w-full px-4 py-3 border border-mid/20 bg-cream rounded-2xl" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} placeholder="Title" required />
+                        <input className="w-full px-4 py-3 border border-mid/20 bg-cream rounded-2xl" value={formData.author} onChange={(e) => setFormData({ ...formData, author: e.target.value })} placeholder="Author" required />
                     </div>
 
-                    <textarea className="w-full px-4 py-3 border border-slate-300 rounded-lg" rows={4} value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="Description" required />
+                    <textarea className="w-full px-4 py-3 border border-mid/20 bg-cream rounded-2xl" rows={4} value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="Description" required />
 
-                    <div className="p-4 bg-slate-50 rounded-lg space-y-4">
-                        <h3 className="font-bold text-slate-800">File Replacement</h3>
+                    <div className="p-4 bg-cream border border-mid/15 rounded-2xl space-y-4">
+                        <h3 className="font-display text-xl text-deep">File Replacement</h3>
                         <div>
                             <label className="block text-sm font-medium text-slate-700 mb-2">Replace PDF File</label>
-                            <input type="file" accept=".pdf" onChange={(e) => setNewPdfFile(e.target.files?.[0] || null)} className="w-full px-4 py-3 border border-slate-300 rounded-lg" />
+                            <input type="file" accept=".pdf" onChange={(e) => setNewPdfFile(e.target.files?.[0] || null)} className="w-full px-4 py-3 border border-mid/20 bg-warm-white rounded-2xl" />
                             {newPdfFile && <p className="text-sm text-green-600 mt-2">Selected file: {newPdfFile.name}</p>}
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-slate-700 mb-2">Replace Cover Image</label>
-                            <input type="file" accept="image/*" onChange={(e) => setNewCoverImage(e.target.files?.[0] || null)} className="w-full px-4 py-3 border border-slate-300 rounded-lg" />
+                            <input type="file" accept="image/*" onChange={(e) => setNewCoverImage(e.target.files?.[0] || null)} className="w-full px-4 py-3 border border-mid/20 bg-warm-white rounded-2xl" />
                             {newCoverImage && <p className="text-sm text-green-600 mt-2">Selected file: {newCoverImage.name}</p>}
                         </div>
                     </div>
@@ -185,8 +185,8 @@ export default function EditBookModal({ book, isOpen, onClose, onSave }: EditBoo
                                     onClick={() => handleCategoryToggle(category)}
                                     className={`px-3 py-2 rounded-lg border-2 text-sm font-medium ${
                                         formData.categories.includes(category)
-                                            ? "border-purple-500 bg-purple-50 text-purple-700"
-                                            : "border-slate-200 text-slate-700"
+                                            ? "border-deep bg-deep text-cream"
+                                            : "border-mid/20 bg-cream text-deep/75"
                                     }`}
                                 >
                                     {category}
@@ -196,19 +196,19 @@ export default function EditBookModal({ book, isOpen, onClose, onSave }: EditBoo
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <input className="w-full px-4 py-3 border border-slate-300 rounded-lg" type="number" value={formData.publishYear} onChange={(e) => setFormData({ ...formData, publishYear: e.target.value })} placeholder="Publish Year" />
-                        <input className="w-full px-4 py-3 border border-slate-300 rounded-lg" value={formData.publisher} onChange={(e) => setFormData({ ...formData, publisher: e.target.value })} placeholder="Publisher" />
-                        <input className="w-full px-4 py-3 border border-slate-300 rounded-lg" value={formData.isbn} onChange={(e) => setFormData({ ...formData, isbn: e.target.value })} placeholder="ISBN" />
-                        <select className="w-full px-4 py-3 border border-slate-300 rounded-lg" value={formData.difficulty} onChange={(e) => setFormData({ ...formData, difficulty: e.target.value as Book["difficulty"] })}>
+                        <input className="w-full px-4 py-3 border border-mid/20 bg-cream rounded-2xl" type="number" value={formData.publishYear} onChange={(e) => setFormData({ ...formData, publishYear: e.target.value })} placeholder="Publish Year" />
+                        <input className="w-full px-4 py-3 border border-mid/20 bg-cream rounded-2xl" value={formData.publisher} onChange={(e) => setFormData({ ...formData, publisher: e.target.value })} placeholder="Publisher" />
+                        <input className="w-full px-4 py-3 border border-mid/20 bg-cream rounded-2xl" value={formData.isbn} onChange={(e) => setFormData({ ...formData, isbn: e.target.value })} placeholder="ISBN" />
+                        <select className="w-full px-4 py-3 border border-mid/20 bg-cream rounded-2xl" value={formData.difficulty} onChange={(e) => setFormData({ ...formData, difficulty: e.target.value as Book["difficulty"] })}>
                             <option value="beginner">Beginner</option>
                             <option value="intermediate">Intermediate</option>
                             <option value="advanced">Advanced</option>
                         </select>
                     </div>
 
-                    <input className="w-full px-4 py-3 border border-slate-300 rounded-lg" value={formData.tags} onChange={(e) => setFormData({ ...formData, tags: e.target.value })} placeholder="Tags separated by commas" />
+                    <input className="w-full px-4 py-3 border border-mid/20 bg-cream rounded-2xl" value={formData.tags} onChange={(e) => setFormData({ ...formData, tags: e.target.value })} placeholder="Tags separated by commas" />
 
-                    <div className="p-4 bg-slate-50 rounded-lg space-y-3">
+                    <div className="p-4 bg-cream border border-mid/15 rounded-2xl space-y-3">
                         <label className="flex items-center gap-2">
                             <input type="checkbox" checked={formData.featured} onChange={(e) => setFormData({ ...formData, featured: e.target.checked })} />
                             <span>Featured Book</span>
@@ -223,11 +223,11 @@ export default function EditBookModal({ book, isOpen, onClose, onSave }: EditBoo
                         </label>
                     </div>
 
-                    <div className="flex gap-3 pt-4 border-t border-slate-200">
-                        <button type="submit" disabled={saving} className="flex-1 px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 disabled:opacity-50">
+                    <div className="flex gap-3 pt-4 border-t border-mid/20">
+                        <button type="submit" disabled={saving} className="flex-1 px-6 py-3 bg-deep text-cream rounded-2xl font-semibold hover:bg-deep/90 disabled:opacity-50">
                             {saving ? "Saving..." : "Save Changes"}
                         </button>
-                        <button type="button" onClick={onClose} className="px-6 py-3 bg-slate-100 text-slate-700 rounded-lg font-semibold hover:bg-slate-200">
+                        <button type="button" onClick={onClose} className="px-6 py-3 bg-cream text-deep rounded-2xl border border-mid/20 font-semibold hover:bg-warm-white">
                             Cancel
                         </button>
                     </div>
