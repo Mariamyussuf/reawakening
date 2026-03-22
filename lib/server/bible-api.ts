@@ -8,6 +8,7 @@ import {
     type Chapter,
     type Verse,
 } from '@/lib/bibleAPI';
+import { getDailyVerseRotationItem } from '@/lib/daily-verses';
 
 const BIBLE_API_BASE = 'https://rest.api.bible/v1';
 const INVALID_ENV_LITERALS = new Set(['', 'undefined', 'null']);
@@ -27,6 +28,10 @@ function getBibleApiKey(): string | undefined {
         normalizeEnvValue(process.env.BIBLE_API_KEY) ??
         normalizeEnvValue(process.env.NEXT_PUBLIC_BIBLE_API_KEY)
     );
+}
+
+export function isBibleApiConfigured(): boolean {
+    return Boolean(getBibleApiKey());
 }
 
 async function fetchBibleAPI(endpoint: string, version: BibleVersion = 'KJV') {
@@ -173,24 +178,7 @@ export async function searchBible(query: string, version: BibleVersion = 'KJV', 
     return data.data.verses || [];
 }
 
-export async function getVerseOfTheDay(version: BibleVersion = 'KJV'): Promise<Verse | null> {
-    const popularVerses = [
-        'JHN.3.16',
-        'PSA.23.1',
-        'PRO.3.5-6',
-        'ROM.8.28',
-        'PHP.4.13',
-        'JER.29.11',
-        'ISA.40.31',
-        'MAT.28.20',
-        'PSA.46.1',
-        '1CO.13.4-7',
-    ];
-
-    const dayOfYear = Math.floor(
-        (Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000
-    );
-    const verseId = popularVerses[dayOfYear % popularVerses.length];
+export async function getVerseById(verseId: string, version: BibleVersion = 'KJV'): Promise<Verse | null> {
     const data = await fetchBibleAPI(`/verses/${verseId}`, version);
 
     return {
@@ -199,4 +187,9 @@ export async function getVerseOfTheDay(version: BibleVersion = 'KJV'): Promise<V
         text: stripHTML(data.data.content),
         verseNumber: 1,
     };
+}
+
+export async function getVerseOfTheDay(version: BibleVersion = 'KJV'): Promise<Verse | null> {
+    const verseOfTheDay = getDailyVerseRotationItem();
+    return getVerseById(verseOfTheDay.verseId, version);
 }

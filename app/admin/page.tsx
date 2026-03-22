@@ -23,10 +23,12 @@ interface DashboardOverview {
     totalConferences: number;
     publishedConferences: number;
     openConferenceRegistrations: number;
+    archivedConferences: number;
     totalDevotionals: number;
     publishedDevotionals: number;
     draftDevotionals: number;
     scheduledDevotionals: number;
+    dailyVerseRotationCount: number;
     totalPrayers: number;
     answeredPrayers: number;
     activePrayers: number;
@@ -135,10 +137,10 @@ function getModuleMeta(moduleId: AdminModuleId, overview: DashboardOverview) {
         case "conferences":
             return `${overview.publishedConferences} published, ${overview.openConferenceRegistrations} open registrations`;
         case "archive":
-            return `${overview.totalDevotionals + overview.totalBooks} content items available`;
+            return `${overview.archivedConferences} archived conferences available`;
         case "verses":
         default:
-            return `${overview.publishedDevotionals} published devotionals supporting scripture flow`;
+            return `${overview.dailyVerseRotationCount} verses in the current rotation`;
     }
 }
 

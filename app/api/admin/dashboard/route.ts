@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 
 import { ApiResponse } from '@/lib/api/response';
+import { DAILY_VERSE_ROTATION } from '@/lib/daily-verses';
 import { isMissingDevotionalsTableError } from '@/lib/devotionals';
 import { log } from '@/lib/logger';
 import { requireAdminOrLeader } from '@/lib/middleware/auth';
@@ -11,22 +12,25 @@ export const dynamic = 'force-dynamic';
 
 async function getConferenceOverview() {
     try {
-        const [totalConferences, publishedConferences, openConferenceRegistrations] = await Promise.all([
+        const [totalConferences, publishedConferences, openConferenceRegistrations, archivedConferences] = await Promise.all([
             prisma.conference.count(),
             prisma.conference.count({ where: { status: 'PUBLISHED' } }),
             prisma.conference.count({ where: { status: 'PUBLISHED', registrationOpen: true } }),
+            prisma.conference.count({ where: { status: 'ARCHIVED' } }),
         ]);
 
         return {
             totalConferences,
             publishedConferences,
             openConferenceRegistrations,
+            archivedConferences,
         };
     } catch {
         return {
             totalConferences: 0,
             publishedConferences: 0,
             openConferenceRegistrations: 0,
+            archivedConferences: 0,
         };
     }
 }
@@ -110,10 +114,12 @@ export async function GET(request: NextRequest) {
                 totalConferences: conferenceOverview.totalConferences,
                 publishedConferences: conferenceOverview.publishedConferences,
                 openConferenceRegistrations: conferenceOverview.openConferenceRegistrations,
+                archivedConferences: conferenceOverview.archivedConferences,
                 totalDevotionals: devotionalOverview.totalDevotionals,
                 publishedDevotionals: devotionalOverview.publishedDevotionals,
                 draftDevotionals: devotionalOverview.draftDevotionals,
                 scheduledDevotionals: devotionalOverview.scheduledDevotionals,
+                dailyVerseRotationCount: DAILY_VERSE_ROTATION.length,
                 totalPrayers,
                 answeredPrayers,
                 activePrayers,
