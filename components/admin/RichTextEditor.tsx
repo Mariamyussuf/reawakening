@@ -244,6 +244,5 @@ export default function RichTextEditor({ content, onChange, placeholder = 'Start
                     <EditorContent editor={editor} />
                 </div>
             </div>
-        </div>
     );
 }
