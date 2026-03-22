@@ -14,6 +14,7 @@ interface ConferenceOverview {
 interface ConferencePayload {
     conferences: SerializedConference[];
     overview: ConferenceOverview;
+    needsDatabaseSetup?: boolean;
 }
 
 interface ConferenceFormState {
@@ -117,6 +118,7 @@ export default function AdminConferencesPage() {
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
+    const [setupRequired, setSetupRequired] = useState(false);
     const [statusFilter, setStatusFilter] = useState<"ALL" | "DRAFT" | "PUBLISHED" | "ARCHIVED">("ALL");
     const [editingId, setEditingId] = useState<string | null>(null);
     const [formState, setFormState] = useState<ConferenceFormState>(emptyFormState);
@@ -147,9 +149,16 @@ export default function AdminConferencesPage() {
             }
 
             const data = extractConferencePayload(payload);
+            const needsDatabaseSetup = Boolean(payload?.needsDatabaseSetup || payload?.data?.needsDatabaseSetup);
+            setSetupRequired(needsDatabaseSetup);
             setConferences(data.conferences);
             setOverview(data.overview);
+
+            if (needsDatabaseSetup) {
+                setError("Conference data is not available in this environment yet. Run the latest production database schema update.");
+            }
         } catch (loadError: any) {
+            setSetupRequired(false);
             setError(loadError?.message || "Failed to load conferences.");
         } finally {
             setLoading(false);
@@ -529,10 +538,16 @@ export default function AdminConferencesPage() {
 
                         {conferences.length === 0 ? (
                             <div className="rounded-2xl border border-dashed border-mid/30 bg-cream px-6 py-16 text-center">
-                                <p className="eyebrow mb-3">No Conferences Yet</p>
-                                <h3 className="font-display text-2xl text-deep mb-2">Create the first conference record</h3>
+                                <p className="eyebrow mb-3">
+                                    {setupRequired ? "Database Setup Required" : "No Conferences Yet"}
+                                </p>
+                                <h3 className="font-display text-2xl text-deep mb-2">
+                                    {setupRequired ? "Conference data is not ready in this environment" : "Create the first conference record"}
+                                </h3>
                                 <p className="text-deep/65 leading-relaxed">
-                                    Once you save one here, the public conference page can start reading from live data.
+                                    {setupRequired
+                                        ? "Sync the latest Prisma schema to the production database, then reload this page."
+                                        : "Once you save one here, the public conference page can start reading from live data."}
                                 </p>
                             </div>
                         ) : (

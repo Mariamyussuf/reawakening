@@ -108,3 +108,33 @@ export function serializeConference(conference: Conference): SerializedConferenc
         updatedAt: conference.updatedAt.toISOString(),
     };
 }
+
+export function isMissingConferenceSchemaError(error: unknown): boolean {
+    if (!error || typeof error !== 'object') {
+        return false;
+    }
+
+    const code = 'code' in error && typeof error.code === 'string' ? error.code : '';
+    const message = 'message' in error && typeof error.message === 'string' ? error.message.toLowerCase() : '';
+
+    if (code === 'P2021' || code === 'P2022') {
+        return true;
+    }
+
+    const referencesConferenceSchema =
+        message.includes('conference') ||
+        message.includes('conferences') ||
+        message.includes('featured') ||
+        message.includes('registrationopen') ||
+        message.includes('registrationurl') ||
+        message.includes('costlabel');
+
+    const indicatesMissingSchema =
+        message.includes('does not exist') ||
+        message.includes('no such table') ||
+        message.includes('no such column') ||
+        (message.includes('table') && message.includes('missing')) ||
+        (message.includes('column') && message.includes('missing'));
+
+    return referencesConferenceSchema && indicatesMissingSchema;
+}

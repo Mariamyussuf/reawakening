@@ -1,9 +1,17 @@
 import { NextRequest } from 'next/server';
 
 import { ApiResponse } from '@/lib/api/response';
-import { normalizeConferenceStatus, serializeConference } from '@/lib/conferences';
+import {
+    isMissingConferenceSchemaError,
+    normalizeConferenceStatus,
+    serializeConference,
+} from '@/lib/conferences';
 import { log } from '@/lib/logger';
-import { requireAdminOrLeader } from '@/lib/middleware/auth';
+import {
+    ForbiddenError,
+    UnauthorizedError,
+    requireAdminOrLeader,
+} from '@/lib/middleware/auth';
 import { rateLimiters } from '@/lib/middleware/ratelimit';
 import prisma from '@/lib/prisma';
 import { sanitizeText } from '@/lib/sanitize';
@@ -81,6 +89,21 @@ export async function GET(
 
         return ApiResponse.success({ conference: serializeConference(conference) });
     } catch (error: any) {
+        if (error instanceof UnauthorizedError) {
+            return ApiResponse.unauthorized(error.message);
+        }
+
+        if (error instanceof ForbiddenError) {
+            return ApiResponse.forbidden(error.message);
+        }
+
+        if (isMissingConferenceSchemaError(error)) {
+            return ApiResponse.error(
+                'Conferences are not available yet because the database schema has not been updated in this environment.',
+                503
+            );
+        }
+
         log.error('Get admin conference error', error, {
             endpoint: '/api/admin/conferences/[id]',
             conferenceId: params.id,
@@ -125,6 +148,21 @@ export async function PUT(
             'Conference updated successfully'
         );
     } catch (error: any) {
+        if (error instanceof UnauthorizedError) {
+            return ApiResponse.unauthorized(error.message);
+        }
+
+        if (error instanceof ForbiddenError) {
+            return ApiResponse.forbidden(error.message);
+        }
+
+        if (isMissingConferenceSchemaError(error)) {
+            return ApiResponse.error(
+                'Conferences are not available yet because the database schema has not been updated in this environment.',
+                503
+            );
+        }
+
         log.error('Update conference error', error, {
             endpoint: '/api/admin/conferences/[id]',
             conferenceId: params.id,
@@ -151,6 +189,21 @@ export async function DELETE(
 
         return ApiResponse.success(null, 200, 'Conference deleted successfully');
     } catch (error: any) {
+        if (error instanceof UnauthorizedError) {
+            return ApiResponse.unauthorized(error.message);
+        }
+
+        if (error instanceof ForbiddenError) {
+            return ApiResponse.forbidden(error.message);
+        }
+
+        if (isMissingConferenceSchemaError(error)) {
+            return ApiResponse.error(
+                'Conferences are not available yet because the database schema has not been updated in this environment.',
+                503
+            );
+        }
+
         log.error('Delete conference error', error, {
             endpoint: '/api/admin/conferences/[id]',
             conferenceId: params.id,

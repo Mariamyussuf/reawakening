@@ -1,9 +1,18 @@
 import { NextRequest } from 'next/server';
 
 import { ApiResponse } from '@/lib/api/response';
-import { CONFERENCE_STATUSES, normalizeConferenceStatus, serializeConference } from '@/lib/conferences';
+import {
+    CONFERENCE_STATUSES,
+    isMissingConferenceSchemaError,
+    normalizeConferenceStatus,
+    serializeConference,
+} from '@/lib/conferences';
 import { log } from '@/lib/logger';
-import { requireAdminOrLeader } from '@/lib/middleware/auth';
+import {
+    ForbiddenError,
+    UnauthorizedError,
+    requireAdminOrLeader,
+} from '@/lib/middleware/auth';
 import { rateLimiters } from '@/lib/middleware/ratelimit';
 import prisma from '@/lib/prisma';
 import { sanitizeText } from '@/lib/sanitize';
@@ -75,20 +84,45 @@ export async function GET(request: NextRequest) {
                 ? { status: status.toUpperCase() }
                 : undefined;
 
-        const conferences = await prisma.conference.findMany({
-            where,
-            orderBy: [
-                { featured: 'desc' },
-                { startDate: 'desc' },
-                { createdAt: 'desc' },
-            ],
-        });
+        let conferences;
+        let totalConferences;
+        let publishedConferences;
+        let openRegistrations;
 
-        const [totalConferences, publishedConferences, openRegistrations] = await Promise.all([
-            prisma.conference.count(),
-            prisma.conference.count({ where: { status: 'PUBLISHED' } }),
-            prisma.conference.count({ where: { status: 'PUBLISHED', registrationOpen: true } }),
-        ]);
+        try {
+            [
+                conferences,
+                totalConferences,
+                publishedConferences,
+                openRegistrations,
+            ] = await Promise.all([
+                prisma.conference.findMany({
+                    where,
+                    orderBy: [
+                        { featured: 'desc' },
+                        { startDate: 'desc' },
+                        { createdAt: 'desc' },
+                    ],
+                }),
+                prisma.conference.count(),
+                prisma.conference.count({ where: { status: 'PUBLISHED' } }),
+                prisma.conference.count({ where: { status: 'PUBLISHED', registrationOpen: true } }),
+            ]);
+        } catch (error) {
+            if (isMissingConferenceSchemaError(error)) {
+                return ApiResponse.success({
+                    conferences: [],
+                    overview: {
+                        totalConferences: 0,
+                        publishedConferences: 0,
+                        openRegistrations: 0,
+                    },
+                    needsDatabaseSetup: true,
+                });
+            }
+
+            throw error;
+        }
 
         return ApiResponse.success({
             conferences: conferences.map(serializeConference),
@@ -99,6 +133,14 @@ export async function GET(request: NextRequest) {
             },
         });
     } catch (error: any) {
+        if (error instanceof UnauthorizedError) {
+            return ApiResponse.unauthorized(error.message);
+        }
+
+        if (error instanceof ForbiddenError) {
+            return ApiResponse.forbidden(error.message);
+        }
+
         log.error('Get admin conferences error', error, { endpoint: '/api/admin/conferences' });
         return ApiResponse.internalError(error.message || 'An error occurred while loading conferences');
     }
@@ -132,6 +174,21 @@ export async function POST(request: NextRequest) {
             'Conference created successfully'
         );
     } catch (error: any) {
+        if (error instanceof UnauthorizedError) {
+            return ApiResponse.unauthorized(error.message);
+        }
+
+        if (error instanceof ForbiddenError) {
+            return ApiResponse.forbidden(error.message);
+        }
+
+        if (isMissingConferenceSchemaError(error)) {
+            return ApiResponse.error(
+                'Conferences are not available yet because the database schema has not been updated in this environment.',
+                503
+            );
+        }
+
         log.error('Create conference error', error, { endpoint: '/api/admin/conferences' });
         return ApiResponse.internalError(error.message || 'An error occurred while creating the conference');
     }
