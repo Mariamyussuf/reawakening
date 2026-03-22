@@ -4,7 +4,6 @@ import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import Image from '@tiptap/extension-image';
-import Link from '@tiptap/extension-link';
 import { useState, useEffect } from 'react';
 
 interface RichTextEditorProps {
@@ -27,6 +26,12 @@ export default function RichTextEditor({ content, onChange, placeholder = 'Start
                         class: 'border-l-4 border-slate-300 pl-4 italic my-6 text-slate-600',
                     },
                 },
+                link: {
+                    openOnClick: false,
+                    HTMLAttributes: {
+                        class: 'text-blue-600 hover:text-blue-800 underline',
+                    },
+                },
             }),
             Placeholder.configure({
                 placeholder,
@@ -36,12 +41,6 @@ export default function RichTextEditor({ content, onChange, placeholder = 'Start
                 allowBase64: true,
                 HTMLAttributes: {
                     class: 'max-w-full h-auto rounded-lg my-8',
-                },
-            }),
-            Link.configure({
-                openOnClick: false,
-                HTMLAttributes: {
-                    class: 'text-blue-600 hover:text-blue-800 underline',
                 },
             }),
         ],

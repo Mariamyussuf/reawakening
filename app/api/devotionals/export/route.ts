@@ -4,6 +4,7 @@ import { ApiResponse } from '@/lib/api/response';
 import { log } from '@/lib/logger';
 import prisma from '@/lib/prisma';
 import { PDFGenerator } from '@/lib/pdf/generator';
+import { parseStoredStringArray } from '@/lib/parse-string-array';
 
 export const dynamic = 'force-dynamic';
 
@@ -55,7 +56,7 @@ export async function GET(request: NextRequest) {
         // Parse tags for all
         const formattedDevotionals = devotionals.map(d => ({
             ...d,
-            tags: d.tags ? JSON.parse(d.tags) : []
+            tags: parseStoredStringArray(d.tags)
         }));
 
         if (formattedDevotionals.length === 0) {

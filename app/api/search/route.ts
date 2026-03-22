@@ -7,6 +7,7 @@ import { log } from '@/lib/logger';
 import prisma from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import { parseStoredStringArray } from '@/lib/parse-string-array';
 
 export const dynamic = 'force-dynamic';
 
@@ -58,7 +59,7 @@ export async function GET(request: NextRequest) {
                 description: book.description,
                 coverImage: book.coverImage,
                 categories: book.categories ? JSON.parse(book.categories) : [],
-                tags: book.tags ? JSON.parse(book.tags) : [],
+                tags: parseStoredStringArray(book.tags),
                 publishYear: book.publishYear,
                 createdAt: book.createdAt,
             }));
@@ -88,7 +89,7 @@ export async function GET(request: NextRequest) {
                 excerpt: devotional.excerpt,
                 author: devotional.author,
                 coverImage: devotional.coverImage,
-                tags: devotional.tags ? JSON.parse(devotional.tags) : [],
+                tags: parseStoredStringArray(devotional.tags),
                 scripture: devotional.scripture,
                 publishDate: devotional.publishDate,
                 createdAt: devotional.createdAt,

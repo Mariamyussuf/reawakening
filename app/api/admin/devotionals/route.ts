@@ -1,18 +1,15 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { requireAdminOrLeader } from '@/lib/middleware/auth';
 import { rateLimiters } from '@/lib/middleware/ratelimit';
-import { validateFormData } from '@/lib/validation';
-import { DevotionalSchema } from '@/lib/validation/schemas';
 import { validateFile, FileValidationPresets } from '@/lib/validation/file-upload';
 import { ApiResponse } from '@/lib/api/response';
 import { log } from '@/lib/logger';
 import prisma from '@/lib/prisma';
+import { parseStoredStringArray } from '@/lib/parse-string-array';
 import { writeFile, mkdir } from 'fs/promises';
 import { existsSync } from 'fs';
 import path from 'path';
 import { sanitizeRichText, sanitizeText } from '@/lib/sanitize';
-
-const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5 MB
 
 // GET /api/admin/devotionals - Get all devotionals (including drafts)
 export async function GET(request: NextRequest) {
@@ -48,7 +45,7 @@ export async function GET(request: NextRequest) {
             publishDate: devotional.publishDate,
             scheduledDate: devotional.scheduledDate,
             status: devotional.status,
-            tags: devotional.tags ? JSON.parse(devotional.tags) : [],
+            tags: parseStoredStringArray(devotional.tags),
             scripture: devotional.scripture,
             createdAt: devotional.createdAt,
             updatedAt: devotional.updatedAt,

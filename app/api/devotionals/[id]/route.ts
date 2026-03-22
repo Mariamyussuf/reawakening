@@ -3,6 +3,7 @@ import { rateLimiters } from '@/lib/middleware/ratelimit';
 import { ApiResponse } from '@/lib/api/response';
 import { log } from '@/lib/logger';
 import prisma from '@/lib/prisma';
+import { parseStoredStringArray } from '@/lib/parse-string-array';
 
 // GET /api/devotionals/:id - Get single devotional
 export async function GET(
@@ -38,7 +39,7 @@ export async function GET(
             author: devotional.author,
             coverImage: devotional.coverImage,
             publishDate: devotional.publishDate,
-            tags: devotional.tags ? JSON.parse(devotional.tags) : [],
+            tags: parseStoredStringArray(devotional.tags),
             scripture: devotional.scripture,
             createdAt: devotional.createdAt,
         };

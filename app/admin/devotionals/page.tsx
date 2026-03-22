@@ -27,9 +27,22 @@ export default function AdminDevotionalsPage() {
         loadDevotionals();
     }, [statusFilter]);
 
+    const extractDevotionals = (payload: any): Devotional[] => {
+        if (Array.isArray(payload?.devotionals)) {
+            return payload.devotionals;
+        }
+
+        if (Array.isArray(payload?.data?.devotionals)) {
+            return payload.data.devotionals;
+        }
+
+        return [];
+    };
+
     const loadDevotionals = async () => {
         try {
             setLoading(true);
+            setError("");
             const params = new URLSearchParams();
             if (statusFilter !== 'all') {
                 params.append('status', statusFilter);
@@ -40,8 +53,8 @@ export default function AdminDevotionalsPage() {
                 throw new Error('Failed to load devotionals');
             }
 
-            const data = await response.json();
-            setDevotionals(data.devotionals);
+            const payload = await response.json();
+            setDevotionals(extractDevotionals(payload));
         } catch (error) {
             console.error("Error loading devotionals:", error);
             setError("Failed to load devotionals");

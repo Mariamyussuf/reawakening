@@ -5,6 +5,7 @@ import { validateFile, FileValidationPresets } from '@/lib/validation/file-uploa
 import { ApiResponse } from '@/lib/api/response';
 import { log } from '@/lib/logger';
 import prisma from '@/lib/prisma';
+import { parseStoredStringArray } from '@/lib/parse-string-array';
 import { writeFile, mkdir, unlink } from 'fs/promises';
 import { existsSync } from 'fs';
 import path from 'path';
@@ -42,7 +43,7 @@ export async function GET(
             publishDate: devotional.publishDate,
             scheduledDate: devotional.scheduledDate,
             status: devotional.status,
-            tags: devotional.tags ? JSON.parse(devotional.tags) : [],
+            tags: parseStoredStringArray(devotional.tags),
             scripture: devotional.scripture,
             createdAt: devotional.createdAt,
             updatedAt: devotional.updatedAt,
@@ -179,7 +180,7 @@ export async function PUT(
             publishDate: devotional.publishDate,
             scheduledDate: devotional.scheduledDate,
             status: devotional.status,
-            tags: devotional.tags ? JSON.parse(devotional.tags) : [],
+            tags: parseStoredStringArray(devotional.tags),
             scripture: devotional.scripture,
             createdAt: devotional.createdAt,
             updatedAt: devotional.updatedAt,
