@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAdminOrLeader } from '@/lib/middleware/auth';
+import {
+    ForbiddenError,
+    UnauthorizedError,
+    requireAdminOrLeader,
+} from '@/lib/middleware/auth';
 import { rateLimiters } from '@/lib/middleware/ratelimit';
 import { validateFile, FileValidationPresets } from '@/lib/validation/file-upload';
 import { ApiResponse } from '@/lib/api/response';
@@ -39,6 +43,14 @@ export async function GET(
 
         return ApiResponse.success({ devotional: formattedDevotional });
     } catch (error: any) {
+        if (error instanceof UnauthorizedError) {
+            return ApiResponse.unauthorized(error.message);
+        }
+
+        if (error instanceof ForbiddenError) {
+            return ApiResponse.forbidden(error.message);
+        }
+
         if (isMissingDevotionalsTableError(error)) {
             return ApiResponse.error(
                 'Devotionals are not available yet because the database schema has not been updated in this environment.',
@@ -169,6 +181,14 @@ export async function PUT(
 
         return ApiResponse.success({ devotional: formattedDevotional }, 200, 'Devotional updated successfully');
     } catch (error: any) {
+        if (error instanceof UnauthorizedError) {
+            return ApiResponse.unauthorized(error.message);
+        }
+
+        if (error instanceof ForbiddenError) {
+            return ApiResponse.forbidden(error.message);
+        }
+
         if (isMissingDevotionalsTableError(error)) {
             return ApiResponse.error(
                 'Devotionals are not available yet because the database schema has not been updated in this environment.',
@@ -221,6 +241,14 @@ export async function DELETE(
 
         return ApiResponse.success(null, 200, 'Devotional deleted successfully');
     } catch (error: any) {
+        if (error instanceof UnauthorizedError) {
+            return ApiResponse.unauthorized(error.message);
+        }
+
+        if (error instanceof ForbiddenError) {
+            return ApiResponse.forbidden(error.message);
+        }
+
         if (isMissingDevotionalsTableError(error)) {
             return ApiResponse.error(
                 'Devotionals are not available yet because the database schema has not been updated in this environment.',

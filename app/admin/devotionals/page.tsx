@@ -53,12 +53,15 @@ export default function AdminDevotionalsPage() {
                 params.append('status', statusFilter);
             }
 
-            const response = await fetch(`/api/admin/devotionals?${params.toString()}`);
+            const response = await fetch(`/api/admin/devotionals?${params.toString()}`, {
+                cache: "no-store",
+            });
+            const payload = await response.json().catch(() => null);
+
             if (!response.ok) {
-                throw new Error('Failed to load devotionals');
+                throw new Error(payload?.error || "Failed to load devotionals");
             }
 
-            const payload = await response.json();
             const needsDatabaseSetup = requiresDatabaseSetup(payload);
             setSetupRequired(needsDatabaseSetup);
             setDevotionals(extractDevotionals(payload));
@@ -66,9 +69,9 @@ export default function AdminDevotionalsPage() {
             if (needsDatabaseSetup) {
                 setError("Devotionals are not available in this environment yet. Run the latest database schema update for production.");
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error loading devotionals:", error);
-            setError("Failed to load devotionals");
+            setError(error?.message || "Failed to load devotionals");
             setSetupRequired(false);
         } finally {
             setLoading(false);

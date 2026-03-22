@@ -1,5 +1,9 @@
 import { NextRequest } from 'next/server';
-import { requireAdminOrLeader } from '@/lib/middleware/auth';
+import {
+    ForbiddenError,
+    UnauthorizedError,
+    requireAdminOrLeader,
+} from '@/lib/middleware/auth';
 import { rateLimiters } from '@/lib/middleware/ratelimit';
 import { validateFile, FileValidationPresets } from '@/lib/validation/file-upload';
 import { ApiResponse } from '@/lib/api/response';
@@ -66,6 +70,14 @@ export async function GET(request: NextRequest) {
             skip,
         });
     } catch (error: any) {
+        if (error instanceof UnauthorizedError) {
+            return ApiResponse.unauthorized(error.message);
+        }
+
+        if (error instanceof ForbiddenError) {
+            return ApiResponse.forbidden(error.message);
+        }
+
         log.error('Get admin devotionals error', error, { endpoint: '/api/admin/devotionals' });
         return ApiResponse.internalError('An error occurred while fetching devotionals');
     }
@@ -159,6 +171,14 @@ export async function POST(request: NextRequest) {
 
         return ApiResponse.created(formattedDevotional);
     } catch (error: any) {
+        if (error instanceof UnauthorizedError) {
+            return ApiResponse.unauthorized(error.message);
+        }
+
+        if (error instanceof ForbiddenError) {
+            return ApiResponse.forbidden(error.message);
+        }
+
         if (isMissingDevotionalsTableError(error)) {
             return ApiResponse.error(
                 'Devotionals are not available yet because the database schema has not been updated in this environment.',
