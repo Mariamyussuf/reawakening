@@ -1,58 +1,143 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
 
-const adminModules = [
+type AdminModuleId =
+    | "verses"
+    | "conferences"
+    | "books"
+    | "devotionals"
+    | "users"
+    | "archive";
+
+interface DashboardOverview {
+    totalUsers: number;
+    totalAdmins: number;
+    totalLeaders: number;
+    totalMembers: number;
+    totalBooks: number;
+    featuredBooks: number;
+    totalDevotionals: number;
+    publishedDevotionals: number;
+    draftDevotionals: number;
+    scheduledDevotionals: number;
+    totalPrayers: number;
+    answeredPrayers: number;
+    activePrayers: number;
+}
+
+interface DashboardPayload {
+    viewer: {
+        name: string;
+        email: string;
+        role: "admin" | "leader" | "member";
+    };
+    overview: DashboardOverview;
+    generatedAt: string;
+}
+
+const adminModules: Array<{
+    id: AdminModuleId;
+    title: string;
+    description: string;
+    href: string;
+    accent: "gold" | "deep";
+    icon: JSX.Element;
+}> = [
     {
         id: "verses",
         title: "Daily Verses",
-        description: "Add and manage daily Bible verses with reflections.",
-        icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>,
+        description: "Manage scripture highlights and verse content for the platform.",
         href: "/admin/verses",
-        color: "gold"
+        accent: "gold",
+        icon: (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
+        ),
     },
     {
         id: "conferences",
         title: "Conferences",
-        description: "Create and edit conference details and registrations.",
-        icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>,
+        description: "Coordinate event details, attendance, and upcoming conference updates.",
         href: "/admin/conferences",
-        color: "navy"
+        accent: "deep",
+        icon: (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+        ),
     },
     {
         id: "books",
         title: "Books Library",
-        description: "Upload, edit, and manage digital books for members.",
-        icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>,
+        description: "Upload, organize, and highlight books for members and study groups.",
         href: "/admin/books",
-        color: "gold"
+        accent: "gold",
+        icon: (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+            </svg>
+        ),
     },
     {
         id: "devotionals",
         title: "Devotionals",
-        description: "Create and manage daily spiritual reflections.",
-        icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>,
+        description: "Review drafts, publish devotionals, and keep the reading flow current.",
         href: "/admin/devotionals",
-        color: "navy"
+        accent: "deep",
+        icon: (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+        ),
     },
     {
         id: "users",
         title: "User Management",
-        description: "Manage users, roles, and community permissions.",
-        icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>,
+        description: "Manage roles, access, and the people serving within the platform.",
         href: "/admin/users",
-        color: "gold"
+        accent: "gold",
+        icon: (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+        ),
     },
     {
         id: "archive",
         title: "Past Archive",
-        description: "Add past conferences and messages to the archive.",
-        icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" /></svg>,
+        description: "Curate past meetings, materials, and ministry records in one place.",
         href: "/admin/archive",
-        color: "navy"
+        accent: "deep",
+        icon: (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+            </svg>
+        ),
     },
 ];
+
+function getModuleMeta(moduleId: AdminModuleId, overview: DashboardOverview) {
+    switch (moduleId) {
+        case "books":
+            return `${overview.totalBooks} books, ${overview.featuredBooks} featured`;
+        case "devotionals":
+            return `${overview.publishedDevotionals} published, ${overview.draftDevotionals} drafts`;
+        case "users":
+            return `${overview.totalUsers} total users`;
+        case "conferences":
+            return `${overview.totalLeaders + overview.totalAdmins} leadership accounts active`;
+        case "archive":
+            return `${overview.totalDevotionals + overview.totalBooks} content items available`;
+        case "verses":
+        default:
+            return `${overview.publishedDevotionals} published devotionals supporting scripture flow`;
+    }
+}
 
 function AdminSignOutButton({ className = "" }: { className?: string }) {
     return (
@@ -69,6 +154,56 @@ export default function AdminPage() {
     const { data: session, status } = useSession();
     const userRole = session?.user?.role;
     const canAccessAdmin = userRole === "admin" || userRole === "leader";
+    const [dashboard, setDashboard] = useState<DashboardPayload | null>(null);
+    const [loadingDashboard, setLoadingDashboard] = useState(false);
+    const [dashboardError, setDashboardError] = useState("");
+
+    useEffect(() => {
+        if (!canAccessAdmin) {
+            setDashboard(null);
+            return;
+        }
+
+        let isMounted = true;
+
+        const loadDashboard = async () => {
+            setLoadingDashboard(true);
+            setDashboardError("");
+
+            try {
+                const response = await fetch("/api/admin/dashboard", {
+                    cache: "no-store",
+                });
+
+                const payload = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(payload?.error || "Failed to load the admin dashboard.");
+                }
+
+                const data = payload?.data ?? payload;
+
+                if (isMounted) {
+                    setDashboard(data as DashboardPayload);
+                }
+            } catch (error: any) {
+                if (isMounted) {
+                    setDashboardError(error?.message || "Failed to load the admin dashboard.");
+                }
+            } finally {
+                if (isMounted) {
+                    setLoadingDashboard(false);
+                }
+            }
+        };
+
+        void loadDashboard();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [canAccessAdmin]);
+
     const visibleModules =
         userRole === "leader"
             ? adminModules.filter((module) => module.id !== "users")
@@ -76,12 +211,10 @@ export default function AdminPage() {
 
     if (status === "loading") {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-cream-50">
+            <div className="min-h-screen flex items-center justify-center bg-cream">
                 <div className="text-center">
-                    <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-navy-900 border-t-transparent" />
-                    <p className="mt-4 font-sans text-sm uppercase tracking-[0.2em] text-ink-400">
-                        Checking Access
-                    </p>
+                    <div className="w-8 h-8 border-2 border-gold/30 border-t-gold rounded-full animate-spin mx-auto mb-4" />
+                    <p className="text-deep/70 font-display text-lg">Loading...</p>
                 </div>
             </div>
         );
@@ -89,41 +222,32 @@ export default function AdminPage() {
 
     if (status === "unauthenticated") {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-cream-50 overflow-hidden relative">
-                <div className="absolute top-0 left-0 w-full h-1 bg-navy-950" />
-                <div className="absolute top-1 left-0 w-full h-px bg-gold-500/30" />
-
-                <div className="w-full max-w-md px-6 relative z-10">
-                    <div className="text-center mb-10">
-                        <Link href="/" className="inline-flex flex-col items-center group">
-                            <div className="relative mb-6">
-                                <div className="absolute inset-0 bg-navy-900/10 rounded-2xl blur-xl" />
-                                <img src="/images/logo.png" alt="Reawakening" className="relative w-16 h-16 object-contain" />
-                            </div>
-                            <h1 className="font-display text-3xl font-semibold text-navy-900 leading-none">Admin Portal</h1>
-                            <div className="gold-line mx-auto my-4 w-12" />
-                            <p className="font-sans text-xs font-semibold tracking-[0.2em] uppercase text-gold-600">Secure Access Only</p>
-                        </Link>
+            <div className="min-h-screen bg-cream flex items-center justify-center px-6 py-12">
+                <div className="w-full max-w-lg rounded-3xl border border-mid/20 bg-warm-white p-8 sm:p-10 shadow-premium text-center">
+                    <div className="inline-flex flex-col items-center mb-8">
+                        <div className="relative mb-5 h-16 w-16">
+                            <Image
+                                src="/images/logo.png"
+                                alt="Reawakening"
+                                fill
+                                className="object-contain"
+                                sizes="64px"
+                            />
+                        </div>
+                        <p className="eyebrow mb-3">Administrative Access</p>
+                        <h1 className="font-display text-3xl text-deep">Sign in to continue</h1>
                     </div>
 
-                    <div className="card-glass p-8 rounded-3xl shadow-premium text-center space-y-6">
-                        <p className="font-sans text-sm text-ink-400 leading-relaxed">
-                            Sign in with an account that has the <span className="font-bold text-navy-900">ADMIN</span> or <span className="font-bold text-navy-900">LEADER</span> role.
-                        </p>
+                    <p className="text-deep/70 leading-relaxed mb-8">
+                        Use an account with the <span className="font-semibold text-deep">admin</span> or <span className="font-semibold text-deep">leader</span> role to open the ministry workspace.
+                    </p>
 
-                        <Link
-                            href="/auth/signin?callbackUrl=%2Fadmin"
-                            className="btn-navy w-full py-4 text-xs font-bold tracking-widest uppercase flex items-center justify-center gap-3 group"
-                        >
-                            Sign In To Continue
-                            <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+                    <div className="flex flex-col gap-3">
+                        <Link href="/auth/signin?callbackUrl=%2Fadmin" className="btn-primary">
+                            Open Sign In
                         </Link>
-                    </div>
-
-                    <div className="mt-10 text-center">
-                        <Link href="/" className="font-sans text-xs font-bold text-ink-400 hover:text-navy-900 transition-colors uppercase tracking-[0.1em] flex items-center justify-center gap-2">
-                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M15 19l-7-7 7-7" /></svg>
-                            Back to Ministry Site
+                        <Link href="/" className="btn-outline">
+                            Back to Home
                         </Link>
                     </div>
                 </div>
@@ -133,176 +257,221 @@ export default function AdminPage() {
 
     if (!canAccessAdmin) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-cream-50 overflow-hidden relative">
-                <div className="w-full max-w-md px-6 relative z-10">
-                    <div className="card-glass p-8 rounded-3xl shadow-premium text-center space-y-6">
-                        <div>
-                            <p className="font-sans text-[10px] font-bold tracking-[0.2em] uppercase text-gold-600 mb-3">
-                                Access Restricted
-                            </p>
-                            <h1 className="font-display text-3xl font-semibold text-navy-900">
-                                Admin Role Required
-                            </h1>
-                        </div>
+            <div className="min-h-screen bg-cream flex items-center justify-center px-6 py-12">
+                <div className="w-full max-w-lg rounded-3xl border border-mid/20 bg-warm-white p-8 sm:p-10 shadow-premium text-center">
+                    <p className="eyebrow mb-3">Access Restricted</p>
+                    <h1 className="font-display text-3xl text-deep mb-4">Admin role required</h1>
+                    <p className="text-deep/70 leading-relaxed mb-8">
+                        You are signed in as <span className="font-semibold text-deep">{session?.user?.email}</span>, but this account does not currently have access to the admin workspace.
+                    </p>
 
-                        <p className="font-sans text-sm text-ink-400 leading-relaxed">
-                            You are signed in as <span className="font-bold text-navy-900">{session?.user?.email}</span>, but this account does not have admin access.
-                        </p>
-
-                        <div className="flex flex-col gap-3">
-                            <Link href="/hub" className="btn-outline py-4 text-xs font-bold tracking-widest uppercase">
-                                Go To Hub
-                            </Link>
-                            <AdminSignOutButton className="btn-navy py-4 text-xs font-bold tracking-widest uppercase" />
-                        </div>
+                    <div className="flex flex-col gap-3">
+                        <Link href="/hub" className="btn-primary">
+                            Go to Member Hub
+                        </Link>
+                        <AdminSignOutButton className="btn-outline" />
                     </div>
                 </div>
             </div>
         );
     }
 
+    const overview = dashboard?.overview;
+    const generatedAtLabel = dashboard?.generatedAt
+        ? new Intl.DateTimeFormat("en-US", {
+            dateStyle: "medium",
+            timeStyle: "short",
+        }).format(new Date(dashboard.generatedAt))
+        : "Refreshing data...";
+
     return (
-        <div className="min-h-screen bg-faint-gold/5 flex">
-            <div className="hidden lg:block w-80 bg-navy-950 relative overflow-hidden flex-shrink-0">
-                <div className="absolute inset-0 bg-hero-pattern opacity-100" />
-                <div className="absolute inset-0 bg-gradient-to-b from-navy-950 via-navy-900/50 to-navy-950" />
-
-                <div className="relative z-10 p-10 h-full flex flex-col">
-                    <Link href="/" className="flex items-center gap-4 mb-16 group">
-                        <div className="relative">
-                            <div className="absolute inset-0 bg-gold-400/20 rounded-xl blur-md group-hover:bg-gold-400/30 transition-all" />
-                            <img src="/images/logo.png" alt="Reawakening" className="relative w-10 h-10 object-contain" />
+        <div className="min-h-screen bg-cream font-body">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8">
+                    <div className="flex items-center gap-4">
+                        <div className="relative h-12 w-12 rounded-2xl border border-gold/20 bg-warm-white overflow-hidden">
+                            <Image
+                                src="/images/logo.png"
+                                alt="Reawakening"
+                                fill
+                                className="object-contain p-2"
+                                sizes="48px"
+                            />
                         </div>
                         <div>
-                            <span className="font-display text-xl font-bold text-cream-50 block leading-none">Admin</span>
-                            <span className="text-[10px] font-sans font-medium tracking-[0.25em] uppercase text-gold-500/70">Terminal</span>
+                            <p className="eyebrow mb-1">Admin Workspace</p>
+                            <h1 className="font-display text-3xl text-deep">Ministry operations</h1>
                         </div>
-                    </Link>
+                    </div>
 
-                    <div className="flex-1 space-y-10">
-                        <div>
-                            <p className="font-sans text-[10px] font-bold tracking-[0.3em] uppercase text-gold-500/50 mb-6">Status</p>
-                            <div className="space-y-4">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                                    <span className="font-sans text-xs text-navy-300">Database Connected</span>
+                    <div className="flex flex-wrap gap-3">
+                        <Link href="/hub" className="btn-outline">
+                            Member Hub
+                        </Link>
+                        <AdminSignOutButton className="btn-primary" />
+                    </div>
+                </div>
+
+                <div className="bg-warm-white border border-mid/20 rounded-3xl p-6 sm:p-8 mb-8 shadow-sm">
+                    <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
+                        <div className="max-w-2xl">
+                            <p className="text-xs text-deep/50 tracking-wide uppercase mb-2">Overview</p>
+                            <h2 className="font-display text-2xl sm:text-4xl text-deep mb-3">
+                                Welcome, {dashboard?.viewer?.name || session?.user?.name || "Administrator"}
+                            </h2>
+                            <p className="text-deep/70 leading-relaxed">
+                                This dashboard now reflects live platform data instead of placeholder values, and access follows the authenticated user role for this session.
+                            </p>
+                        </div>
+
+                        <div className="rounded-2xl bg-deep p-5 min-w-[220px]">
+                            <p className="text-[10px] tracking-[0.2em] uppercase text-gold/70 mb-2">Current Session</p>
+                            <p className="font-display text-xl text-cream">{dashboard?.viewer?.email || session?.user?.email}</p>
+                            <p className="text-sm text-cream/60 mt-1">
+                                Role: {(dashboard?.viewer?.role || userRole || "member").toUpperCase()}
+                            </p>
+                            <p className="text-xs text-cream/50 mt-3">
+                                Updated {generatedAtLabel}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                {dashboardError && (
+                    <div className="mb-8 rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-red-700">
+                        {dashboardError}
+                    </div>
+                )}
+
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-10">
+                    {[
+                        {
+                            label: "Community",
+                            value: overview ? `${overview.totalUsers}` : "—",
+                            detail: overview
+                                ? `${overview.totalMembers} members, ${overview.totalLeaders} leaders, ${overview.totalAdmins} admins`
+                                : "Loading community summary...",
+                        },
+                        {
+                            label: "Library",
+                            value: overview ? `${overview.totalBooks}` : "—",
+                            detail: overview
+                                ? `${overview.featuredBooks} featured resources`
+                                : "Loading book summary...",
+                        },
+                        {
+                            label: "Devotionals",
+                            value: overview ? `${overview.totalDevotionals}` : "—",
+                            detail: overview
+                                ? `${overview.publishedDevotionals} published, ${overview.draftDevotionals} drafts`
+                                : "Loading devotional summary...",
+                        },
+                        {
+                            label: "Prayer Requests",
+                            value: overview ? `${overview.totalPrayers}` : "—",
+                            detail: overview
+                                ? `${overview.activePrayers} active, ${overview.answeredPrayers} answered`
+                                : "Loading prayer summary...",
+                        },
+                    ].map((card) => (
+                        <div key={card.label} className="bg-warm-white border border-mid/20 rounded-2xl p-5 shadow-sm">
+                            <p className="text-xs text-deep/50 tracking-wide uppercase mb-2">{card.label}</p>
+                            <p className="font-display text-3xl text-deep mb-2">
+                                {loadingDashboard && !overview ? "…" : card.value}
+                            </p>
+                            <p className="text-sm text-deep/65 leading-relaxed">{card.detail}</p>
+                        </div>
+                    ))}
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-[1.4fr_0.8fr] gap-6 mb-10">
+                    <div className="bg-warm-white border border-mid/20 rounded-3xl p-6 shadow-sm">
+                        <div className="flex items-center justify-between gap-4 mb-6">
+                            <div>
+                                <p className="eyebrow mb-2">Modules</p>
+                                <h3 className="font-display text-2xl text-deep">Administrative tools</h3>
+                            </div>
+                            <span className="text-sm text-deep/50">
+                                {visibleModules.length} modules available
+                            </span>
+                        </div>
+
+                        <div className="grid sm:grid-cols-2 gap-4">
+                            {visibleModules.map((module) => (
+                                <Link
+                                    key={module.id}
+                                    href={module.href}
+                                    className="group rounded-2xl border border-mid/20 bg-cream p-5 hover:border-gold/40 hover:shadow-lift transition-all"
+                                >
+                                    <div className={`w-11 h-11 rounded-2xl flex items-center justify-center mb-4 ${
+                                        module.accent === "gold"
+                                            ? "bg-gold/15 text-gold-dark"
+                                            : "bg-deep text-cream"
+                                    }`}>
+                                        {module.icon}
+                                    </div>
+
+                                    <h4 className="font-display text-xl text-deep mb-2 group-hover:text-gold-dark transition-colors">
+                                        {module.title}
+                                    </h4>
+                                    <p className="text-sm text-deep/70 leading-relaxed mb-4">
+                                        {module.description}
+                                    </p>
+                                    <p className="text-xs uppercase tracking-[0.15em] text-deep/45 mb-4">
+                                        {overview ? getModuleMeta(module.id, overview) : "Loading live summary..."}
+                                    </p>
+                                    <span className="inline-flex items-center gap-2 text-sm font-medium text-gold-dark group-hover:gap-3 transition-all">
+                                        Open module
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                        </svg>
+                                    </span>
+                                </Link>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="space-y-6">
+                        <div className="bg-deep rounded-3xl p-6 border border-gold/20 shadow-sm">
+                            <p className="eyebrow mb-3 text-gold/80">Serving Snapshot</p>
+                            <h3 className="font-display text-2xl text-cream mb-3">Steward the platform well</h3>
+                            <p className="text-sm text-cream/70 leading-relaxed mb-5">
+                                Keep resources current, protect access carefully, and review open prayer and devotional workflows regularly.
+                            </p>
+                            <div className="space-y-3 text-sm text-cream/80">
+                                <div className="flex items-center justify-between gap-3">
+                                    <span>Open prayer requests</span>
+                                    <span className="font-semibold text-gold">
+                                        {overview ? overview.activePrayers : "—"}
+                                    </span>
                                 </div>
-                                <div className="flex items-center gap-3">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-gold-500" />
-                                    <span className="font-sans text-xs text-navy-300">Role: {userRole?.toUpperCase()}</span>
+                                <div className="flex items-center justify-between gap-3">
+                                    <span>Draft devotionals</span>
+                                    <span className="font-semibold text-gold">
+                                        {overview ? overview.draftDevotionals : "—"}
+                                    </span>
+                                </div>
+                                <div className="flex items-center justify-between gap-3">
+                                    <span>Featured books</span>
+                                    <span className="font-semibold text-gold">
+                                        {overview ? overview.featuredBooks : "—"}
+                                    </span>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="pt-10 border-t border-navy-800/80">
-                            <p className="font-sans text-[10px] font-bold tracking-[0.3em] uppercase text-gold-500/50 mb-6">Admin Note</p>
-                            <p className="font-display italic text-base text-navy-300 leading-relaxed">
-                                &ldquo;Whatever you do, work at it with all your heart, as working for the Lord.&rdquo;
+                        <div className="bg-warm-white border border-mid/20 rounded-3xl p-6 shadow-sm">
+                            <p className="eyebrow mb-3">Role Scope</p>
+                            <h3 className="font-display text-2xl text-deep mb-3">
+                                {(userRole || "member").toUpperCase()} access
+                            </h3>
+                            <p className="text-sm text-deep/70 leading-relaxed">
+                                Leaders can access content and ministry tools. User management remains reserved for full admin accounts.
                             </p>
-                            <p className="text-[10px] font-sans text-gold-600 uppercase tracking-widest mt-4">Colossians 3:23</p>
                         </div>
                     </div>
-
-                    <AdminSignOutButton className="mt-auto flex items-center gap-3 text-navy-400 hover:text-red-400 transition-colors py-4 border-t border-navy-800/80 font-sans text-xs font-bold uppercase tracking-widest" />
                 </div>
             </div>
-
-            <main className="flex-1 min-w-0 bg-cream-50 overflow-y-auto">
-                <div className="lg:hidden flex items-center justify-between p-6 bg-navy-950 border-b border-gold-500/20">
-                    <Link href="/" className="flex items-center gap-3">
-                        <img src="/images/logo.png" alt="" className="w-7 h-7" />
-                        <span className="font-display text-lg font-bold text-cream-50">Admin Panel</span>
-                    </Link>
-                    <AdminSignOutButton className="text-gold-500 font-sans text-xs font-bold uppercase tracking-[0.2em]" />
-                </div>
-
-                <div className="max-w-6xl mx-auto px-6 lg:px-12 py-12">
-                    <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6 pb-8 border-b border-cream-200">
-                        <div>
-                            <p className="font-sans text-[10px] font-bold tracking-[0.3em] uppercase text-gold-600 mb-2">Management Console</p>
-                            <h2 className="font-display text-5xl font-semibold text-navy-950">Administrative Control</h2>
-                            <p className="mt-3 font-sans text-sm text-ink-400">
-                                Signed in as <span className="font-semibold text-navy-900">{session?.user?.name || session?.user?.email}</span>
-                            </p>
-                        </div>
-                        <div className="flex gap-3">
-                            <Link href="/" className="btn-outline py-3 px-6 text-xs font-bold tracking-widest uppercase">Visit Site</Link>
-                            <button className="btn-navy py-3 px-6 text-xs font-bold tracking-widest uppercase shadow-glow-navy">Deploy Update</button>
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
-                        {[
-                            { label: "Total Members", val: "542", icon: "M12 4.354a4 4 0 110 5.292" },
-                            { label: "Conf. Reg.", val: "128", icon: "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" },
-                            { label: "Active Prayers", val: "24", icon: "M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733" },
-                            { label: "Books Shared", val: "12", icon: "M12 6.253v13m0-13C10.832 5.477" }
-                        ].map((s, i) => (
-                            <div key={i} className="bg-white p-6 rounded-2xl border border-cream-200 shadow-sm flex items-center justify-between">
-                                <div>
-                                    <p className="font-sans text-[10px] font-bold tracking-widest uppercase text-ink-300 mb-1">{s.label}</p>
-                                    <p className="font-display text-3xl font-bold text-navy-900">{s.val}</p>
-                                </div>
-                                <div className="w-10 h-10 rounded-xl bg-faint-gold/10 flex items-center justify-center text-gold-600">
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={s.icon} /></svg>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
-                        {visibleModules.map((mod) => (
-                            <Link
-                                key={mod.id}
-                                href={mod.href}
-                                className="group relative bg-white p-8 rounded-3xl border border-cream-200 shadow-sm hover:shadow-premium hover:-translate-y-1 transition-all duration-300"
-                            >
-                                <div className={`absolute top-0 right-0 w-24 h-24 bg-gradient-to-br transition-opacity duration-300 opacity-0 group-hover:opacity-100 rounded-bl-[100px] border-l border-b border-cream-100 ${
-                                    mod.color === "gold" ? "from-gold-50/40 to-white" : "from-navy-50/40 to-white"
-                                }`} />
-
-                                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-all duration-500 group-hover:scale-110 shadow-sm ${
-                                    mod.color === "gold"
-                                        ? "bg-gradient-to-br from-gold-400 to-gold-600 text-white"
-                                        : "bg-navy-900 text-gold-400"
-                                }`}>
-                                    {mod.icon}
-                                </div>
-
-                                <h3 className="font-display text-2xl font-semibold text-navy-950 mb-3 group-hover:text-gold-600 transition-colors uppercase tracking-tight">{mod.title}</h3>
-                                <p className="font-sans text-sm text-ink-400 leading-relaxed mb-8">{mod.description}</p>
-
-                                <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-gold-600 group-hover:gap-4 transition-all">
-                                    Launch Module
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
-                                </div>
-                            </Link>
-                        ))}
-                    </div>
-
-                    <div className="card-navy p-10 rounded-3xl relative overflow-hidden">
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-gold-400/5 rounded-full blur-3xl -mr-32 -mt-32" />
-                        <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
-                            <div className="max-w-md text-center md:text-left">
-                                <h3 className="font-display text-2xl font-bold text-cream-50 mb-4 tracking-tight">Security & Oversight</h3>
-                                <p className="font-sans text-xs text-navy-400 leading-relaxed uppercase tracking-widest">
-                                    All administrative actions are logged and timestamped under this session. Ensure you sign out after completing your tasks.
-                                </p>
-                            </div>
-                            <div className="flex gap-4">
-                                <div className="flex flex-col items-center px-6 py-4 rounded-2xl bg-navy-900/50 border border-navy-800">
-                                    <span className="font-display text-2xl font-bold text-gold-400">AES-256</span>
-                                    <span className="font-sans text-[8px] font-bold tracking-[0.3em] uppercase text-navy-500 mt-1">Encryption</span>
-                                </div>
-                                <div className="flex flex-col items-center px-6 py-4 rounded-2xl bg-navy-900/50 border border-navy-800">
-                                    <span className="font-display text-2xl font-bold text-gold-400">TLS 1.3</span>
-                                    <span className="font-sans text-[8px] font-bold tracking-[0.3em] uppercase text-navy-500 mt-1">Handshake</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </main>
         </div>
     );
 }
