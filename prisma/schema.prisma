@@ -140,6 +140,30 @@ model Book {
   @@map("books")
 }
 
+model Conference {
+  id                String   @id @default(cuid())
+  theme             String
+  summary           String
+  venue             String
+  timeLabel         String
+  costLabel         String   @default("Free (Registration Required)")
+  registrationUrl   String?
+  details           String?
+  startDate         DateTime
+  endDate           DateTime?
+  isOnline          Boolean  @default(false)
+  registrationOpen  Boolean  @default(false)
+  featured          Boolean  @default(false)
+  status            String   @default("DRAFT")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([status])
+  @@index([featured])
+  @@index([startDate])
+  @@map("conferences")
+}
+
 model BibleBookmark {
   id              String   @id @default(cuid())
   userId          String
@@ -168,6 +192,7 @@ model BibleBookmark {
 // Valid values for category: "GENERAL", "HEALTH", "FAMILY", etc.
 // Valid values for mood: "GRATEFUL", "JOYFUL", "HOPEFUL", etc.
 // Valid values for status: "DRAFT", "SCHEDULED", "PUBLISHED"
+// Valid values for conference status: "DRAFT", "PUBLISHED", "ARCHIVED"
 // Valid values for difficulty: "BEGINNER", "INTERMEDIATE", "ADVANCED"
 // Valid values for color: "YELLOW", "GREEN", "BLUE", "PINK", "PURPLE"
 

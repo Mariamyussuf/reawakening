@@ -8,6 +8,28 @@ import prisma from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
+async function getConferenceOverview() {
+    try {
+        const [totalConferences, publishedConferences, openConferenceRegistrations] = await Promise.all([
+            prisma.conference.count(),
+            prisma.conference.count({ where: { status: 'PUBLISHED' } }),
+            prisma.conference.count({ where: { status: 'PUBLISHED', registrationOpen: true } }),
+        ]);
+
+        return {
+            totalConferences,
+            publishedConferences,
+            openConferenceRegistrations,
+        };
+    } catch {
+        return {
+            totalConferences: 0,
+            publishedConferences: 0,
+            openConferenceRegistrations: 0,
+        };
+    }
+}
+
 export async function GET(request: NextRequest) {
     const rateLimitResponse = await rateLimiters.admin(request);
     if (rateLimitResponse) {
@@ -16,6 +38,8 @@ export async function GET(request: NextRequest) {
 
     try {
         const session = await requireAdminOrLeader();
+
+        const conferenceOverview = await getConferenceOverview();
 
         const [
             totalUsers,
@@ -60,6 +84,9 @@ export async function GET(request: NextRequest) {
                 totalMembers,
                 totalBooks,
                 featuredBooks,
+                totalConferences: conferenceOverview.totalConferences,
+                publishedConferences: conferenceOverview.publishedConferences,
+                openConferenceRegistrations: conferenceOverview.openConferenceRegistrations,
                 totalDevotionals,
                 publishedDevotionals,
                 draftDevotionals,

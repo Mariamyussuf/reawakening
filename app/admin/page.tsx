@@ -20,6 +20,9 @@ interface DashboardOverview {
     totalMembers: number;
     totalBooks: number;
     featuredBooks: number;
+    totalConferences: number;
+    publishedConferences: number;
+    openConferenceRegistrations: number;
     totalDevotionals: number;
     publishedDevotionals: number;
     draftDevotionals: number;
@@ -130,7 +133,7 @@ function getModuleMeta(moduleId: AdminModuleId, overview: DashboardOverview) {
         case "users":
             return `${overview.totalUsers} total users`;
         case "conferences":
-            return `${overview.totalLeaders + overview.totalAdmins} leadership accounts active`;
+            return `${overview.publishedConferences} published, ${overview.openConferenceRegistrations} open registrations`;
         case "archive":
             return `${overview.totalDevotionals + overview.totalBooks} content items available`;
         case "verses":

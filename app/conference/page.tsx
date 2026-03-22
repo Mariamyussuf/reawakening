@@ -1,11 +1,15 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import type { Metadata } from "next";
+import { serializeConference } from "@/lib/conferences";
+import prisma from "@/lib/prisma";
 
 export const metadata: Metadata = {
     title: "Conference | Reawakening Ministry",
     description: "Join us for our next post-exam conference focused on spiritual renewal, teaching, prayer, and worship.",
 };
+
+export const dynamic = "force-dynamic";
 
 // Icons
 const CalendarIcon = () => (
@@ -57,16 +61,28 @@ const FellowshipIcon = () => (
     </svg>
 );
 
-export default function ConferencePage() {
-    // This would typically come from a CMS or database
-    const upcomingConference = {
-        theme: "Anchored in Hope",
-        date: "March 15-16, 2026",
-        time: "9:00 AM - 5:00 PM",
-        venue: "Community Hall, Campus Center",
-        isOnline: false,
-        registrationOpen: true,
-    };
+async function getUpcomingConference() {
+    try {
+        const conference = await prisma.conference.findFirst({
+            where: {
+                status: "PUBLISHED",
+            },
+            orderBy: [
+                { featured: "desc" },
+                { startDate: "asc" },
+                { createdAt: "desc" },
+            ],
+        });
+
+        return conference ? serializeConference(conference) : null;
+    } catch {
+        return null;
+    }
+}
+
+export default async function ConferencePage() {
+    const upcomingConference = await getUpcomingConference();
+    const registrationHref = upcomingConference?.registrationUrl || (upcomingConference?.registrationOpen ? "#registration" : "/contact");
 
     return (
         <>
@@ -89,17 +105,17 @@ export default function ConferencePage() {
                 </section>
 
                 {/* Upcoming Conference */}
-                {upcomingConference.registrationOpen ? (
+                {upcomingConference ? (
                     <section className="bg-cream py-16 md:py-24">
                         <div className="container-page">
                             <div className="max-w-4xl mx-auto">
                                 <div className="bg-deep border border-gold/20 rounded-lg p-8 md:p-12">
                                     <div className="text-center mb-10">
                                         <span className="inline-block bg-gold/20 text-gold px-4 py-1.5 rounded-full text-xs font-medium tracking-wide uppercase mb-4">
-                                            Upcoming Conference
+                                            {upcomingConference.registrationOpen ? "Upcoming Conference" : "Conference Update"}
                                         </span>
                                         <h2 className="font-display text-4xl md:text-5xl text-cream mb-3">{upcomingConference.theme}</h2>
-                                        <p className="text-cream/60">Join us for a time of spiritual renewal and growth</p>
+                                        <p className="text-cream/60">{upcomingConference.summary}</p>
                                     </div>
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
@@ -107,7 +123,7 @@ export default function ConferencePage() {
                                             <CalendarIcon />
                                             <div>
                                                 <h3 className="font-display text-lg text-cream">Date</h3>
-                                                <p className="text-cream/60">{upcomingConference.date}</p>
+                                                <p className="text-cream/60">{upcomingConference.dateLabel}</p>
                                             </div>
                                         </div>
 
@@ -115,15 +131,15 @@ export default function ConferencePage() {
                                             <ClockIcon />
                                             <div>
                                                 <h3 className="font-display text-lg text-cream">Time</h3>
-                                                <p className="text-cream/60">{upcomingConference.time}</p>
+                                                <p className="text-cream/60">{upcomingConference.timeLabel}</p>
                                             </div>
                                         </div>
 
                                         <div className="flex items-start space-x-4 bg-deep-2 rounded-lg p-4 border border-gold/10">
                                             <LocationIcon />
                                             <div>
-                                                <h3 className="font-display text-lg text-cream">Venue</h3>
-                                                <p className="text-cream/60">{upcomingConference.venue}</p>
+                                                <h3 className="font-display text-lg text-cream">{upcomingConference.isOnline ? "Format" : "Venue"}</h3>
+                                                <p className="text-cream/60">{upcomingConference.isOnline ? "Online Event" : upcomingConference.venue}</p>
                                             </div>
                                         </div>
 
@@ -131,14 +147,14 @@ export default function ConferencePage() {
                                             <TicketIcon />
                                             <div>
                                                 <h3 className="font-display text-lg text-cream">Cost</h3>
-                                                <p className="text-cream/60">Free (Registration Required)</p>
+                                                <p className="text-cream/60">{upcomingConference.costLabel}</p>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div className="text-center">
-                                        <a href="#registration" className="btn-primary inline-block">
-                                            Register Now
+                                        <a href={registrationHref} className="btn-primary inline-block">
+                                            {upcomingConference.registrationOpen ? "Register Now" : "Stay Updated"}
                                         </a>
                                     </div>
                                 </div>
@@ -152,9 +168,9 @@ export default function ConferencePage() {
                                 <svg className="w-16 h-16 text-mid/40 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>
-                                <h2 className="font-display text-3xl text-deep mb-3">No Upcoming Conference</h2>
+                                <h2 className="font-display text-3xl text-deep mb-3">No Published Conference Yet</h2>
                                 <p className="text-deep/70 mb-6">
-                                    We&apos;ll announce our next conference soon. Check back here or subscribe to our updates.
+                                    Publish a conference from the admin workspace and it will appear here automatically.
                                 </p>
                                 <a href="/contact" className="btn-outline inline-block">
                                     Stay Updated
@@ -218,7 +234,7 @@ export default function ConferencePage() {
                 </section>
 
                 {/* Registration Form */}
-                {upcomingConference.registrationOpen && (
+                {upcomingConference?.registrationOpen && !upcomingConference.registrationUrl && (
                     <section id="registration" className="bg-cream py-16 md:py-24">
                         <div className="container-page">
                             <div className="max-w-2xl mx-auto">
